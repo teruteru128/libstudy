@@ -1,3 +1,7 @@
+2020-06-23  gettextize  <bug-gnu-gettext@gnu.org>
+
+	* Makefile.in.in: New file, from gettext-0.19.8.1.
+
 2020-06-16  gettextize  <bug-gnu-gettext@gnu.org>
 
 	* Makefile.in.in: New file, from gettext-0.19.8.1.

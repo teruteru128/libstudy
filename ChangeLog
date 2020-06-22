@@ -1,3 +1,7 @@
+2020-06-23  gettextize  <bug-gnu-gettext@gnu.org>
+
+	* configure.ac (AC_CONFIG_FILES): Add po/Makefile.in.
+
 2020-06-16  gettextize  <bug-gnu-gettext@gnu.org>
 
 	* Makefile.am (SUBDIRS): Add intl.
