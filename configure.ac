@@ -8,7 +8,6 @@ AC_CONFIG_SRCDIR([src/study.c])
 AC_CONFIG_HEADERS([config.h])
 AC_CANONICAL_HOST
 AC_CONFIG_MACRO_DIRS([m4])
-AM_GNU_GETTEXT_INTL_SUBDIR
 AM_PROG_LIBTOOL
 LT_INIT
 
@@ -32,7 +31,7 @@ AC_TYPE_UINT8_T
 AC_CHECK_TYPES([ptrdiff_t])
 
 # Checks for library functions.
-AM_GNU_GETTEXT
+AM_GNU_GETTEXT([external])
 AC_FUNC_MALLOC
 AC_FUNC_MBRTOWC
 AC_FUNC_MMAP
@@ -42,7 +41,6 @@ AC_ENABLE_SHARED
 
 AC_CONFIG_FILES([Makefile
     include/Makefile
-    intl/Makefile
     po/Makefile.in
     src/Makefile
 ])
