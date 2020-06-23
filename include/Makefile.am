@@ -1,4 +1,23 @@
 
 include_HEADERS  =
-include_HEADERS += study.h
+include_HEADERS += aes.h
+include_HEADERS += arg.h
+include_HEADERS += arg_parse.h
 include_HEADERS += base64.h
+include_HEADERS += java_random.h
+include_HEADERS += md5.h
+include_HEADERS += numsys.h
+include_HEADERS += orz.h
+include_HEADERS += print_addrinfo.h
+include_HEADERS += printint.h
+include_HEADERS += queue.h
+include_HEADERS += random.h
+include_HEADERS += sha.h
+include_HEADERS += sha-1.h
+include_HEADERS += sha-2.h
+include_HEADERS += sha-3.h
+include_HEADERS += string_array.h
+include_HEADERS += string_joiner.h
+include_HEADERS += string_list.h
+include_HEADERS += study.h
+include_HEADERS += svgplot.h
