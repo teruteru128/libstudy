@@ -2,6 +2,7 @@ SUBDIRS  =
 SUBDIRS += include
 SUBDIRS += po
 SUBDIRS += src
+SUBDIRS += tests
 
 ACLOCAL_AMFLAGS = -I m4
 
