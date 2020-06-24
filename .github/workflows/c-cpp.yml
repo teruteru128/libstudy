@@ -13,6 +13,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - name: Install dependents
+      run: |
+        sudo apt update
+        sudo apt install autopoint
     - name: autogen.sh
       run: ./autogen.sh
     - name: configure
