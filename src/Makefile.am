@@ -24,5 +24,6 @@ libstudy_la_SOURCES += string_joiner.c
 libstudy_la_SOURCES += string_list.c
 libstudy_la_SOURCES += study.c
 libstudy_la_SOURCES += svgplot.c
+libstudy_la_SOURCES += xorshift.c
 
 AM_CPPFLAGES = -I$(srcdir)/.. $(top_srcdir)/include $(all_includes)

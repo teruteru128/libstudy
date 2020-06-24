@@ -21,3 +21,4 @@ include_HEADERS += string_joiner.h
 include_HEADERS += string_list.h
 include_HEADERS += study.h
 include_HEADERS += svgplot.h
+include_HEADERS += xorshift.h
