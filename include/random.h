@@ -22,7 +22,7 @@ Random *setSeed(Random *, int64_t);
 int32_t next(Random *, int32_t);
 int64_t nextLong(Random *);
 int32_t nextInt(Random *);
-int32_t nextIntWithRange(Random *, int32_t);
+int32_t nextIntWithBounds(Random *, int32_t);
 double nextDouble(Random *);
 
 void init_genrand64(uint64_t);
@@ -33,10 +33,5 @@ double genrand64_real1(void);
 double genrand64_real2(void);
 double genrand64_real3(void);
 int nextBytes(unsigned char *buf, size_t len);
-
-// java.util.Random 内部状態計算ユーティリティ
-int64_t p(int64_t);
-int64_t pInverse(int64_t);
-int64_t initializeSeed(int64_t);
 
 #endif

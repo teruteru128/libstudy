@@ -35,7 +35,7 @@ int32_t nextInt(Random *rnd)
     return next(rnd, 32);
 }
 
-int32_t nextIntWithRange(Random *rnd, int32_t bound)
+int32_t nextIntWithBounds(Random *rnd, int32_t bound)
 {
     if (bound <= 0)
     {
@@ -55,4 +55,18 @@ int32_t nextIntWithRange(Random *rnd, int32_t bound)
             ;
     }
     return r;
+}
+
+// 
+// nextもrandomも使われているので適当にpとする
+int64_t p(int64_t seed) {
+  return (seed * 0x5DEECE66DL + 0xBL) & 0xFFFFFFFFFFFFL;
+}
+
+int64_t pInverse(int64_t seed) {
+  return (seed - 0xBL) * 0xDFE05BCB1365L & 0xFFFFFFFFFFFFL;
+}
+
+int64_t initializeSeed(int64_t seed) {
+  return (seed ^ 0x5DEECE66DL) & 0xFFFFFFFFFFFFL;
 }
