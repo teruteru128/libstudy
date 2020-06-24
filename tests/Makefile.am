@@ -1,4 +1,4 @@
 
 METASOURCES=AUTO
 check_PROGRAMS=
-TESTS=
+TESTS=test.sh

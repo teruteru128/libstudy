@@ -43,6 +43,7 @@ AC_ENABLE_SHARED
 AC_CONFIG_FILES([Makefile
     include/Makefile
     po/Makefile.in
+    tests/Makefile
     src/Makefile
 ])
 AC_OUTPUT
