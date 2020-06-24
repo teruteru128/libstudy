@@ -8,6 +8,8 @@ libstudy_la_SOURCES += arg_parse.c
 libstudy_la_SOURCES += base64.c
 libstudy_la_SOURCES += internal_queue.h
 libstudy_la_SOURCES += internal_random.h
+libstudy_la_SOURCES += internal_string_array.h
+libstudy_la_SOURCES += internal_string_list.h
 libstudy_la_SOURCES += java_random.c
 libstudy_la_SOURCES += md5.c
 libstudy_la_SOURCES += numsys.c
@@ -27,4 +29,5 @@ libstudy_la_SOURCES += study.c
 libstudy_la_SOURCES += svgplot.c
 libstudy_la_SOURCES += xorshift.c
 
-AM_CPPFLAGES = -I$(srcdir)/.. $(top_srcdir)/include $(all_includes)
+## "本当に"これが正しいんですか？
+AM_CPPFLAGS = -I$(top_srcdir)/include
