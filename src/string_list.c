@@ -1,6 +1,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include "string_list.h"
 #include "internal_string_list.h"
 
 /*
