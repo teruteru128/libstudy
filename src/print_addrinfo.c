@@ -7,7 +7,6 @@
 #include <netdb.h>
 
 #include <stdio.h>
-#include "print_addrinfo.h"
 
 /**
  * アドレスとポート番号を表示する。

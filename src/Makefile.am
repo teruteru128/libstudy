@@ -6,6 +6,7 @@ libstudy_la_SOURCES += aes.c
 libstudy_la_SOURCES += arg.c
 libstudy_la_SOURCES += arg_parse.c
 libstudy_la_SOURCES += base64.c
+libstudy_la_SOURCES += internal_queue.h
 libstudy_la_SOURCES += internal_random.h
 libstudy_la_SOURCES += java_random.c
 libstudy_la_SOURCES += md5.c

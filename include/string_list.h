@@ -2,12 +2,9 @@
 #ifndef STRING_LIST_H
 #define STRING_LIST_H (1)
 
+#include <stdio.h>
+
 typedef struct string_list string_list;
-typedef struct string_list
-{
-    char *str;
-    string_list *next;
-} string_list;
 
 string_list *string_list_add(string_list *, char *);
 string_list *str_split(char *, char *);

@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "string_array.h"
+#include "internal_string_array.h"
 
 string_array *string_array_create(size_t initialCapacity)
 {
