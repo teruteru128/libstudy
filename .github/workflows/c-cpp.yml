@@ -17,7 +17,7 @@ jobs:
       - name: Install dependents
         run: |
           sudo apt update
-          sudo apt install autopoint
+          sudo apt install autopoint libcurl4-gnutls-dev libgmp-dev libsodium-dev libupnp-dev libxmlrpc-core-c3-dev uuid-dev
       - name: autogen.sh
         run: ./autogen.sh
       - name: configure
