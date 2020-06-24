@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <stdint.h>
 #include "internal_random.h"
-#include "random.h"
 
 static int64_t initialScramble(uint64_t seed)
 {
@@ -55,6 +54,11 @@ int32_t nextIntWithBounds(Random *rnd, int32_t bound)
             ;
     }
     return r;
+}
+
+double nextDouble(Random *rnd)
+{
+  return (((int64_t)(next(rnd, 26)) << 27) + next(rnd, 27)) * DOUBLE_UNIT;
 }
 
 // 

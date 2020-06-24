@@ -4,16 +4,14 @@
 
 #include <stdint.h>
 
-typedef struct random_t
-{
-  int64_t seed;
-} Random;
+typedef struct random_t Random;
 
 Random *setSeed(Random *, int64_t);
 int32_t next(Random *, int32_t);
 int64_t nextLong(Random *);
 int32_t nextInt(Random *);
 int32_t nextIntWithBounds(Random *, int32_t);
+double nextDouble(Random *);
 
 // java.util.Random 内部状態計算ユーティリティ
 int64_t p(int64_t);
