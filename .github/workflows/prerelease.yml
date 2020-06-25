@@ -29,28 +29,28 @@ jobs:
         run: make check  -j
       - name: make distcheck
         run: make distcheck  -j
-    - name: Create a Release
-      id: create_release
-      uses: actions/create-release@v1.1.0
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        # The name of the tag. This should come from the webhook payload, `github.GITHUB_REF` when a user pushes a new tag
-        tag_name: ${{ github.ref }}
-        # The name of the release. For example, `Release v1.0.1`
-        release_name: Release ${{ github.ref }}
-        draft: false
-        prerelease: true
-    - name: Upload a Release Asset
-      uses: actions/upload-release-asset@v1.0.2
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        # The URL for uploading assets to the release
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        # The path to the asset you want to upload
-        asset_path: libstudy-1.0.0.tar.gz
-        # The name of the asset you want to upload
-        asset_name: libstudy-1.0.0.tar.gz
-        # The content-type of the asset you want to upload. See the supported Media Types here: https://www.iana.org/assignments/media-types/media-types.xhtml for more information
-        asset_content_type: application/gzip
+      - name: Create a Release
+        id: create_release
+        uses: actions/create-release@v1.1.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          # The name of the tag. This should come from the webhook payload, `github.GITHUB_REF` when a user pushes a new tag
+          tag_name: ${{ github.ref }}
+          # The name of the release. For example, `Release v1.0.1`
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: true
+      - name: Upload a Release Asset
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          # The URL for uploading assets to the release
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          # The path to the asset you want to upload
+          asset_path: libstudy-1.0.0.tar.gz
+          # The name of the asset you want to upload
+          asset_name: libstudy-1.0.0.tar.gz
+          # The content-type of the asset you want to upload. See the supported Media Types here: https://www.iana.org/assignments/media-types/media-types.xhtml for more information
+          asset_content_type: application/gzip
