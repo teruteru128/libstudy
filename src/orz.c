@@ -10,7 +10,7 @@
 
 #define URANDOM_PATH "/dev/urandom"
 #define BUF_SIZE 8
-#include "random.h"
+#include <random.h>
 
 int orz(int num)
 {
