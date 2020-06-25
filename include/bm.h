@@ -31,6 +31,16 @@ typedef struct connectioninfo_t
 } connectioninfo;
 
 /* int ripe(ripectx, signpub, encpub) */
-size_t ripe(RIPE_CTX *, unsigned char *signpub, unsigned char *encpub);
+size_t ripe(RIPE_CTX *, unsigned char *, unsigned char *);
+char *encodeVarint(unsigned long);
+char *encodeBase58();
+char *encodeAddress0(int, int, char *, int);
+char *encodeAddress(int, int, char *);
+char *encodeV4Address(char *);
+char *encodeV3Address(char *ripe);
+char *encodeShorterV3Address(char *);
+char *encodeWIF(char *);
+char *formatKey(char *, char *, char *);
+int exportAddress(unsigned char *, unsigned char *, unsigned char *, unsigned char *, unsigned char *);
 
 #endif
