@@ -31,5 +31,5 @@ jobs:
       - name: Save artifact
         uses: actions/upload-artifact@v2.0.1
         with:
-          name: libstudy-1.0.0-alpha1.tar.gz
-          path: libstudy-1.0.0-alpha1.tar.gz
+          name: libstudy-1.0.0.tar.gz
+          path: libstudy-1.0.0.tar.gz
