@@ -3,8 +3,8 @@ lib_LTLIBRARIES += libstudy.la
 
 libstudy_la_SOURCES  =
 libstudy_la_SOURCES += aes.c
-libstudy_la_SOURCES += arg.c
-libstudy_la_SOURCES += arg_parse.c
+libstudy_la_SOURCES += args.c
+libstudy_la_SOURCES += args_parse.c
 libstudy_la_SOURCES += base64.c
 libstudy_la_SOURCES += bitmessage.c
 libstudy_la_SOURCES += bitset.c

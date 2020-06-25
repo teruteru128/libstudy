@@ -1,8 +1,8 @@
 
 include_HEADERS  =
 include_HEADERS += aes.h
-include_HEADERS += arg.h
-include_HEADERS += arg_parse.h
+include_HEADERS += args.h
+include_HEADERS += args_parse.h
 include_HEADERS += base64.h
 include_HEADERS += bitmessage.h
 include_HEADERS += bitset.h
