@@ -14,8 +14,8 @@ int32_t nextIntWithBounds(Random *, int32_t);
 double nextDouble(Random *);
 
 // java.util.Random 内部状態計算ユーティリティ
-int64_t p(int64_t);
-int64_t pInverse(int64_t);
+int64_t n(int64_t);
+int64_t nInverse(int64_t);
 int64_t initializeSeed(int64_t);
 
 #endif

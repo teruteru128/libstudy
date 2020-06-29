@@ -63,14 +63,16 @@ double nextDouble(Random *rnd)
 
 // 
 // nextもrandomも使われているので適当にpとする
-int64_t p(int64_t seed) {
-  return (seed * 0x5DEECE66DL + 0xBL) & 0xFFFFFFFFFFFFL;
+// rかn関数のほうがいいかな？
+// next関数の略としてn
+int64_t n(int64_t seed) {
+  return (seed * MULTIPLIER + ADDEND) & MASK;
 }
 
-int64_t pInverse(int64_t seed) {
-  return (seed - 0xBL) * 0xDFE05BCB1365L & 0xFFFFFFFFFFFFL;
+int64_t nInverse(int64_t seed) {
+  return (seed - ADDEND) * INVERSE_MULTIPLIER & MASK;
 }
 
 int64_t initializeSeed(int64_t seed) {
-  return (seed ^ 0x5DEECE66DL) & 0xFFFFFFFFFFFFL;
+  return (seed ^ MULTIPLIER) & MASK;
 }
