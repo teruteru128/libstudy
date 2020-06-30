@@ -9,6 +9,7 @@ include_HEADERS += bitset.h
 include_HEADERS += bm.h
 include_HEADERS += bmapi.h
 include_HEADERS += charset-convert.h
+include_HEADERS += epsp_data_type.h
 include_HEADERS += epsp-parser.h
 include_HEADERS += java_random.h
 include_HEADERS += md5.h
