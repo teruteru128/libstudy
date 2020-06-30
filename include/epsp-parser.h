@@ -4,15 +4,7 @@
 
 #include "string_list.h"
 #include "string_array.h"
-
-// TODO move to epsp_protocol.h
-typedef struct epsp_packet_t{
-  int code;
-  int hop_count;
-  char* code_str;
-  char* hop_count_str;
-  string_array* data;
-} epsp_packet;
+#include "epsp_data_type.h"
 
 epsp_packet* epsp_packet_parse(char* line);
 
