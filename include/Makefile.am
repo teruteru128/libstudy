@@ -25,6 +25,7 @@ include_HEADERS += sha.h
 include_HEADERS += string_array.h
 include_HEADERS += string_joiner.h
 include_HEADERS += string_list.h
+include_HEADERS += strjoin.h
 include_HEADERS += study.h
 include_HEADERS += svgplot.h
 include_HEADERS += xmlrpc.h

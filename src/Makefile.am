@@ -31,6 +31,7 @@ libstudy_la_SOURCES += sha.c
 libstudy_la_SOURCES += string_array.c
 libstudy_la_SOURCES += string_joiner.c
 libstudy_la_SOURCES += string_list.c
+libstudy_la_SOURCES += strjoin.c
 libstudy_la_SOURCES += study.c
 libstudy_la_SOURCES += svgplot.c
 libstudy_la_SOURCES += xmlrpc.c
