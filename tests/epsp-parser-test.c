@@ -1,4 +1,5 @@
 
+#include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -32,6 +33,7 @@ int main(int argc, char *argv[])
   FILE *in = fopen("epsp-packet-sample-success.txt", "r");
   if(!in)
   {
+    perror("fopen");
     return EXIT_FAILURE;
   }
   char buf[BUFSIZ];
@@ -44,6 +46,7 @@ int main(int argc, char *argv[])
   int r = fclose(in);
   if(r)
   {
+    perror("fopen");
     return EXIT_FAILURE;
   }
   /*
