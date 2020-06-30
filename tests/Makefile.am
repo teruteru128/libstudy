@@ -2,7 +2,7 @@
 METASOURCES=AUTO
 check_PROGRAMS=epsp-parser-test
 TESTS=test.sh epsp-parser-test
-EXTRA_DIST=test.sh
+EXTRA_DIST=test.sh epsp-packet-sample-fail.txt epsp-packet-sample-success.txt
 
 AM_CPPFLAGS = -I$(top_srcdir)/include
 
