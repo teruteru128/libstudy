@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 //Joinを1関数で完結させるのはまずいような？
 char *strjoin(char *delimiter, char **array, size_t arraylen)

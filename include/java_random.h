@@ -1,6 +1,6 @@
 
-#ifndef RANDOM_H
-#define RANDOM_H
+#ifndef JAVA_RANDOM_H
+#define JAVA_RANDOM_H
 
 #include <stdint.h>
 

@@ -38,4 +38,4 @@ libstudy_la_SOURCES += xmlrpc.c
 libstudy_la_SOURCES += xorshift.c
 
 ## "本当に"これが正しいんですか？
-AM_CPPFLAGS = -I$(top_srcdir)/include
+AM_CPPFLAGS =-Wall -Wextra -Wdisabled-optimization -I$(top_srcdir)/include

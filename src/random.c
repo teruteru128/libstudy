@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <xorshift.h>
 #include "internal_random.h"
 
 int read_file(const char *const path, void *buf, const size_t size, const size_t nmemb)
@@ -44,16 +45,6 @@ size_t read_random(void *buf, const size_t size, size_t nmemb, int use_true_rand
 static int64_t initialScramble(uint64_t seed)
 {
   return (seed ^ MULTIPLIER) & MASK;
-}
-
-#define DOUBLE_UNIT 0x1.0p-53
-
-double nextDoubleXor()
-{
-  static uint32_t y = 2463534242;
-  uint32_t z1 = y = xorshift(y);
-  uint32_t z2 = y = xorshift(y);
-  return (((int64_t)(z1 & 0x3ffffff) << 27) + (z2 & 0x7ffffff)) * DOUBLE_UNIT;
 }
 
 #define NN 312

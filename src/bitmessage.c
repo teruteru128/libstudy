@@ -2,6 +2,7 @@
 #include "config.h"
 #include <stdio.h>
 
+#include "args.h"
 #include "bitmessage.h"
 #include "bm.h"
 

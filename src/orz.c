@@ -7,6 +7,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <xorshift.h>
 
 #define URANDOM_PATH "/dev/urandom"
 #define BUF_SIZE 8
