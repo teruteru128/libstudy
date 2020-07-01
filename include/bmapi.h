@@ -1,17 +1,19 @@
 
-#ifndef API_H
-#define API_H
+#ifndef BMAPI_H
+#define BMAPI_H
 #include <stdarg.h>
 #include <string.h>
 #include <xmlrpc.h>
 #include <xmlrpc_client.h>
 
+// TODO: 実装をinternalへ移す
 typedef struct bm_client_t
 {
   xmlrpc_client *cp;
   xmlrpc_server_info *sinfo;
 } bm_client;
 
+bm_client *bm_client_new();
 int bmapi_init(void);
 int bmapi_cleanup();
 char *bmapi_helloWorld(char*, char*);

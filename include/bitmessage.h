@@ -2,7 +2,8 @@
 #ifndef BITMESSAGE_H
 #define BITMESSAGE_H
 
-struct arg_t{};
+#include <args.h>
+
 int BM_init(void);
 
 #endif // BITMESSAGE_H 

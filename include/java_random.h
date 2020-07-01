@@ -6,6 +6,10 @@
 
 typedef struct random_t Random;
 
+// Random *Random_constructor();
+// int Random_destructor(Random *);
+// Random *random_new();
+// int random_free(Random *);
 Random *setSeed(Random *, int64_t);
 int32_t next(Random *, int32_t);
 int64_t nextLong(Random *);
