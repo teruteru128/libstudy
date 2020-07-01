@@ -30,7 +30,10 @@ void print_reg_error(int errorcode, regex_t *buf)
 */
 int main(int argc, char *argv[])
 {
-  FILE *in = fopen("epsp-packet-sample-success.txt", "r");
+  char pathbuf[4096];
+  snprintf(pathbuf, 4096, "%s/epsp-packet-sample-success.txt", getenv("srcdir"));
+  printf("%s\n", pathbuf);
+  FILE *in = fopen(pathbuf, "r");
   if(!in)
   {
     perror("fopen");
