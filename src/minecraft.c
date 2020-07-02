@@ -1,7 +1,9 @@
 
+#include <stdio.h>
 #include <stdint.h>
 
 #define MC_CACHE_SIZE 1250
+#define OFFSET ((MC_CACHE_SIZE + 1) / 2)
 
 int64_t s(int64_t seed, int32_t x, int32_t z)
 {
@@ -13,22 +15,21 @@ static int64_t memoZ[MC_CACHE_SIZE];
 
 void mc_slime_init()
 {
-  int32_t pos = 0;
-  const int32_t offset = (MC_CACHE_SIZE + 1) / 2;
-  int32_t square = 0;
-  int32_t x1;
-  for (int i = 0; i < MC_CACHE_SIZE; i++)
+  uint64_t pos = 0;
+  uint64_t square = 0;
+  //int64_t x1, x2;
+  for (size_t i = 0; i < MC_CACHE_SIZE; i++)
   {
-    pos = i - offset;
+    pos = i - OFFSET;
     square = pos * pos;
-    memoX[i] = 0L + (long)(pos * pos * 0x4c1906) + (long)(pos * 0x5ac0db);
+    memoX[i] = square * 0x4c1906 + pos * 0x5ac0db;
     memoZ[i] = pos * pos * 0x4307a7L + pos * 0x5f24f;
   }
 }
 
 int64_t s1(int64_t seed, int32_t x, int32_t z)
 {
-  return (seed + memoX[x + 625] + memoZ[z + 625]) ^ 0x3ad8025f;
+  return (seed + memoX[x + OFFSET] + memoZ[z + OFFSET]) ^ 0x3ad8025f;
 }
 
 int64_t s2(int64_t seed, int32_t x, int32_t z)
