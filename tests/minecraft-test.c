@@ -15,13 +15,20 @@ void s1test()
     int32_t x;
     int32_t z;
     char msg[64];
+    int64_t cseed = 0;
+    int64_t cseed1 = 0;
     for(z = -625; z < -615; z++)
     {
         for(x = -625; x < 625; x++)
         {
-            //CU_ASSERT(s(seed, x, z) == s1(seed, x, z));
+            cseed = s(seed, x, z);
+            cseed1 = s1(seed, x, z);
             snprintf(msg, 64, "s(%ld, %d, %d) == s1(%ld, %d, %d)", seed, x, z, seed, x, z);
-            CU_assertImplementation((s(seed, x, z) == s1(seed, x, z)), __LINE__, msg, __FILE__, "", CU_FALSE);
+            CU_assertImplementation(cseed == cseed1, __LINE__, msg, __FILE__, "", CU_FALSE);
+            if(cseed != cseed1)
+            {
+                fprintf(stderr, "(%ld, %d, %d) : %ld, %ld\n", seed, x, z, cseed, cseed1);
+            }
         }
     }
 }
@@ -36,7 +43,6 @@ void s2test()
     {
         for(x = -625; x < 625; x++)
         {
-            //CU_ASSERT(s(seed, x, z) == s2(seed, x, z));
             snprintf(msg, 64, "s(%ld, %d, %d) == s2(%ld, %d, %d)", seed, x, z, seed, x, z);
             CU_assertImplementation((s(seed, x, z) == s2(seed, x, z)), __LINE__, msg, __FILE__, "", CU_FALSE);
         }
@@ -50,7 +56,7 @@ int main(int argc, char** argv)
     CU_initialize_registry();
     testSuite = CU_add_suite("minecraft test suite", NULL, NULL);
 
-    //CU_add_test(testSuite, "s1test", s1test);
+    CU_add_test(testSuite, "s1test", s1test);
     CU_add_test(testSuite, "s2test", s2test);
 
     CU_basic_set_mode(CU_BRM_NORMAL);

@@ -15,8 +15,8 @@ static int64_t memoZ[MC_CACHE_SIZE];
 
 void mc_slime_init()
 {
-  uint64_t pos = 0;
-  uint64_t square = 0;
+  int64_t pos = 0;
+  int64_t square = 0;
   //int64_t x1, x2;
   for (size_t i = 0; i < MC_CACHE_SIZE; i++)
   {
