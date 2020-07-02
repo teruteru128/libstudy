@@ -13,6 +13,7 @@ include_HEADERS += epsp_data_type.h
 include_HEADERS += epsp-parser.h
 include_HEADERS += java_random.h
 include_HEADERS += md5.h
+include_HEADERS += minecraft.h
 include_HEADERS += numsys.h
 include_HEADERS += orz.h
 include_HEADERS += print_addrinfo.h

@@ -18,6 +18,7 @@ libstudy_la_SOURCES += internal_string_array.h
 libstudy_la_SOURCES += internal_string_list.h
 libstudy_la_SOURCES += java_random.c
 libstudy_la_SOURCES += md5.c
+libstudy_la_SOURCES += minecraft.c
 libstudy_la_SOURCES += numsys.c
 libstudy_la_SOURCES += orz.c
 libstudy_la_SOURCES += print_addrinfo.c

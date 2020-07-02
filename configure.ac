@@ -15,6 +15,11 @@ LT_INIT
 AC_PROG_CC
 
 # Checks for libraries.
+AC_CHECK_LIB([crypto], [main], [], [AC_MSG_FAILURE([could not find lib crypto])])
+AC_CHECK_LIB([xmlrpc], [main], [], [AC_MSG_FAILURE([could not find lib xmlrpc])])
+AC_CHECK_LIB([xmlrpc_client], [main], [], [AC_MSG_FAILURE([could not find lib xmlrpc_client])])
+AC_CHECK_LIB([xmlrpc_server], [main], [], [AC_MSG_FAILURE([could not find lib xmlrpc_server])])
+AC_CHECK_LIB([cunit], [main], [], [AC_MSG_FAILURE([could not find lib cunit])])
 
 # Checks for header files.
 AC_FUNC_ALLOCA
