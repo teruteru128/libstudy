@@ -9,7 +9,7 @@
 #include <CUnit/Basic.h>
 #include <minecraft.h>
 
-void s1test()
+static void s1test()
 {
     int64_t seed = 0;
     int32_t x;
@@ -17,6 +17,7 @@ void s1test()
     char msg[64];
     int64_t cseed = 0;
     int64_t cseed1 = 0;
+    for(seed = 0; seed < 5500; seed++)
     for(z = -625; z < -615; z++)
     {
         for(x = -625; x < 625; x++)
@@ -33,12 +34,13 @@ void s1test()
     }
 }
 
-void s2test()
+static void s2test()
 {
     int64_t seed = 0;
     int32_t x;
     int32_t z;
     char msg[64];
+    for(seed = 0; seed < 5500; seed++)
     for(z = -625; z < 625; z++)
     {
         for(x = -625; x < 625; x++)
