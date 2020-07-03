@@ -3,7 +3,7 @@ METASOURCES=AUTO
 check_PROGRAMS=epsp-parser-test minecraft-test
 TESTS=test.sh xfail.sh epsp-parser-test minecraft-test
 XFAIL_TESTS=xfail.sh
-EXTRA_DIST=test.sh xfail.sh epsp-packet-sample-fail.txt epsp-packet-sample-success.txt
+EXTRA_DIST=test.sh xfail.sh epsp-packet-sample-fail.txt epsp-packet-sample-success.txt seeds.txt
 
 AM_CPPFLAGS = -I$(top_srcdir)/include
 
