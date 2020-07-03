@@ -26,28 +26,27 @@ void print_reg_error(int errorcode, regex_t *buf)
 }
 
 /*
-  文字列の配列を返す
-*/
+ * 文字列の配列を返す。テストデータファイルの改行コードはCRLFにすること。
+ */
 int main(int argc, char *argv[])
 {
-  char pathbuf[4096];
-  snprintf(pathbuf, 4096, "%s/epsp-packet-sample-success.txt", getenv("srcdir"));
-  printf("%s\n", pathbuf);
-  FILE *in = fopen(pathbuf, "r");
-  if(!in)
+  char buf[BUFSIZ];
+  snprintf(buf, BUFSIZ, "%s/epsp-packet-sample-success.txt", getenv("srcdir"));
+  printf("%s\n", buf);
+  FILE *in = fopen(buf, "r");
+  if (!in)
   {
     perror("fopen");
     return EXIT_FAILURE;
   }
-  char buf[BUFSIZ];
   printf("%d\n", BUFSIZ);
   size_t len = 0L;
-  while (len = fread(buf, 1, BUFSIZ, in))
+  while (fgets(buf, BUFSIZ, in))
   {
     fprintf(stdout, "%s", buf);
   }
   int r = fclose(in);
-  if(r)
+  if (r)
   {
     perror("fopen");
     return EXIT_FAILURE;

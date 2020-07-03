@@ -10,3 +10,4 @@ AM_CPPFLAGS = -I$(top_srcdir)/include
 epsp_parser_test_SOURCES=epsp-parser-test.c
 epsp_parser_test_LDADD=../src/libstudy.la
 minecraft_test_LDADD=../src/libstudy.la
+minecraft_test_LDFLAGS=-static
