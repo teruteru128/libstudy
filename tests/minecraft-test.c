@@ -9,7 +9,7 @@
 #include <CUnit/Basic.h>
 #include <minecraft.h>
 
-int64_t *seeds;
+static int64_t *seeds;
 
 static void stest(void)
 {
@@ -95,7 +95,7 @@ int main(int argc, char **argv)
     testSuite = CU_add_suite("minecraft test suite", NULL, NULL);
 
     CU_add_test(testSuite, "stest", stest);
-    CU_add_test(testSuite, "s1test", s1test);
+    //CU_add_test(testSuite, "s1test", s1test);
     CU_add_test(testSuite, "s2test", s2test);
 
     CU_basic_set_mode(CU_BRM_NORMAL);
