@@ -1,6 +1,6 @@
 
-#ifndef a
-#define a
+#ifndef CHARSET_CONVERT_H
+#define CHARSET_CONVERT_H
 int encode_utf8_2_sjis(char**, const char*);
 int encode_utf8_2_unicode(char**, const char*);
 int encode_sjis_2_utf8(char**, const char*);

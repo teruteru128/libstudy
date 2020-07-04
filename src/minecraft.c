@@ -3,9 +3,6 @@
 #include <stdint.h>
 #include <java_random.h>
 
-#define MC_CACHE_SIZE 1250
-#define OFFSET ((MC_CACHE_SIZE + 1) / 2)
-
 int64_t s(int64_t seed, int32_t x, int32_t z)
 {
   return (seed + (long)(x * x * 0x4c1906) + (long)(x * 0x5ac0db) + (long)(z * z) * 0x4307a7L + (long)(z * 0x5f24f)) ^ 0x3ad8025f;
@@ -16,6 +13,9 @@ int isSlimeChunk(int64_t *ctx, int64_t seed, int32_t x, int32_t z)
   *ctx = s(seed, x, z);
   return !nextIntWithBounds(ctx, 10);
 }
+
+#define MC_CACHE_SIZE 1250
+#define OFFSET ((MC_CACHE_SIZE + 1) / 2)
 
 static int64_t memoX[MC_CACHE_SIZE];
 static int64_t memoZ[MC_CACHE_SIZE];
