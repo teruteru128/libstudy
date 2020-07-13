@@ -1,11 +1,12 @@
 
 //
+#include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <strings.h>
 #include <regex.h>
-#include "epsp-parser.h"
+#include "epsp_parser.h"
 #include "string_array.h"
 #include "string_list.h"
 
