@@ -12,6 +12,7 @@ libstudy_la_SOURCES += bm.c
 libstudy_la_SOURCES += bmapi.c
 libstudy_la_SOURCES += charset-convert.c
 libstudy_la_SOURCES += epsp-parser.c
+libstudy_la_SOURCES += gettext.h
 libstudy_la_SOURCES += internal_queue.h
 libstudy_la_SOURCES += internal_random.h
 libstudy_la_SOURCES += internal_string_array.h
