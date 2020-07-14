@@ -59,6 +59,11 @@ double nextDouble(int64_t *rnd)
   return (((int64_t)(next(rnd, 26)) << 27) + next(rnd, 27)) * DOUBLE_UNIT;
 }
 
+float nextFloat(int64_t *rnd)
+{
+    return next(rnd, 24) / ((float)(1 << 24));
+}
+
 // 
 // nextもrandomも使われているので適当にpとする
 // rかn関数のほうがいいかな？
