@@ -4,13 +4,6 @@
 
 #include <stdint.h>
 
-typedef struct random_t Random;
-
-// Random *Random_constructor();
-// int Random_destructor(Random *);
-// Random *random_new();
-// void random_free(Random *);
-Random *setSeed(int64_t *, int64_t);
 int32_t next(int64_t *, int32_t);
 int64_t nextLong(int64_t *);
 int32_t nextInt(int64_t *);
