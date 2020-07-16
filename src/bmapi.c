@@ -16,7 +16,7 @@ static xmlrpc_server_info *sinfo;
 
 typedef struct bm_client_t bm_client;
 
-static void die_if_fault_occurred(xmlrpc_env *env)
+void die_if_fault_occurred(xmlrpc_env *env)
 {
   /* Check our error-handling environment for an XML-RPC fault. */
   if (env->fault_occurred)
