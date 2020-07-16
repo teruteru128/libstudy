@@ -29,7 +29,7 @@ static void die_if_fault_occurred(xmlrpc_env *env)
 
 bm_client *bm_client_new()
 {
-  if(initflag == 0)
+  if (initflag == 0)
   {
     return NULL;
   }
@@ -58,7 +58,7 @@ void bm_client_free(bm_client *c)
 
 int bmapi_init()
 {
-  if(initflag == 0)
+  if (initflag == 0)
   {
     xmlrpc_env_init(&env);
     xmlrpc_init(&env);
@@ -70,7 +70,7 @@ int bmapi_init()
 
 int bmapi_cleanup()
 {
-  if(initflag == 1)
+  if (initflag == 1)
   {
     xmlrpc_client_setup_global_const(&env);
     xmlrpc_env_clean(&env);
@@ -134,8 +134,9 @@ char *bmapi_getStatus(char *ackData)
 
 char *bmapi_simpleSendMessage(char *toaddress, char *fromaddress, char *subject, char *message)
 {
-  return bmapi_sendMessage(toaddress, fromaddress, subject, message, 2, 4 * 24 * 60 * 60);
+  return bmapi_sendMessage(toaddress, fromaddress, subject, message, 2, 345600); // 4 * 24 * 60 * 60
 }
+
 char *bmapi_sendMessage(char *toaddress, char *fromaddress, char *subject, char *message, int encodingType, int TTL)
 {
   char *const methodName = "sendMessage";
