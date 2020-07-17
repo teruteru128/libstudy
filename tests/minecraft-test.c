@@ -76,7 +76,7 @@ int main(int argc, char **argv)
     }
     {
         char path[PATH_MAX];
-        snprintf(path, PATH_MAX, "%s/epsp-packet-sample-success.txt", getenv("srcdir"));
+        snprintf(path, PATH_MAX, "%s/seeds.txt", getenv("srcdir"));
         FILE *in = fopen(path, "r");
         if (in == NULL)
         {
@@ -85,10 +85,11 @@ int main(int argc, char **argv)
         }
         int ret = 0;
         size_t i = 0;
-        while ((ret = fscanf(in, "%ld", &seeds[i++])) != EOF)
+        while ((ret = fscanf(in, " %ld", &seeds[i++])) != EOF)
         {
         }
         fclose(in);
+        fprintf(stderr, "hello!\n");
     }
     mc_slime_init();
     CU_pSuite testSuite;
