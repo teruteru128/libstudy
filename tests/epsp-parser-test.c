@@ -32,11 +32,7 @@ void print_reg_error(int errorcode, regex_t *buf)
 int main(int argc, char *argv[])
 {
   char path[PATH_MAX];
-  if(realpath("epsp-packet-sample-success.txt", path) == NULL)
-  {
-    perror("realpath");
-    exit(EXIT_FAILURE);
-  }
+  snprintf(path, PATH_MAX, "%s/epsp-packet-sample-success.txt", getenv("srcdir"));
   printf("%d\n", PATH_MAX);
   printf("%s\n", path);
   FILE *in = fopen(path, "r");

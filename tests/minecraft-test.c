@@ -76,12 +76,7 @@ int main(int argc, char **argv)
     }
     {
         char path[PATH_MAX];
-        char *catch = realpath("seeds.txt", path);
-        if (catch == NULL)
-        {
-            perror("realpath");
-            exit(EXIT_FAILURE);
-        }
+        snprintf(path, PATH_MAX, "%s/epsp-packet-sample-success.txt", getenv("srcdir"));
         FILE *in = fopen(path, "r");
         if (in == NULL)
         {
