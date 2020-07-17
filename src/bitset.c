@@ -18,6 +18,7 @@ static size_t wordIndex(size_t bitIndex)
 }
 
 #define max(a, b) (((a) >= (b)) ? (a) : (b))
+#define min(a, b) (((a) <= (b)) ? (a) : (b))
 
 static void ensureCapacity(bitset *set, size_t wordsRequired)
 {
@@ -108,6 +109,41 @@ bitset* bitset_alloc()
   return set;
 }
 #endif
+
+static void trimToSize(bitset *set)
+{
+  if (set->wordsInUse != set->wordsLength)
+  {
+    int64_t *tmp = calloc(set->wordsInUse, sizeof(int64_t));
+    size_t length = min(set->wordsLength, set->wordsInUse);
+    memcpy(tmp, set->words, length * sizeof(int64_t));
+    set->words = tmp;
+    set->wordsLength = length;
+    checkInvariants(set);
+  }
+}
+
+bitset *bitset_clone(bitset *set)
+{
+  if (!set->sizeIsSticky)
+    trimToSize(set);
+
+  bitset *dolly = malloc(sizeof(bitset));
+  if (!dolly)
+    return NULL;
+  dolly->words = set->sizeIsSticky;
+  dolly->words = set->wordsInUse;
+  dolly->words = set->wordsLength;
+  dolly->words = calloc(set->wordsLength, sizeof(int64_t));
+  if (!dolly->words)
+  {
+    free(dolly);
+    return NULL;
+  }
+  memcpy(dolly->words, set->words, set->wordsLength * sizeof(int64_t));
+  checkInvariants(dolly);
+  return dolly;
+}
 
 void bitset_free(bitset *set)
 {
