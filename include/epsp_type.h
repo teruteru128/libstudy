@@ -63,8 +63,7 @@ struct protocol_code_t code_list[] = {
      .require = UNNECESSARY},
     {.code = 0,
      .str = NULL,
-     .require = NONE},
-    NULL};
+     .require = NONE}};
 // HOP_COUNT & MAX_HOP_COUNT
 
 #endif

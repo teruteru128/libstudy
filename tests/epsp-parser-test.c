@@ -7,6 +7,7 @@
 #include <errno.h>
 #include <epsp_parser.h>
 #include <string_array.h>
+#include <limits.h>
 
 /*
  * https://p2pquake.github.io/epsp-specifications/epsp-specifications.html
@@ -30,15 +31,21 @@ void print_reg_error(int errorcode, regex_t *buf)
  */
 int main(int argc, char *argv[])
 {
-  char buf[BUFSIZ];
-  snprintf(buf, BUFSIZ, "%s/epsp-packet-sample-success.txt", getenv("srcdir"));
-  printf("%s\n", buf);
-  FILE *in = fopen(buf, "r");
+  char path[PATH_MAX];
+  if(realpath("epsp-packet-sample-success.txt", path) == NULL)
+  {
+    perror("realpath");
+    exit(EXIT_FAILURE);
+  }
+  printf("%d\n", PATH_MAX);
+  printf("%s\n", path);
+  FILE *in = fopen(path, "r");
   if (!in)
   {
     perror("fopen");
     return EXIT_FAILURE;
   }
+  char buf[BUFSIZ];
   printf("%d\n", BUFSIZ);
   size_t len = 0L;
   while (fgets(buf, BUFSIZ, in))

@@ -8,6 +8,7 @@
 #include <CUnit/CUnit.h>
 #include <CUnit/Basic.h>
 #include <minecraft.h>
+#include <limits.h>
 
 static int64_t *seeds;
 
@@ -74,9 +75,14 @@ int main(int argc, char **argv)
         return EXIT_FAILURE;
     }
     {
-        char buf[BUFSIZ];
-        snprintf(buf, BUFSIZ, "%s/seeds.txt", getenv("srcdir"));
-        FILE *in = fopen(buf, "r");
+        char path[PATH_MAX];
+        char *catch = realpath("seeds.txt", path);
+        if (catch == NULL)
+        {
+            perror("realpath");
+            exit(EXIT_FAILURE);
+        }
+        FILE *in = fopen(path, "r");
         if (in == NULL)
         {
             perror("fopen");
