@@ -131,9 +131,9 @@ bitset *bitset_clone(bitset *set)
   bitset *dolly = malloc(sizeof(bitset));
   if (!dolly)
     return NULL;
-  dolly->words = set->sizeIsSticky;
-  dolly->words = set->wordsInUse;
-  dolly->words = set->wordsLength;
+  dolly->sizeIsSticky = set->sizeIsSticky;
+  dolly->wordsInUse = set->wordsInUse;
+  dolly->wordsLength = set->wordsLength;
   dolly->words = calloc(set->wordsLength, sizeof(int64_t));
   if (!dolly->words)
   {
