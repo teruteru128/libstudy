@@ -159,7 +159,7 @@ int epsp_packet_parse(epsp_packet *packet, char *line)
    * tryparse(call internal parser)
    * return packet OR Exception
    * epsp_packetを使い回すことを前提にするのならmemsetで0埋めなんてとてもじゃないができないんだが
-   * TODO epsp_packet使いまわし用スタック
+   * TODO: epsp_packet使いまわし用スタック
    * いくつかのインスタンスをスタックしておく
    * 使用時：スタックが0なら新規作成して使う
    * 格納時：スタックが16以上(?)なら解放する
