@@ -21,13 +21,12 @@ void print_addrinfo0(struct addrinfo *adrinf, FILE *stream)
   char *protocol = NULL;
   switch (adrinf->ai_protocol)
   {
-  case 6:
+  case IPPROTO_TCP:
+    protocol = "TCP";
+    break;
+  case IPPROTO_UDP:
     protocol = "UDP";
     break;
-  case 17:
-    protocol = "UDP";
-    break;
-
   default:
     protocol = "UNKNOWN";
     break;
