@@ -17,7 +17,6 @@ void print_addrinfo0(struct addrinfo *adrinf, FILE *stream)
 {
   char hbuf[NI_MAXHOST]; /* 返されるアドレスを格納する */
   char sbuf[NI_MAXSERV]; /* 返されるポート番号を格納する */
-  int rc;
   char *protocol = NULL;
   switch (adrinf->ai_protocol)
   {
@@ -33,7 +32,7 @@ void print_addrinfo0(struct addrinfo *adrinf, FILE *stream)
   }
 
   /* アドレス情報に対応するアドレスとポート番号を得る */
-  rc = getnameinfo(adrinf->ai_addr, adrinf->ai_addrlen,
+  int rc = getnameinfo(adrinf->ai_addr, adrinf->ai_addrlen,
                    hbuf, sizeof(hbuf),
                    sbuf, sizeof(sbuf),
                    NI_NUMERICHOST | NI_NUMERICSERV);
@@ -43,7 +42,10 @@ void print_addrinfo0(struct addrinfo *adrinf, FILE *stream)
     return;
   }
 
-  fprintf(stream, "[%s]:%s(%s)\n", hbuf, sbuf, protocol);
+  fprintf(stream, "[%s]:%s(%s), flags : %d, family : %d, socktype : %d, protocol : %d", hbuf, sbuf, protocol, adrinf->ai_flags, adrinf->ai_family, adrinf->ai_socktype, adrinf->ai_protocol);
+  if(adrinf->ai_canonname != NULL)
+    fprintf(stream, ", canonname : %s", adrinf->ai_canonname);
+  fputs("\n", stream);
 }
 
 /**
