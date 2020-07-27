@@ -10,6 +10,7 @@ libstudy_la_SOURCES += bitmessage.c
 libstudy_la_SOURCES += bitset.c
 libstudy_la_SOURCES += bm.c
 libstudy_la_SOURCES += bmapi.c
+libstudy_la_SOURCES += changebase.c
 libstudy_la_SOURCES += charset-convert.c
 libstudy_la_SOURCES += epsp-parser.c
 libstudy_la_SOURCES += gettext.h

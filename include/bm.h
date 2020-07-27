@@ -2,6 +2,7 @@
 #ifndef BM_H
 #define BM_H
 
+#include <stdint.h>
 #include <openssl/ripemd.h>
 #include <openssl/sha.h>
 #include <xmlrpc.h>
@@ -30,15 +31,22 @@ typedef struct connectioninfo_t
   serverinfo server;
 } connectioninfo;
 
+struct chararray
+{
+  char *data;
+  size_t length;
+};
+
 /* int ripe(ripectx, signpub, encpub) */
 size_t ripe(RIPE_CTX *, unsigned char *, unsigned char *);
-char *encodeVarint(unsigned long);
+struct chararray *encodeVarint(uint64_t u);
+void chararrayfree(struct chararray *p);
 char *encodeBase58();
-char *encodeAddress0(int, int, char *, int);
-char *encodeAddress(int, int, char *);
-char *encodeV4Address(char *);
-char *encodeV3Address(char *ripe);
-char *encodeShorterV3Address(char *);
+char *encodeAddress0(int, int, unsigned char *, size_t ripelen, size_t max);
+char *encodeAddress(int version, int stream, unsigned char *ripe, size_t ripelen);
+char *encodeV4Address(unsigned char *, size_t ripelen);
+char *encodeV3Address(unsigned char *ripe, size_t ripelen);
+char *encodeShorterV3Address(unsigned char *, size_t ripelen);
 char *encodeWIF(char *);
 char *formatKey(char *, char *, char *);
 int exportAddress(unsigned char *, unsigned char *, unsigned char *, unsigned char *, unsigned char *);

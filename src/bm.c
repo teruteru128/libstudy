@@ -5,6 +5,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <uuid/uuid.h>
+#include <openssl/evp.h>
+#include <byteswap.h>
+#include <changebase.h>
+#include <err.h>
 #include "bitmessage.h"
 #include "bm.h"
 #include "bmapi.h"
@@ -30,9 +34,59 @@ size_t ripe(RIPE_CTX *ctx, unsigned char *signpubkey, unsigned char *encpubkey)
   return nlz;
 }
 
-char *encodeVarint(unsigned long u)
+/*
+ * 
+ * https://github.com/Bitmessage/PyBitmessage/blob/d09782e53d3f42132532b6e39011cd27e7f41d25/src/addresses.py#L63
+ * https://docs.python.org/ja/3/library/struct.html
+ */
+struct chararray *encodeVarint(uint64_t u)
 {
+  struct chararray *p = malloc(sizeof(struct chararray));
+  if (p == NULL)
+  {
     return NULL;
+  }
+  if (u < 253)
+  {
+    p->data = malloc(sizeof(char));
+    *p->data = (uint8_t)u;
+    p->length = 1;
+    return p;
+  }
+  if (253 <= u && u < 65536)
+  {
+    p->data = malloc(sizeof(char) + sizeof(uint16_t));
+    *p->data = 253;
+    *((uint16_t *)&p->data[1]) = bswap_16((uint16_t)u);
+    p->length = 3;
+    return p;
+  }
+  if (65536 <= u && u < 4294967296L)
+  {
+    p->data = malloc(sizeof(char) + sizeof(uint32_t));
+    *p->data = 254;
+    *((uint32_t *)&p->data[1]) = bswap_32((uint32_t)u);
+    p->length = 5;
+    return p;
+  }
+  if (4294967296L <= u && u <= 18446744073709551615UL)
+  {
+    p->data = malloc(sizeof(char) + sizeof(uint64_t));
+    *p->data = 254;
+    *((uint64_t *)&p->data[1]) = bswap_64((uint64_t)u);
+    p->length = 9;
+    return p;
+  }
+  // おそらくここには来ない
+  free(p);
+  return NULL;
+}
+
+void chararrayfree(struct chararray *p)
+{
+  if (p->data)
+    free(p->data);
+  free(p);
 }
 
 char *encodeBase58()
@@ -40,45 +94,116 @@ char *encodeBase58()
     return NULL;
 }
 
-char *encodeAddress0(int version, int stream, char *ripe, int max)
+char *encodeAddress0(int version, int stream, unsigned char *ripe, size_t ripelen, size_t max)
 {
-    max = 1 <= max ? max : 1;
-    max = max <= 20 ? max : 20;
-    if (version >= 2 && version < 4)
+  unsigned char *workripe = ripe;
+  size_t workripelen = ripelen;
+  if (version >= 2 && version < 4)
+  {
+    if (ripelen != 20)
     {
-        int i = 0;
-        for (; ripe[i] == 0 && i < 2; i++)
+      return NULL;
+    }
+    if (max < 20)
+    {
+      if (memcmp(ripe, "\0\0", 2) == 0)
+      {
+        workripe = &ripe[2];
+        workripelen -= 2;
+      }
+      else if (memcmp(ripe, "\0", 1) == 0)
+      {
+        workripe = &ripe[1];
+        workripelen -= 1;
+      }
+    }
+    else
+    {
+        size_t i = 0;
+        for (; ripe[i] == 0 && i < max; i++)
         {
         }
     }
-    else if (version == 4)
+  }
+  else
+  {
+    if (ripelen != 20)
     {
-        int i = 0;
-        for (; ripe[i] == 0 && i < RIPEMD160_DIGEST_LENGTH; i++)
-        {
-        }
+      return NULL;
     }
-    return NULL;
+    size_t i = 0;
+    for (; ripe[i] == 0 && i < ripelen; i++)
+      ;
+
+    workripe = &ripe[i];
+    workripelen -= i;
+  }
+  struct chararray *variantVersion = encodeVarint(version);
+  struct chararray *variantStream = encodeVarint(stream);
+  size_t storedBinaryDataLen = variantVersion->length + variantStream->length + workripelen + 4;
+  unsigned char *storedBinaryData = malloc(variantVersion->length + variantStream->length + workripelen + 4);
+  memcpy(storedBinaryData, variantVersion->data, variantVersion->length);
+  memcpy(storedBinaryData + variantVersion->length, variantStream->data, variantStream->length);
+  memcpy(storedBinaryData + variantVersion->length + variantStream->length, workripe, workripelen);
+  chararrayfree(variantVersion);
+  chararrayfree(variantStream);
+
+  {
+    const EVP_MD *sha512 = EVP_sha512();
+    EVP_MD_CTX *ctx = EVP_MD_CTX_new();
+    EVP_DigestInit(ctx, sha512);
+    EVP_DigestUpdate(ctx, storedBinaryData, storedBinaryDataLen - 4);
+    unsigned int s = 0;
+    unsigned char cache64[64];
+    EVP_DigestFinal(ctx, cache64, &s);
+    EVP_DigestInit(ctx, sha512);
+    EVP_DigestUpdate(ctx, cache64, 64);
+    EVP_DigestFinal(ctx, cache64, &s);
+    EVP_MD_CTX_free(ctx);
+    memcpy(storedBinaryData + variantVersion->length + variantStream->length + workripelen, cache64, 4);
+  }
+
+  char *a = base58encode(storedBinaryData, storedBinaryDataLen);
+  free(storedBinaryData);
+  char *ret = malloc(45);
+  snprintf(ret, 45, "BM-%s", a);
+  free(a);
+  {
+    char *tmp = realloc(ret, strlen(ret) + 1);
+    if (!ret)
+    {
+      free(ret);
+      err(EXIT_FAILURE, "can not realloc");
+    }
+    ret = tmp;
+  }
+  return ret;
 }
 
-char *encodeAddress(int version, int stream, char *ripe)
+/*
+ * ripeをBitMessageアドレスにエンコードします。
+ * 
+ * https://github.com/Bitmessage/PyBitmessage/blob/d09782e53d3f42132532b6e39011cd27e7f41d25/src/addresses.py#L143
+ * https://github.com/teruteru128/java-study/blob/03906187223ad8e5e8f8629e23ecbe2fbca5b7b4/src/main/java/com/twitter/teruteru128/study/bitmessage/genaddress/BMAddress.java#L18
+ */
+char *encodeAddress(int version, int stream, unsigned char *ripe, size_t ripelen)
 {
-    return encodeAddress0(version, stream, ripe, 20);
+    return encodeAddress0(version, stream, ripe, ripelen, 20);
 }
 
-char *encodeV4Address(char *ripe)
+char *encodeV4Address(unsigned char *ripe, size_t r)
 {
-    return encodeAddress0(4, 1, ripe, 20);
+    return encodeAddress0(4, 1, ripe, r, 20);
 }
 
-char *encodeV3Address(char *ripe)
+char *encodeV3Address(unsigned char *ripe, size_t r)
 {
-    return encodeAddress0(3, 1, ripe, 2);
+    return encodeAddress0(3, 1, ripe, r, 2);
 }
 
-char *encodeShorterV3Address(char *ripe)
+char *encodeShorterV3Address(unsigned char *ripe, size_t r)
 {
-    return encodeAddress0(3, 1, ripe, 20);
+    return encodeAddress0(3, 1, ripe, r, 20);
 }
 
 char *encodeWIF(char *key)

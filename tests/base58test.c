@@ -1,8 +1,8 @@
 
 #include <stdio.h>
-
-size_t parseHex(unsigned char **out, const char *str);
-char *encodeAddress(int version, int stream, unsigned char *ripe, size_t ripelen);
+#include <stdlib.h>
+#include <string.h>
+#include <changebase.h>
 
 int main(int argc, char const *argv[])
 {

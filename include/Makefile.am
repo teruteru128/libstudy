@@ -8,6 +8,7 @@ include_HEADERS += bitmessage.h
 include_HEADERS += bitset.h
 include_HEADERS += bm.h
 include_HEADERS += bmapi.h
+include_HEADERS += changebase.h
 include_HEADERS += charset-convert.h
 include_HEADERS += epsp_parser.h
 include_HEADERS += epsp_type.h
