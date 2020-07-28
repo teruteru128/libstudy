@@ -7,15 +7,16 @@
 #include <stdlib.h>
 #include <string.h>
 #include <iconv.h>
-#include "charset-convert.h"
+#include <charset-convert.h>
 
 static int convert(iconv_t cd, char **dest, const char *src)
 {
   size_t srclen = strlen(src);
   size_t destlen = srclen * 3 + 1;
+  char *tmpsrc = src;
   char *destbuf = malloc(destlen);
   char *head = destbuf;
-  size_t ret = iconv(cd, (char **)&src, &srclen, &destbuf, &destlen);
+  size_t ret = iconv(cd, &tmpsrc, &srclen, &destbuf, &destlen);
   if (ret == (size_t)-1)
   {
     perror("iconv");

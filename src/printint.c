@@ -196,7 +196,7 @@ char *itoa(int value, char *str, int radix)
 
 #define hexchars "0123456789abcdef"
 
-// TODO: ライブラリ化
+/** TODO: ライブラリ化 */
 void hex_dump(const void *pt, const size_t len)
 {
   char *p = (char *)pt;

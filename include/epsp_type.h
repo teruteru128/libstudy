@@ -17,8 +17,8 @@ typedef struct peer_data
 } peer_data;
 
 /**
- * TODO 送受信両方に使いたい
- * TODO move to epsp_protocol.h
+ * TODO: 送受信両方に使いたい
+ * TODO: move to epsp_protocol.h
  */
 typedef struct epsp_packet_t
 {

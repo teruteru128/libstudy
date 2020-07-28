@@ -9,8 +9,10 @@ typedef struct chunk_pos
     int32_t z;
 } chunk_pos;
 
-// 配列キュー
-// TODO chunk_pos* を void* にする -> マイクラのチャンク探索向けから汎用化する
+/**
+ *配列キュー
+ * TODO: chunk_pos* を void* にする -> マイクラのチャンク探索向けから汎用化する
+ */
 typedef struct seedqueue
 {
     chunk_pos *data;

@@ -24,7 +24,7 @@ seedqueue *queue_new()
     return 0;
 }
 
-// TODO: destroy時にqueue内に残されたアイテムの扱いは？
+/** TODO: destroy時にqueue内に残されたアイテムの扱いは？ */
 int destroy_queue(seedqueue *queue)
 {
 

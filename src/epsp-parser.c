@@ -154,7 +154,7 @@ int epsp_packet_parse(epsp_packet *packet, char *line)
     return NULL;
   }
 
-  /*
+  /**
    * allocate
    * tryparse(call internal parser)
    * return packet OR Exception
