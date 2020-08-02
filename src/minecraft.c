@@ -1,7 +1,7 @@
 
 #include <stdio.h>
 #include <stdint.h>
-#include <java_random.h>
+#include "java_random.h"
 
 int64_t s(int64_t seed, int32_t x, int32_t z)
 {
