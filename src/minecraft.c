@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include <java_random.h>
 
-static int64_t s(int64_t seed, int32_t x, int32_t z)
+int64_t s(int64_t seed, int32_t x, int32_t z)
 {
   return (seed + (long)(x * x * 0x4c1906) + (long)(x * 0x5ac0db) + (long)(z * z) * 0x4307a7L + (long)(z * 0x5f24f)) ^ 0x3ad8025f;
 }
