@@ -145,8 +145,6 @@ char *encodeAddress0(int version, int stream, unsigned char *ripe, size_t ripele
   memcpy(storedBinaryData, variantVersion->data, variantVersion->length);
   memcpy(storedBinaryData + variantVersion->length, variantStream->data, variantStream->length);
   memcpy(storedBinaryData + variantVersion->length + variantStream->length, workripe, workripelen);
-  chararrayfree(variantVersion);
-  chararrayfree(variantStream);
 
   {
     const EVP_MD *sha512 = EVP_sha512();
@@ -162,6 +160,8 @@ char *encodeAddress0(int version, int stream, unsigned char *ripe, size_t ripele
     EVP_MD_CTX_free(ctx);
     memcpy(storedBinaryData + variantVersion->length + variantStream->length + workripelen, cache64, 4);
   }
+  chararrayfree(variantVersion);
+  chararrayfree(variantStream);
 
   char *a = base58encode(storedBinaryData, storedBinaryDataLen);
   free(storedBinaryData);
