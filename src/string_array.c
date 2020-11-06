@@ -7,6 +7,7 @@
 string_array *string_array_create(size_t initialCapacity)
 {
 }
+
 int trimToSize(string_array *a)
 {
 }
@@ -25,11 +26,13 @@ int string_array_add(string_array *data, char *a)
 string_array *string_array_split(const char *in, const char *delim)
 {
     char *work = strdup(in);
-    if(work == NULL){
+    if (work == NULL)
+    {
         return NULL;
     }
     char **str = malloc(sizeof(char *) * 10);
-    if(str == NULL){
+    if (str == NULL)
+    {
         free(work);
         return NULL;
     }

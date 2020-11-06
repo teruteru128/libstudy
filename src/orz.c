@@ -25,11 +25,11 @@ int orz(int num)
   size_t i = 0;
 
   char *messages[] = {
-    "orz",
-    "申し訳ございませんでした",
-    "ごめんなさい",
-    "すみませんでした",
-    NULL};
+      "orz",
+      "申し訳ございませんでした",
+      "ごめんなさい",
+      "すみませんでした",
+      NULL};
   size_t messages_size = 0;
   char **tmp = messages;
   while (*tmp++ != NULL)

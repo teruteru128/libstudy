@@ -56,7 +56,7 @@ int32_t nextIntWithBounds(int64_t *rnd, int32_t bound)
 
 double nextDouble(int64_t *rnd)
 {
-  return (((int64_t)(next(rnd, 26)) << 27) + next(rnd, 27)) * DOUBLE_UNIT;
+    return (((int64_t)(next(rnd, 26)) << 27) + next(rnd, 27)) * DOUBLE_UNIT;
 }
 
 float nextFloat(int64_t *rnd)
@@ -64,14 +64,16 @@ float nextFloat(int64_t *rnd)
     return next(rnd, 24) / ((float)(1 << 24));
 }
 
-// 
+//
 // nextもrandomも使われているので適当にpとする
 // rかn関数のほうがいいかな？
 // next関数の略としてn
-int64_t n(int64_t seed) {
-  return (seed * MULTIPLIER + ADDEND) & MASK;
+int64_t n(int64_t seed)
+{
+    return (seed * MULTIPLIER + ADDEND) & MASK;
 }
 
-int64_t nInverse(int64_t seed) {
-  return (seed - ADDEND) * INVERSE_MULTIPLIER & MASK;
+int64_t nInverse(int64_t seed)
+{
+    return (seed - ADDEND) * INVERSE_MULTIPLIER & MASK;
 }

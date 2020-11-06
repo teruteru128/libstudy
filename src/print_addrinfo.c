@@ -33,9 +33,9 @@ void print_addrinfo0(struct addrinfo *adrinf, FILE *stream)
 
   /* アドレス情報に対応するアドレスとポート番号を得る */
   int rc = getnameinfo(adrinf->ai_addr, adrinf->ai_addrlen,
-                   hbuf, sizeof(hbuf),
-                   sbuf, sizeof(sbuf),
-                   NI_NUMERICHOST | NI_NUMERICSERV);
+                       hbuf, sizeof(hbuf),
+                       sbuf, sizeof(sbuf),
+                       NI_NUMERICHOST | NI_NUMERICSERV);
   if (rc != 0)
   {
     perror("getnameinfo");
@@ -43,7 +43,7 @@ void print_addrinfo0(struct addrinfo *adrinf, FILE *stream)
   }
 
   fprintf(stream, "[%s]:%s(%s), flags : %d, family : %d, socktype : %d, protocol : %d", hbuf, sbuf, protocol, adrinf->ai_flags, adrinf->ai_family, adrinf->ai_socktype, adrinf->ai_protocol);
-  if(adrinf->ai_canonname != NULL)
+  if (adrinf->ai_canonname != NULL)
     fprintf(stream, ", canonname : %s", adrinf->ai_canonname);
   fputs("\n", stream);
 }
