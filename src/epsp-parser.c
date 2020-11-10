@@ -40,7 +40,7 @@ void parser_free(void)
  * failed : 1
  * success : 0
  */
-static int parse_internal(epsp_packet *packet, const char *line)
+static int parse_internal(epsp_packet_t *packet, const char *line)
 {
   // 一応nullチェック
   if (packet == NULL || line == NULL)
@@ -55,9 +55,9 @@ static int parse_internal(epsp_packet *packet, const char *line)
   char *trash_str = NULL;
   {
     // 作業用コピー copy_lineはfreeしてはいけない
-    char *copy_line = strdupa(line);
+    char *work_line = strdupa(line);
     char *catch = NULL;
-    code_str = strtok_r(copy_line, " ", &catch);
+    code_str = strtok_r(work_line, " ", &catch);
     hop_str = strtok_r(NULL, " ", &catch);
     data_str = strtok_r(NULL, " ", &catch);
     trash_str = strtok_r(NULL, " ", &catch);
@@ -80,9 +80,9 @@ static int parse_internal(epsp_packet *packet, const char *line)
 
   // 初期値
   packet->code = -1;
-  packet->code_str = NULL;
+  //packet->code_str = NULL;
   packet->hop_count = -1;
-  packet->hop_count_str = NULL;
+  //packet->hop_count_str = NULL;
   packet->data = NULL;
 
   {
@@ -94,13 +94,6 @@ static int parse_internal(epsp_packet *packet, const char *line)
       ret = 1;
       goto clean;
     }
-    packet->code_str = strdup(code_str);
-    if (packet->code_str == NULL)
-    {
-      // strdup失敗
-      ret = 1;
-      goto clean;
-    }
     if (hop_str != NULL)
     {
       packet->hop_count = strtol(hop_str, &catch, 10);
@@ -108,14 +101,6 @@ static int parse_internal(epsp_packet *packet, const char *line)
       {
         // 不正な文字が混入した
         ret = 1;
-        goto clean;
-      }
-      packet->hop_count_str = strdup(hop_str);
-      if (packet->hop_count_str == NULL)
-      {
-        // strdup失敗
-        ret = 1;
-        free(packet->code_str);
         goto clean;
       }
     }
@@ -137,17 +122,58 @@ clean:
   return ret;
 }
 
-void epsp_packet_free(epsp_packet *packet)
+void epsp_packet_free(epsp_packet_t *packet)
 {
+}
+
+/**
+  文字列がスペース区切りで1つ以上3追加であることを検証する
+  https://p2pquake.github.io/epsp-specifications/epsp-specifications.html#base-2
+*/
+int validate_epsp_packet_format(char *line)
+{
+  char *tmp = strdupa(line);
+  if (tmp == NULL)
+  {
+    perror("strdupa");
+    exit(EXIT_FAILURE);
+  }
+  size_t count = 0;
+  char *str = NULL;
+  char *token = NULL;
+  char *catch = NULL;
+  for(str = tmp;; count++, tmp = NULL)
+  {
+    token = strtok_r(tmp, " ", &catch);
+    if (token == NULL)
+    {
+      break;
+    }
+  }
+  return 0;
+}
+
+/**
+  @success new epsp packet object
+  @error NULL
+*/
+epsp_packet_t *epsp_packet_new(char *line)
+{
+  char *tmp = NULL;
+  char *code_str = NULL;
+  char *hop_count_str = NULL;
+  char *data = NULL;
+  /*  */
+  return NULL;
 }
 
 /**
  * epsp_packet_new
  * epsp_packet_free
- * int epsp_packet_parse(epsp_packet *, const char *);
+ * int epsp_packet_parse(epsp_packet_t *, const char *);
  * https://github.com/teruteru128/epsp-peer-cs/blob/master/Client/Common/Net/Packet.cs
  */
-int epsp_packet_parse(epsp_packet *packet, char *line)
+int epsp_packet_parse(epsp_packet_t *packet, char *line)
 {
   if (line_pattern == NULL || line == NULL)
   {
@@ -158,8 +184,8 @@ int epsp_packet_parse(epsp_packet *packet, char *line)
    * allocate
    * tryparse(call internal parser)
    * return packet OR Exception
-   * epsp_packetを使い回すことを前提にするのならmemsetで0埋めなんてとてもじゃないができないんだが
-   * TODO: epsp_packet使いまわし用スタック
+   * epsp_packet_tを使い回すことを前提にするのならmemsetで0埋めなんてとてもじゃないができないんだが
+   * TODO: epsp_packet_t使いまわし用スタック
    * いくつかのインスタンスをスタックしておく
    * 使用時：スタックが0なら新規作成して使う
    * 格納時：スタックが16以上(?)なら解放する
@@ -174,7 +200,7 @@ int epsp_packet_parse(epsp_packet *packet, char *line)
    * CR:もう1バイト読んでLFなら続行、違ったらungetcして続行
    * CRLF:だいたいお前のせいだよクソ野郎
    */
-  memset(packet, 0, sizeof(epsp_packet));
+  memset(packet, 0, sizeof(epsp_packet_t));
   if (parse_internal(packet, line) != 0)
   {
     //failed

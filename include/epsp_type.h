@@ -16,18 +16,18 @@ typedef struct peer_data
     uint16_t peer_id;
 } peer_data;
 
+typedef struct epsp_packet epsp_packet_t;
 /**
  * TODO: 送受信両方に使いたい
  * TODO: move to epsp_protocol.h
  */
-typedef struct epsp_packet_t
+typedef struct epsp_packet
 {
     int code;
     int hop_count;
-    char *code_str;
-    char *hop_count_str;
-    string_array *data;
-} epsp_packet;
+    char *data;
+    epsp_packet_t *next;
+} epsp_packet_t;
 
 #if 0
 typedef struct epsp_packet_t
