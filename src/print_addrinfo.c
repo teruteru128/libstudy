@@ -7,6 +7,7 @@
 #include <netdb.h>
 
 #include <stdio.h>
+#include <string.h>
 
 /**
  * アドレスとポート番号を指定されたストリームへ表示する。
@@ -17,17 +18,17 @@ void print_addrinfo0(struct addrinfo *adrinf, FILE *stream)
 {
   char hbuf[NI_MAXHOST]; /* 返されるアドレスを格納する */
   char sbuf[NI_MAXSERV]; /* 返されるポート番号を格納する */
-  char *protocol = NULL;
+  char protocol[16] = "";
   switch (adrinf->ai_protocol)
   {
   case IPPROTO_TCP:
-    protocol = "TCP";
+    strncpy(protocol, "TCP", 3);
     break;
   case IPPROTO_UDP:
-    protocol = "UDP";
+    strncpy(protocol, "UDP", 3);
     break;
   default:
-    protocol = "UNKNOWN";
+    strncpy(protocol, "UNKNOWN", 7);
     break;
   }
 

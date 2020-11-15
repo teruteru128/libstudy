@@ -124,6 +124,24 @@ clean:
 
 void epsp_packet_free(epsp_packet_t *packet)
 {
+  if (packet == NULL)
+    return;
+
+  packet->code = 0;
+  packet->hop_count = 0;
+  if (packet->data != NULL)
+  {
+    size_t len = strlen(packet->data);
+    memset(packet->data, 0, len);
+    free(packet->data);
+    packet->data = NULL;
+  }
+  if (packet->next)
+  {
+    epsp_packet_free(packet->next);
+    packet->next = NULL;
+  }
+  free(packet);
 }
 
 /**
@@ -132,6 +150,12 @@ void epsp_packet_free(epsp_packet_t *packet)
 */
 int validate_epsp_packet_format(char *line)
 {
+  // 毎回コンパイルするのはもったいなくない？
+  regex_t packet_pattern;
+  int ret = regcomp(&packet_pattern, "^[[:digit:]]{3}( [[:digit:]]+( .*)?)?$",
+                    REG_EXTENDED | REG_NEWLINE | REG_ICASE);
+  ret = regexec(&packet_pattern, line, 0, NULL, 0);
+  regfree(&packet_pattern);
   char *tmp = strdupa(line);
   if (tmp == NULL)
   {
@@ -142,15 +166,13 @@ int validate_epsp_packet_format(char *line)
   char *str = NULL;
   char *token = NULL;
   char *catch = NULL;
-  for(str = tmp;; count++, tmp = NULL)
+  for (str = tmp;; count++, tmp = NULL)
   {
     token = strtok_r(tmp, " ", &catch);
     if (token == NULL)
-    {
       break;
-    }
   }
-  return 0;
+  return 1 > count || count > 3;
 }
 
 /**
@@ -159,11 +181,19 @@ int validate_epsp_packet_format(char *line)
 */
 epsp_packet_t *epsp_packet_new(char *line)
 {
-  char *tmp = NULL;
-  char *code_str = NULL;
-  char *hop_count_str = NULL;
-  char *data = NULL;
-  /*  */
+  // null check
+  if (line == NULL)
+    return NULL;
+  // validate
+  // split
+  // parse
+  // build
+  epsp_packet_t *packet = calloc(1, sizeof(epsp_packet_t));
+  packet->code = 0;
+  packet->hop_count = 0;
+  packet->data = NULL;
+  packet->next = NULL;
+  // return
   return NULL;
 }
 

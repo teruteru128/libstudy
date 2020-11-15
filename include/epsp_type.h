@@ -29,16 +29,6 @@ typedef struct epsp_packet
     epsp_packet_t *next;
 } epsp_packet_t;
 
-#if 0
-typedef struct epsp_packet_t
-{
-    int code;
-    int hop;
-    size_t data_length;
-    char **data;
-} epsp_packet;
-#endif
-
 enum data_require
 {
     NONE,
