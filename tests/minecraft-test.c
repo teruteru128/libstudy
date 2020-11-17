@@ -77,7 +77,20 @@ int main(int argc, char **argv)
     {
         char path[PATH_MAX];
         snprintf(path, PATH_MAX, "%s/seeds.txt", getenv("srcdir"));
-        FILE *in = fopen(path, "r");
+#ifdef _GNU_SOURCE
+        char *p = canonicalize_file_name(path);
+#elif _POSIX_VERSION >= 200809L || defined(linux)
+        char *p = realpath(path, NULL);
+#else
+#error "unsupported realpath"
+#endif
+        if(p == NULL)
+        {
+            perror("");
+            exit(1);
+        }
+        FILE *in = fopen(p, "r");
+        free(p);
         if (in == NULL)
         {
             perror("fopen");
