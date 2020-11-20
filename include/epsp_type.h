@@ -25,7 +25,8 @@ typedef struct epsp_packet
 {
     int code;
     int hop_count;
-    char *data;
+    char **data;
+    size_t data_length;
     epsp_packet_t *next;
 } epsp_packet_t;
 

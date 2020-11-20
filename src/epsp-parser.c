@@ -1,5 +1,14 @@
 
-//
+/**
+ * @file epsp-parser.c
+ * @author Teruteru (teruterubouU1024@gmail.com)
+ * @brief 
+ * @version 0.1
+ * @date 2020-11-20
+ * 
+ * @copyright GPL
+ * 
+ */
 #include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,29 +19,29 @@
 #include "string_array.h"
 #include "string_list.h"
 
-#define LINE_PATTERN "([[:digit:]]+) ([[:digit:]]+) ?(.+)?"
+// validateでだけ使う？
+#define LINE_PATTERN "[[:digit:]]{3} [[:digit:]]+( .+)?"
 
-static regex_t *line_pattern = NULL;
+// XXX: 可能ならばグローバル領域に置きたくない
+static regex_t line_pattern;
+static int pattern_initialized = 0;
 
 void parser_init(void)
 {
-  if (line_pattern == NULL)
+  if (pattern_initialized == 0)
   {
-    line_pattern = malloc(sizeof(regex_t));
-    if (line_pattern == NULL)
-    {
-      perror("line_pattern malloc failed");
-    }
-    int errorcode = regcomp(line_pattern, LINE_PATTERN, REG_EXTENDED | REG_NEWLINE);
+    int errorcode = regcomp(&line_pattern, LINE_PATTERN, REG_EXTENDED | REG_NEWLINE);
+    if (errorcode == 0)
+      pattern_initialized = 1;
   }
 }
 
 void parser_free(void)
 {
-  if (line_pattern != NULL)
+  if (pattern_initialized != 0)
   {
-    regfree(line_pattern);
-    line_pattern = NULL;
+    regfree(&line_pattern);
+    pattern_initialized = 0;
   }
 }
 
@@ -145,12 +154,16 @@ void epsp_packet_free(epsp_packet_t *packet)
 }
 
 /**
-  文字列がスペース区切りで1つ以上3追加であることを検証する
-  https://p2pquake.github.io/epsp-specifications/epsp-specifications.html#base-2
-*/
-int validate_epsp_packet_format(char *line)
+ * @brief 文字列がスペース区切りで1つ以上3追加であることを検証する.
+ * @link https://p2pquake.github.io/epsp-specifications/epsp-specifications.html#base-2
+ * 
+ * @param line 
+ * @return int 
+ */
+int validate_epsp_packet_line(char *line)
 {
-  // 毎回コンパイルするのはもったいなくない？
+  // 毎回コンパイルするのはもったいなくない？->どのタイミングでコンパイルする？
+  // validateでだけ正規表現を使って分割はstrdupを使う？
   regex_t packet_pattern;
   int ret = regcomp(&packet_pattern, "^[[:digit:]]{3}( [[:digit:]]+( .*)?)?$",
                     REG_EXTENDED | REG_NEWLINE | REG_ICASE);
@@ -176,15 +189,18 @@ int validate_epsp_packet_format(char *line)
 }
 
 /**
-  @success new epsp packet object
-  @error NULL
-*/
+ * @brief 
+ * 
+ * @param line 
+ * @return epsp_packet_t* new epsp packet object
+ */
 epsp_packet_t *epsp_packet_new(char *line)
 {
   // null check
   if (line == NULL)
     return NULL;
   // validate
+
   // split
   // parse
   // build
@@ -205,7 +221,7 @@ epsp_packet_t *epsp_packet_new(char *line)
  */
 int epsp_packet_parse(epsp_packet_t *packet, char *line)
 {
-  if (line_pattern == NULL || line == NULL)
+  if (pattern_initialized == 0 || line == NULL)
   {
     return NULL;
   }
