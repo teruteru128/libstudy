@@ -16,12 +16,12 @@ typedef struct bm_client_t
 bm_client *bm_client_new();
 int bmapi_init(void);
 int bmapi_cleanup();
-char *bmapi_helloWorld(char*, char*);
+const char *bmapi_helloWorld(const char *, const char *);
 int bmapi_add(int, int);
 int bmapi_statusBar();
 int bmapi_listAddresses2();
 int bmapi_createRandomAddress();
-char* bmapi_getDeterministicAddress(char*, int, int);
+const char *bmapi_getDeterministicAddress(const char *, int, int);
 int bmapi_getAllInboxMessages();
 int bmapi_getAllInboxMessageIDs();
 int bmapi_getSentMessageByAckData();
@@ -33,17 +33,17 @@ int bmapi_trashMessages();
   simpleSendMessage(toaddress, fromaddress, subject, message)
   sendMessage(toAddress, fromAddress, subject, message, encodingType, TTL)
 */
-char* bmapi_simpleSendMessage(char*, char*, char*, char*);
-char* bmapi_sendMessage(char*, char*, char*, char*, int, int);
+const char *bmapi_simpleSendMessage(const char *, const char *, const char *, const char *);
+const char *bmapi_sendMessage(const char *, const char *, const char *, const char *, const int, int);
 int bmapi_sendBroadcast();
-char* bmapi_getStatus(char*);
+const char *bmapi_getStatus(const char *);
 int bmapi_listSubscriptions();
 int bmapi_addSubscription();
 int bmapi_deleteSubscriptions();
 int bmapi_listAddressBookEntries();
 int bmapi_addAddressBookEntry();
 int bmapi_deleteAddressBookEntry();
-char *bmapi_createChan(char *);
+const char *bmapi_createChan(const char *);
 int bmapi_deleteAddress();
 int bmapi_decodeAddress();
 int bmapi_addAddressToBlackWhiteList();

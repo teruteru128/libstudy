@@ -3,10 +3,13 @@
 #define BM_H
 
 #include <stdint.h>
+#include <config.h>
 #include <openssl/ripemd.h>
 #include <openssl/sha.h>
+#include <openssl/evp.h>
 #include <xmlrpc.h>
 #include <xmlrpc_client.h>
+#include <netdb.h>
 
 #define PUBLIC_KEY_LENGTH 65
 
@@ -17,19 +20,27 @@ typedef struct
   unsigned char cache64[SHA512_DIGEST_LENGTH];
 } RIPE_CTX;
 
-typedef struct clientinfo_t
+typedef struct endpointinfo
 {
-} clientinfo;
+  char host[NI_MAXHOST];
+  char port[NI_MAXSERV];
+} endpointinfo_t;
 
-typedef struct serverinfo_t
+typedef struct peerinfo
 {
-} serverinfo;
+  int peer_id;
+} peerinfo_t;
 
-typedef struct connectioninfo_t
+typedef struct serverinfo
 {
-  clientinfo client;
-  serverinfo server;
-} connectioninfo;
+  endpointinfo_t ep;
+} serverinfo_t;
+
+typedef struct connectioninfo
+{
+  peerinfo_t client;
+  serverinfo_t server;
+} connectioninfo_t;
 
 struct chararray
 {

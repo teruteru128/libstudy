@@ -8,6 +8,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <byteswap.h>
 
 /**
  * アドレスとポート番号を指定されたストリームへ表示する。
@@ -22,13 +23,13 @@ void print_addrinfo0(struct addrinfo *adrinf, FILE *stream)
   switch (adrinf->ai_protocol)
   {
   case IPPROTO_TCP:
-    strncpy(protocol, "TCP", 3);
+    strncpy(protocol, "TCP", 4);
     break;
   case IPPROTO_UDP:
-    strncpy(protocol, "UDP", 3);
+    strncpy(protocol, "UDP", 4);
     break;
   default:
-    strncpy(protocol, "UNKNOWN", 7);
+    strncpy(protocol, "UNKNOWN", 8);
     break;
   }
 
@@ -44,6 +45,18 @@ void print_addrinfo0(struct addrinfo *adrinf, FILE *stream)
   }
 
   fprintf(stream, "[%s]:%s(%s), flags : %d, family : %d, socktype : %d, protocol : %d", hbuf, sbuf, protocol, adrinf->ai_flags, adrinf->ai_family, adrinf->ai_socktype, adrinf->ai_protocol);
+  /*
+  if (adrinf->ai_family == AF_INET6)
+  {
+    struct sockaddr_in6 *addr = (struct sockaddr_in6 *)adrinf->ai_addr;
+    fprintf(stream, ", port : %d", bswap_16(addr->sin6_port));
+  }
+  else if (adrinf->ai_family == AF_INET)
+  {
+    struct sockaddr_in *addr = (struct sockaddr_in *)adrinf->ai_addr;
+    fprintf(stream, ", port : %d", bswap_16(addr->sin_port));
+  }
+  */
   if (adrinf->ai_canonname != NULL)
     fprintf(stream, ", canonname : %s", adrinf->ai_canonname);
   fputs("\n", stream);
