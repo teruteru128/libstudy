@@ -9,7 +9,7 @@
 #include "base64.h"
 #include <stdlib.h>
 
-const endpointinfo_t server_addresses_list[] = {
+const endpointinfo_t server_addresses_list[5] = {
     {"p2pquake.dyndns.info", "6910"},
     {"www.p2pquake.net", "6910"},
     {"p2pquake.dnsalias.net", "6910"},
@@ -17,9 +17,6 @@ const endpointinfo_t server_addresses_list[] = {
     {"", ""}};
 
 static int initflag = 0;
-static xmlrpc_env env;
-static xmlrpc_client *cp;
-static xmlrpc_server_info *sinfo;
 
 typedef struct bm_client_t bm_client;
 
@@ -34,6 +31,7 @@ void die_if_fault_occurred(xmlrpc_env *e)
   }
 }
 
+/*
 bm_client *bm_client_new()
 {
   if (initflag == 0)
@@ -86,14 +84,25 @@ int bmapi_cleanup()
   }
   return 0;
 }
+*/
 
+/*
 static void bmapi_call(const char *const methodName, xmlrpc_value *paramArray, xmlrpc_value **resultPP)
 {
   xmlrpc_client_call2(&env, cp, sinfo, methodName, paramArray, resultPP);
 }
+*/
 
-/***/
-const char *bmapi_helloWorld(const char *first, const char *second)
+#define HELLO_WORLD_METHOD_NAME "helloWorld"
+
+/**
+ * @brief 
+ * 
+ * @param first 
+ * @param second 
+ * @return const char* 
+ */
+const char *bmapi_helloWorld(xmlrpc_env *env, xmlrpc_client *clientP, xmlrpc_server_info *serverP, const char *first, const char *second)
 {
   if (initflag != 1)
   {
@@ -101,135 +110,115 @@ const char *bmapi_helloWorld(const char *first, const char *second)
   }
 
   // create array
-  xmlrpc_value *paramArray = xmlrpc_array_new(&env);
-  xmlrpc_value *f = xmlrpc_string_new(&env, first);
-  xmlrpc_value *s = xmlrpc_string_new(&env, second);
-  xmlrpc_array_append_item(&env, paramArray, f);
-  xmlrpc_array_append_item(&env, paramArray, s);
+  xmlrpc_value *paramArray = xmlrpc_array_new(env);
+  xmlrpc_value *f = xmlrpc_string_new(env, first);
+  xmlrpc_value *s = xmlrpc_string_new(env, second);
+  xmlrpc_array_append_item(env, paramArray, f);
+  xmlrpc_array_append_item(env, paramArray, s);
 
   xmlrpc_value *resultP = NULL;
-  bmapi_call("helloWorld", paramArray, &resultP);
-  die_if_fault_occurred(&env);
+  xmlrpc_client_call2(env, clientP, serverP, HELLO_WORLD_METHOD_NAME, paramArray, &resultP);
+  die_if_fault_occurred(env);
 
   const char *msg = NULL;
-  xmlrpc_read_string(&env, resultP, &msg);
+  xmlrpc_read_string(env, resultP, &msg);
   xmlrpc_DECREF(paramArray);
   xmlrpc_DECREF(resultP);
 
   return msg;
 }
 
-const char *bmapi_getStatus(const char *ackData)
-{
-  const char methodName[] = "getStatus";
+#define GET_STATUS_METHOD_NAME "getStatus"
 
-  xmlrpc_value *paramArray = xmlrpc_array_new(&env);
-  xmlrpc_value *ack_xml = xmlrpc_string_new(&env, ackData);
-  xmlrpc_array_append_item(&env, paramArray, ack_xml);
+const char *bmapi_getStatus(xmlrpc_env *env, xmlrpc_client *clientP, xmlrpc_server_info *serverP, const char *ackData)
+{
+  xmlrpc_value *paramArray = xmlrpc_array_new(env);
+  xmlrpc_value *ack_xml = xmlrpc_string_new(env, ackData);
+  xmlrpc_array_append_item(env, paramArray, ack_xml);
   xmlrpc_value *resultP = NULL;
-  bmapi_call(methodName, paramArray, &resultP);
+  xmlrpc_client_call2(env, clientP, serverP, GET_STATUS_METHOD_NAME, paramArray, &resultP);
   const char *msg = NULL;
-  xmlrpc_read_string(&env, resultP, &msg);
+  xmlrpc_read_string(env, resultP, &msg);
 
   return msg;
 }
 
+/*
 const char *bmapi_simpleSendMessage(const char *toaddress, const char *fromaddress, const char *subject, const char *message)
 {
   return bmapi_sendMessage(toaddress, fromaddress, subject, message, 2, 345600); // 4 * 24 * 60 * 60
 }
+*/
 
-const char *bmapi_sendMessage(const char *toaddress, const char *fromaddress, const char *subject, const char *message, int encodingType, int TTL)
+#define SEND_MESSAGE_METHOD_NAME "sendMessage"
+
+const char *bmapi_sendMessage(xmlrpc_env *env, xmlrpc_client *clientP, xmlrpc_server_info *serverP, xmlrpc_value *toaddressV, xmlrpc_value *fromaddressV, xmlrpc_value *subjectV, xmlrpc_value *messageV, xmlrpc_value *encodingTypeV, xmlrpc_value *TTLV)
 {
-  const char methodName[] = "sendMessage";
+  xmlrpc_value *paramArray = xmlrpc_array_new(env);
+  die_if_fault_occurred(env);
 
-  xmlrpc_value *paramArray = NULL;
-  paramArray = xmlrpc_array_new(&env);
-  die_if_fault_occurred(&env);
-  xmlrpc_value *toaddressV = NULL;
-  toaddressV = xmlrpc_string_new(&env, toaddress);
-  die_if_fault_occurred(&env);
-
-  xmlrpc_value *fromaddressV = NULL;
-  fromaddressV = xmlrpc_string_new(&env, fromaddress);
-  die_if_fault_occurred(&env);
-
-  char *subb64tmp = NULL;
-  subb64tmp = base64encode(subject, strlen(subject));
-  xmlrpc_value *subjectV = NULL;
-  subjectV = xmlrpc_string_new(&env, subb64tmp);
-  die_if_fault_occurred(&env);
-
-  char *msgb64tmp = NULL;
-  msgb64tmp = base64encode(message, strlen(message));
-  xmlrpc_value *messageV = NULL;
-  messageV = xmlrpc_string_new(&env, msgb64tmp);
-  die_if_fault_occurred(&env);
-
-  xmlrpc_value *encodingTypeP = NULL;
-  encodingTypeP = xmlrpc_int_new(&env, encodingType);
-  die_if_fault_occurred(&env);
-
-  xmlrpc_value *TTLP = NULL;
-  TTLP = xmlrpc_int_new(&env, TTL);
-  die_if_fault_occurred(&env);
-
-  xmlrpc_array_append_item(&env, paramArray, toaddressV);
-  die_if_fault_occurred(&env);
-  xmlrpc_array_append_item(&env, paramArray, fromaddressV);
-  die_if_fault_occurred(&env);
-  xmlrpc_array_append_item(&env, paramArray, subjectV);
-  die_if_fault_occurred(&env);
-  xmlrpc_array_append_item(&env, paramArray, messageV);
-  die_if_fault_occurred(&env);
-  xmlrpc_array_append_item(&env, paramArray, encodingTypeP);
-  die_if_fault_occurred(&env);
-  xmlrpc_array_append_item(&env, paramArray, TTLP);
-  die_if_fault_occurred(&env);
+  xmlrpc_array_append_item(env, paramArray, toaddressV);
+  die_if_fault_occurred(env);
+  xmlrpc_array_append_item(env, paramArray, fromaddressV);
+  die_if_fault_occurred(env);
+  xmlrpc_array_append_item(env, paramArray, subjectV);
+  die_if_fault_occurred(env);
+  xmlrpc_array_append_item(env, paramArray, messageV);
+  die_if_fault_occurred(env);
+  xmlrpc_array_append_item(env, paramArray, encodingTypeV);
+  die_if_fault_occurred(env);
+  xmlrpc_array_append_item(env, paramArray, TTLV);
+  die_if_fault_occurred(env);
 
   xmlrpc_value *resultP = NULL;
-  bmapi_call(methodName, paramArray, &resultP);
-  die_if_fault_occurred(&env);
+  xmlrpc_client_call2(env, clientP, serverP, SEND_MESSAGE_METHOD_NAME, paramArray, &resultP);
+  die_if_fault_occurred(env);
 
   const char *msg = NULL;
-  xmlrpc_read_string(&env, resultP, &msg);
+  xmlrpc_read_string(env, resultP, &msg);
   xmlrpc_DECREF(paramArray);
-  xmlrpc_DECREF(resultP);
+  //xmlrpc_DECREF(toaddressV);
+  //xmlrpc_DECREF(fromaddressV);
+  //xmlrpc_DECREF(subjectV);
+  //xmlrpc_DECREF(messageV);
+  //xmlrpc_DECREF(encodingTypeV);
+  //xmlrpc_DECREF(TTLV);
+  //xmlrpc_DECREF(resultP);
 
-  die_if_fault_occurred(&env);
+  die_if_fault_occurred(env);
 
   return msg;
 }
 
-const char *bmapi_getDeterministicAddress(const char *pass, int addver, int stream)
-{
-  const char *methodName = "getDeterministicAddress";
+#define GET_DETERMINISTIC_ADDRESS_METHOD_NAME "getDeterministicAddress"
 
-  xmlrpc_value *paramArray = xmlrpc_array_new(&env);
+const char *bmapi_getDeterministicAddress(xmlrpc_env *env, xmlrpc_client *clientP, xmlrpc_server_info *serverP, const char *pass, int addver, int stream)
+{
+  xmlrpc_value *paramArray = xmlrpc_array_new(env);
   char *passb64 = base64encode(pass, strlen(pass));
-  xmlrpc_value *passphrase = xmlrpc_string_new(&env, passb64);
-  xmlrpc_value *add = xmlrpc_int_new(&env, addver);
-  xmlrpc_value *s = xmlrpc_int_new(&env, stream);
+  xmlrpc_value *passphrase = xmlrpc_string_new(env, passb64);
+  xmlrpc_value *add = xmlrpc_int_new(env, addver);
+  xmlrpc_value *s = xmlrpc_int_new(env, stream);
 
-  xmlrpc_array_append_item(&env, paramArray, passphrase);
-  xmlrpc_array_append_item(&env, paramArray, add);
-  xmlrpc_array_append_item(&env, paramArray, s);
+  xmlrpc_array_append_item(env, paramArray, passphrase);
+  xmlrpc_array_append_item(env, paramArray, add);
+  xmlrpc_array_append_item(env, paramArray, s);
 
   xmlrpc_value *resultP = NULL;
-  bmapi_call(methodName, paramArray, &resultP);
+  xmlrpc_client_call2(env, clientP, serverP, GET_DETERMINISTIC_ADDRESS_METHOD_NAME, paramArray, &resultP);
 
   const char *msg = NULL;
-  xmlrpc_read_string(&env, resultP, &msg);
+  xmlrpc_read_string(env, resultP, &msg);
   xmlrpc_DECREF(paramArray);
   xmlrpc_DECREF(resultP);
   return msg;
 }
 
-const char *bmapi_createChan(const char *passphrase)
+#define CREATE_CHAN_METHOD_NAME "createChan"
+
+const char *bmapi_createChan(xmlrpc_env *env, xmlrpc_client *clientP, xmlrpc_server_info *serverP, const char *passphrase)
 {
-  const char methodName[] = "sendMessage";
   const char *address = NULL;
-  xmlrpc_value *encodingTypeP = NULL;
   char *adb64tmp = base64encode(passphrase, strlen(passphrase));
   printf("%s, %s\n", passphrase, adb64tmp);
   size_t len = strlen(adb64tmp);
@@ -238,24 +227,20 @@ const char *bmapi_createChan(const char *passphrase)
   strncat(adbtmp2 + len, "\n", 1);
 
   xmlrpc_value *passArray = NULL;
-  passArray = xmlrpc_array_new(&env);
-  die_if_fault_occurred(&env);
+  passArray = xmlrpc_array_new(env);
+  die_if_fault_occurred(env);
 
   xmlrpc_value *passV = NULL;
-  passV = xmlrpc_string_new(&env, adbtmp2);
-  die_if_fault_occurred(&env);
-  //  encodingTypeP = xmlrpc_int_new(&env, 2);
-  //  die_if_fault_occurred(&env);
+  passV = xmlrpc_string_new(env, adbtmp2);
+  die_if_fault_occurred(env);
 
-  xmlrpc_array_append_item(&env, passArray, passV);
-  die_if_fault_occurred(&env);
-  //  xmlrpc_array_append_item(&env, passArray, encodingTypeP);
-  //  die_if_fault_occurred(&env);
+  xmlrpc_array_append_item(env, passArray, passV);
+  die_if_fault_occurred(env);
   xmlrpc_value *resultP = NULL;
-  bmapi_call(methodName, passArray, &resultP);
-  die_if_fault_occurred(&env);
+  xmlrpc_client_call2(env, clientP, serverP, CREATE_CHAN_METHOD_NAME, passArray, &resultP);
+  die_if_fault_occurred(env);
   printf("%s\n", xmlrpc_type_name(xmlrpc_value_type(resultP)));
-  xmlrpc_read_string(&env, resultP, &address);
+  xmlrpc_read_string(env, resultP, &address);
   xmlrpc_DECREF(passArray);
   xmlrpc_DECREF(resultP);
   free(adb64tmp);

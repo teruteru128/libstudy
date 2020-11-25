@@ -23,18 +23,22 @@ static int bm_cleanup()
 
 static int global_init()
 {
+    return 0;
 }
 
 static int global_cleanup()
 {
+    return 0;
 }
 
-static int arg_parse(struct arg_t *argt, int argc, char **argv)
+static int arg_parse(args_t *arg, int argc, char **argv)
 {
+    return 0;
 }
 
 static char *get_config_filepath()
 {
+    return NULL;
 }
 
 /**
@@ -45,12 +49,15 @@ static char *get_config_filepath()
  * */
 static int config_parse(char *filename)
 {
+    return 0;
 }
 
 static char *getString()
 {
+    return NULL;
 }
 
 static int getInt()
 {
+    return 0;
 }
