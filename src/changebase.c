@@ -21,7 +21,7 @@ static char divmod58(unsigned char *number, size_t length, size_t startAt)
     int digit256 = number[i] & 0xFF;
     int temp = (remainder << 8) + digit256;
 
-    number[i] = (char)(temp / BASE_58);
+    number[i] = (unsigned char)(temp / BASE_58);
 
     remainder = temp % BASE_58;
   }

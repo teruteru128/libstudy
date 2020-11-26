@@ -3,11 +3,11 @@
 #include "config.h"
 #endif
 #include <stdio.h>
+#include <stdlib.h>
 #include "bm.h"
 #include "bmapi.h"
 #include "xmlrpc.h"
 #include "base64.h"
-#include <stdlib.h>
 
 const endpointinfo_t server_addresses_list[5] = {
     {"p2pquake.dyndns.info", "6910"},
@@ -15,10 +15,6 @@ const endpointinfo_t server_addresses_list[5] = {
     {"p2pquake.dnsalias.net", "6910"},
     {"p2pquake.ddo.jp", "6910"},
     {"", ""}};
-
-static int initflag = 0;
-
-typedef struct bm_client_t bm_client;
 
 void die_if_fault_occurred(xmlrpc_env *e)
 {
@@ -31,68 +27,6 @@ void die_if_fault_occurred(xmlrpc_env *e)
   }
 }
 
-/*
-bm_client *bm_client_new()
-{
-  if (initflag == 0)
-  {
-    return NULL;
-  }
-  bm_client *c = malloc(sizeof(bm_client));
-  xmlrpc_client_create(&env, XMLRPC_CLIENT_NO_FLAGS, PACKAGE_NAME, PACKAGE_VERSION, NULL, 0, &c->cp);
-  c->sinfo = xmlrpc_server_info_new(&env, "http://localhost:8442/");
-  xmlrpc_server_info_set_user(&env, c->sinfo, "teruteru128", "testpassword");
-  xmlrpc_server_info_allow_auth_basic(&env, c->sinfo);
-  return c;
-}
-
-void bm_client_set_server(bm_client *c, const char *const url)
-{
-  c->sinfo = xmlrpc_server_info_new(&env, url);
-}
-
-void bm_client_set_user(bm_client *c, const char *const username, const char *const password)
-{
-  xmlrpc_server_info_set_user(&env, c->sinfo, "teruteru128", "testpassword");
-}
-
-void bm_client_free(bm_client *c)
-{
-  return;
-}
-
-int bmapi_init()
-{
-  if (initflag == 0)
-  {
-    xmlrpc_env_init(&env);
-    xmlrpc_init(&env);
-    xmlrpc_client_setup_global_const(&env);
-    initflag = 1;
-  }
-  return 0;
-}
-
-int bmapi_cleanup()
-{
-  if (initflag == 1)
-  {
-    xmlrpc_client_setup_global_const(&env);
-    xmlrpc_env_clean(&env);
-    xmlrpc_term();
-    initflag = 0;
-  }
-  return 0;
-}
-*/
-
-/*
-static void bmapi_call(const char *const methodName, xmlrpc_value *paramArray, xmlrpc_value **resultPP)
-{
-  xmlrpc_client_call2(&env, cp, sinfo, methodName, paramArray, resultPP);
-}
-*/
-
 #define HELLO_WORLD_METHOD_NAME "helloWorld"
 
 /**
@@ -104,10 +38,6 @@ static void bmapi_call(const char *const methodName, xmlrpc_value *paramArray, x
  */
 const char *bmapi_helloWorld(xmlrpc_env *env, xmlrpc_client *clientP, xmlrpc_server_info *serverP, const char *first, const char *second)
 {
-  if (initflag != 1)
-  {
-    return NULL;
-  }
 
   // create array
   xmlrpc_value *paramArray = xmlrpc_array_new(env);
@@ -176,6 +106,8 @@ const char *bmapi_sendMessage(xmlrpc_env *env, xmlrpc_client *clientP, xmlrpc_se
 
   const char *msg = NULL;
   xmlrpc_read_string(env, resultP, &msg);
+  die_if_fault_occurred(env);
+
   xmlrpc_DECREF(paramArray);
   //xmlrpc_DECREF(toaddressV);
   //xmlrpc_DECREF(fromaddressV);
@@ -184,8 +116,6 @@ const char *bmapi_sendMessage(xmlrpc_env *env, xmlrpc_client *clientP, xmlrpc_se
   //xmlrpc_DECREF(encodingTypeV);
   //xmlrpc_DECREF(TTLV);
   //xmlrpc_DECREF(resultP);
-
-  die_if_fault_occurred(env);
 
   return msg;
 }

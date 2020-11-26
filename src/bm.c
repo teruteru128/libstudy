@@ -51,14 +51,14 @@ struct chararray *encodeVarint(uint64_t u)
   if (u < 253)
   {
     p->data = malloc(sizeof(char));
-    *p->data = (uint8_t)u;
+    *p->data = (int8_t)u;
     p->length = 1;
     return p;
   }
   if (253 <= u && u < 65536)
   {
     p->data = malloc(sizeof(char) + sizeof(uint16_t));
-    *p->data = 253;
+    *p->data = -3;
     *((uint16_t *)&p->data[1]) = bswap_16((uint16_t)u);
     p->length = 3;
     return p;
@@ -66,7 +66,7 @@ struct chararray *encodeVarint(uint64_t u)
   if (65536 <= u && u < 4294967296L)
   {
     p->data = malloc(sizeof(char) + sizeof(uint32_t));
-    *p->data = 254;
+    *p->data = -2;
     *((uint32_t *)&p->data[1]) = bswap_32((uint32_t)u);
     p->length = 5;
     return p;
@@ -74,7 +74,7 @@ struct chararray *encodeVarint(uint64_t u)
   if (4294967296L <= u && u <= 18446744073709551615UL)
   {
     p->data = malloc(sizeof(char) + sizeof(uint64_t));
-    *p->data = 254;
+    *p->data = -1;
     *((uint64_t *)&p->data[1]) = bswap_64((uint64_t)u);
     p->length = 9;
     return p;
@@ -96,7 +96,7 @@ char *encodeBase58()
   return NULL;
 }
 
-char *encodeAddress0(int version, int stream, unsigned char *ripe, size_t ripelen, size_t max)
+char *encodeAddress0(uint64_t version, uint64_t stream, unsigned char *ripe, size_t ripelen, size_t max)
 {
   unsigned char *workripe = ripe;
   size_t workripelen = ripelen;
@@ -188,24 +188,24 @@ char *encodeAddress0(int version, int stream, unsigned char *ripe, size_t ripele
  * https://github.com/Bitmessage/PyBitmessage/blob/d09782e53d3f42132532b6e39011cd27e7f41d25/src/addresses.py#L143
  * https://github.com/teruteru128/java-study/blob/03906187223ad8e5e8f8629e23ecbe2fbca5b7b4/src/main/java/com/twitter/teruteru128/study/bitmessage/genaddress/BMAddress.java#L18
  */
-char *encodeAddress(int version, int stream, unsigned char *ripe, size_t ripelen)
+char *encodeAddress(uint64_t version, uint64_t stream, unsigned char *ripe, size_t ripelen)
 {
   return encodeAddress0(version, stream, ripe, ripelen, 20);
 }
 
 char *encodeV4Address(unsigned char *ripe, size_t r)
 {
-  return encodeAddress0(4, 1, ripe, r, 20);
+  return encodeAddress0(4U, 1U, ripe, r, 20);
 }
 
 char *encodeV3Address(unsigned char *ripe, size_t r)
 {
-  return encodeAddress0(3, 1, ripe, r, 2);
+  return encodeAddress0(3UL, 1UL, ripe, r, 2);
 }
 
 char *encodeShorterV3Address(unsigned char *ripe, size_t r)
 {
-  return encodeAddress0(3, 1, ripe, r, 20);
+  return encodeAddress0(3UL, 1UL, ripe, r, 20);
 }
 
 char *encodeWIF(char *key)
