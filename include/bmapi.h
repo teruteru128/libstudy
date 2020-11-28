@@ -16,12 +16,12 @@ typedef struct bm_client_t
 bm_client *bm_client_new();
 int bmapi_init(void);
 int bmapi_cleanup();
-const char *bmapi_helloWorld(xmlrpc_env *, xmlrpc_client *, xmlrpc_server_info *, const char *, const char *);
+char *bmapi_helloWorld(xmlrpc_env *, xmlrpc_client *, xmlrpc_server_info *, const char *, const char *);
 int bmapi_add(int, int);
 int bmapi_statusBar();
 int bmapi_listAddresses2();
 int bmapi_createRandomAddress();
-const char *bmapi_getDeterministicAddress(xmlrpc_env *, xmlrpc_client *, xmlrpc_server_info *, const char *, int, int);
+char *bmapi_getDeterministicAddress(xmlrpc_env *, xmlrpc_client *, xmlrpc_server_info *, const char *, int, int);
 int bmapi_getAllInboxMessages();
 int bmapi_getAllInboxMessageIDs();
 int bmapi_getSentMessageByAckData();
@@ -33,17 +33,19 @@ int bmapi_trashMessages();
   simpleSendMessage(toaddress, fromaddress, subject, message)
   sendMessage(toAddress, fromAddress, subject, message, encodingType, TTL)
 */
-const char *bmapi_simpleSendMessage(const char *, const char *, const char *, const char *);
-const char *bmapi_sendMessage(xmlrpc_env *, xmlrpc_client *, xmlrpc_server_info *, xmlrpc_value *, xmlrpc_value *, xmlrpc_value *, xmlrpc_value *, xmlrpc_value *, xmlrpc_value *);
+#if 0
+char *bmapi_simpleSendMessage(const char *, const char *, const char *, const char *);
+#endif
+char *bmapi_sendMessage(xmlrpc_env *, xmlrpc_client *, xmlrpc_server_info *, xmlrpc_value *, xmlrpc_value *, xmlrpc_value *, xmlrpc_value *, xmlrpc_value *, xmlrpc_value *) __wur;
 int bmapi_sendBroadcast();
-const char *bmapi_getStatus(xmlrpc_env *, xmlrpc_client *, xmlrpc_server_info *, const char *);
+char *bmapi_getStatus(xmlrpc_env *, xmlrpc_client *, xmlrpc_server_info *, const char *);
 int bmapi_listSubscriptions();
 int bmapi_addSubscription();
 int bmapi_deleteSubscriptions();
 int bmapi_listAddressBookEntries();
 int bmapi_addAddressBookEntry();
 int bmapi_deleteAddressBookEntry();
-const char *bmapi_createChan(xmlrpc_env *, xmlrpc_client *, xmlrpc_server_info *, const char *);
+char *bmapi_createChan(xmlrpc_env *, xmlrpc_client *, xmlrpc_server_info *, const char *);
 int bmapi_deleteAddress();
 int bmapi_decodeAddress();
 int bmapi_addAddressToBlackWhiteList();
