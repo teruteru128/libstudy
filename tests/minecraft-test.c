@@ -84,7 +84,7 @@ int main(int argc, char **argv)
 #else
 #error "unsupported realpath"
 #endif
-        if(p == NULL)
+        if (p == NULL)
         {
             perror("");
             exit(1);
@@ -98,9 +98,31 @@ int main(int argc, char **argv)
         }
         int ret = 0;
         size_t i = 0;
+        char buf[21];
+        while (fgets(buf, 21, in) != NULL)
+        {
+            char *p = strpbrk(buf, "\r\n");
+            if (p != NULL)
+            {
+                *p = '\0';
+            }
+            /*
+            size_t len = strlen(buf);
+            size_t spn = strspn(buf, "-1234567890");
+            if (len != spn)
+            {
+                fprintf(stderr, "%zu, %zu\n", len, spn);
+                exit(EXIT_FAILURE);
+            }
+            */
+            seeds[i++] = strtol(buf, NULL, 10);
+        }
+        // fscanfとかscanfとか嫌いなんですよね
+        /*
         while ((ret = fscanf(in, " %ld", &seeds[i++])) != EOF)
         {
         }
+        */
         fclose(in);
         fprintf(stderr, "hello!\n");
     }
