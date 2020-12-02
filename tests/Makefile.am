@@ -1,7 +1,7 @@
 
 METASOURCES=AUTO
-check_PROGRAMS=epsp-parser-test minecraft-test base58test ripeencode changebasetest
-TESTS=test.sh xfail.sh epsp-parser-test minecraft-test base58test ripeencode changebasetest
+check_PROGRAMS=epsp-parser-test minecraft-test base58test ripeencode changebasetest string_list_test
+TESTS=test.sh xfail.sh epsp-parser-test minecraft-test base58test ripeencode changebasetest string_list_test 
 XFAIL_TESTS=xfail.sh
 EXTRA_DIST=test.sh xfail.sh epsp-packet-sample-fail.txt epsp-packet-sample-success.txt seeds.txt
 
@@ -17,3 +17,5 @@ ripeencode_LDADD=$(top_builddir)/src/libstudy.la
 ripeencode_SOURCES=ripeencode.c
 changebasetest_LDADD=$(top_builddir)/src/libstudy.la
 changebasetest_SOURCES=changebasetest.c
+string_list_test_LDADD=$(top_builddir)/src/libstudy.la
+string_list_test_SOURCES=string_list_test.c
