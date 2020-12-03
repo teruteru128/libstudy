@@ -164,7 +164,10 @@ int validate_epsp_packet_line(char *line)
 {
   // 毎回コンパイルするのはもったいなくない？->どのタイミングでコンパイルする？
   // validateでだけ正規表現を使って分割はstrdupを使う？
+  // sscanf()を使ってもいいかもしれないけどデータ部分どうするんだよ
+  // sscanfは空白文字を読めないので不可
   regex_t packet_pattern;
+  // "^[[:digit:]]{3} [[:digit:]]+( .+)?$"
   int ret = regcomp(&packet_pattern, "^[[:digit:]]{3}( [[:digit:]]+( .*)?)?$",
                     REG_EXTENDED | REG_NEWLINE | REG_ICASE);
   ret = regexec(&packet_pattern, line, 0, NULL, 0);
@@ -210,7 +213,7 @@ epsp_packet_t *epsp_packet_new(char *line)
   packet->data = NULL;
   packet->next = NULL;
   // return
-  return NULL;
+  return packet;
 }
 
 /**
