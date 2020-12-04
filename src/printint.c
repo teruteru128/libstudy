@@ -35,29 +35,25 @@ static size_t stringSize(const uint64_t l)
  */
 size_t snprintUInt64(char *restrict s, size_t n, uint64_t l)
 {
-  uint64_t tmp;
-  size_t length;
   /* length = min(length, n); */
   //length = length < n ? length : n;
-  uint64_t q;
-  uint32_t r;
-  size_t charPos;
-  size_t i;
 
   if (s == NULL || n == 0)
   {
     return 0;
   }
 
-  tmp = l;
-  memset(s, 0, n);
-  length = stringSize(tmp);
-  for (i = length; i > n; i--)
+  uint64_t tmp = l;
+  size_t length;
+  for (length = stringSize(l); length >= n; length--)
   {
     tmp = tmp / 10;
   }
-  charPos = i;
+  size_t charPos = length;
+  s[charPos] = 0;
 
+  uint64_t q;
+  uint32_t r;
   while (tmp > 0x7FFFFFFFULL)
   {
     q = tmp / 100;
@@ -88,7 +84,7 @@ size_t snprintUInt64(char *restrict s, size_t n, uint64_t l)
       break;
     }
   }
-  return i;
+  return length;
 }
 
 size_t snprintInt64(char *restrict s, size_t n, int64_t l)
