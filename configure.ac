@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.69])
-AC_CONFIG_AUX_DIR([.])
+AC_CONFIG_AUX_DIR
 AC_INIT([libstudy],[1.0.2],[teruterubouzu1024@gmail.com])
 AM_INIT_AUTOMAKE([foreign])
 AC_CONFIG_SRCDIR([src/study.c])
