@@ -3,7 +3,6 @@
 #define BM_H
 
 #include <stdint.h>
-#include <config.h>
 #include <openssl/ripemd.h>
 #include <openssl/sha.h>
 #include <openssl/evp.h>
