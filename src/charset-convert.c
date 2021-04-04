@@ -11,8 +11,8 @@
 
 static int convert(iconv_t cd, char **dest, const char *src)
 {
-  size_t srclen = strlen(src);
-  size_t destlen = srclen * 3 + 1;
+  const size_t srclen = strlen(src);
+  const size_t destlen = srclen * 3 + 1;
   char *tmpsrc = src;
   char *destbuf = malloc(destlen);
   char *head = destbuf;
