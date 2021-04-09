@@ -22,6 +22,7 @@ libstudy_la_SOURCES  = \
                 java_random.c \
                 md5.c \
                 minecraft.c \
+                nlz.c \
                 numsys.c \
                 orz.c \
                 print_addrinfo.c \

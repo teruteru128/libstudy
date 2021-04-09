@@ -12,6 +12,7 @@
 #include "bitmessage.h"
 #include "bm.h"
 #include "bmapi.h"
+#include "nlz.h"
 #define localhost_ip "127.0.0.1"
 #define bitmessage_port 8442
 #define NAME "TR BM TEST CLIENT"
@@ -29,10 +30,7 @@ size_t ripe(RIPE_CTX *ctx, unsigned char *signpubkey, unsigned char *encpubkey)
   RIPEMD160_Init(&ripemd160ctx);
   RIPEMD160_Update(&ripemd160ctx, cache64, SHA512_DIGEST_LENGTH);
   RIPEMD160_Final(cache64, &ripemd160ctx);
-  size_t nlz = 0;
-  for (; cache64[nlz] == 0 && nlz < RIPEMD160_DIGEST_LENGTH; nlz++)
-  {
-  }
+  size_t nlz = getNLZ(cache64, RIPEMD160_DIGEST_LENGTH);
   return nlz;
 }
 
