@@ -18,6 +18,28 @@
 #define NAME "TR BM TEST CLIENT"
 #define SERVER_URL "http://127.0.0.1:8442/"
 
+void hashSHA512(EVP_MD_CTX *mdctx, const EVP_MD *sha512, unsigned char *cache64, unsigned char *publicKey, size_t signkeyindex, size_t enckeyindex)
+{
+  EVP_DigestInit(mdctx, sha512);
+  EVP_DigestUpdate(mdctx, publicKey + signkeyindex * PUBLIC_KEY_LENGTH, PUBLIC_KEY_LENGTH);
+  EVP_DigestUpdate(mdctx, publicKey + enckeyindex * PUBLIC_KEY_LENGTH, PUBLIC_KEY_LENGTH);
+  EVP_DigestFinal(mdctx, cache64, NULL);
+}
+
+void hashRIPEMD160(EVP_MD_CTX *mdctx, const EVP_MD *ripemd160, unsigned char *cache64)
+{
+  EVP_DigestInit(mdctx, ripemd160);
+  EVP_DigestUpdate(mdctx, cache64, 64);
+  EVP_DigestFinal(mdctx, cache64, NULL);
+}
+
+int calcRipe(EVP_MD_CTX *mdctx, const EVP_MD *sha512, const EVP_MD *ripemd160, unsigned char *cache64, unsigned char *publicKey, size_t signkeyindex, size_t enckeyindex)
+{
+  hashSHA512(mdctx, sha512, cache64, publicKey, signkeyindex, enckeyindex);
+  hashRIPEMD160(mdctx, ripemd160, cache64);
+  return 0;
+}
+
 size_t ripe(RIPE_CTX *ctx, unsigned char *signpubkey, unsigned char *encpubkey)
 {
   unsigned char *cache64 = ctx->cache64;

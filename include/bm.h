@@ -49,6 +49,10 @@ struct chararray
   size_t length;
 };
 
+void hashSHA512(EVP_MD_CTX *mdctx, const EVP_MD *sha512, unsigned char *cache64, unsigned char *publicKey, size_t signkeyindex, size_t enckeyindex);
+void hashRIPEMD160(EVP_MD_CTX *mdctx, const EVP_MD *ripemd160, unsigned char *cache64);
+int calcRipe(EVP_MD_CTX *mdctx, const EVP_MD *sha512, const EVP_MD *ripemd160, unsigned char *cache64, unsigned char *publicKey, size_t signkeyindex, size_t enckeyindex);
+
 /* int ripe(ripectx, signpub, encpub) */
 size_t ripe(RIPE_CTX *, unsigned char *, unsigned char *);
 struct chararray *encodeVarint(uint64_t u);
