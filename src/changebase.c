@@ -169,7 +169,7 @@ size_t parseHex(unsigned char **out, const char *str)
   }
   for (i = 0; i < length; i++)
   {
-    data[i] = (TABLE[str[2 * i] & 0xff] << 4) | (TABLE[str[2 * i + 1] & 0xff]);
+    data[i] = (unsigned char)((TABLE[str[2 * i] & 0xff] << 4) | (TABLE[str[2 * i + 1] & 0xff]));
   }
   *out = data;
   return length;
