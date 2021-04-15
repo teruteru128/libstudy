@@ -1,6 +1,8 @@
 base58test
+chainCookiesTest
 changebasetest
 epsp-parser-test
 minecraft-test
 ripeencode
 string_list_test
+random-test

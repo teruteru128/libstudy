@@ -6,7 +6,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
-#include <xorshift.h>
 #include "internal_random.h"
 
 int read_file(const char *const path, void *buf, const size_t size, const size_t nmemb)

@@ -10,6 +10,7 @@ libstudy_la_SOURCES  = \
                 bitset.c \
                 bm.c \
                 bmapi.c \
+                chainCookies.c \
                 changebase.c \
                 charset-convert.c \
                 epsp-parser.c \

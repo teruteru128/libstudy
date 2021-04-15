@@ -24,7 +24,7 @@ int orz(int num)
   }
   size_t i = 0;
 
-  char *messages[] = {
+  char **messages = {
       "orz",
       "申し訳ございませんでした",
       "ごめんなさい",

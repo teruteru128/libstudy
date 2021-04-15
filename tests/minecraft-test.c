@@ -31,6 +31,28 @@ static void stest(void)
     }
 }
 
+static void seedtest(void)
+{
+    int64_t seed = 42056176818708L;
+    int64_t ctx = 0;
+    CU_ASSERT_TRUE(isSlimeChunk(&ctx, seed, -196, -150) == 1);
+    CU_ASSERT_TRUE(isSlimeChunk(&ctx, seed, -195, -150) == 1);
+    CU_ASSERT_TRUE(isSlimeChunk(&ctx, seed, -194, -150) == 1);
+    CU_ASSERT_TRUE(isSlimeChunk(&ctx, seed, -193, -150) == 1);
+    CU_ASSERT_TRUE(isSlimeChunk(&ctx, seed, -196, -149) == 1);
+    CU_ASSERT_TRUE(isSlimeChunk(&ctx, seed, -195, -149) == 1);
+    CU_ASSERT_TRUE(isSlimeChunk(&ctx, seed, -194, -149) == 1);
+    CU_ASSERT_TRUE(isSlimeChunk(&ctx, seed, -193, -149) == 1);
+    CU_ASSERT_TRUE(isSlimeChunk(&ctx, seed, -196, -148) == 1);
+    CU_ASSERT_TRUE(isSlimeChunk(&ctx, seed, -195, -148) == 1);
+    CU_ASSERT_TRUE(isSlimeChunk(&ctx, seed, -194, -148) == 1);
+    CU_ASSERT_TRUE(isSlimeChunk(&ctx, seed, -193, -148) == 1);
+    CU_ASSERT_TRUE(isSlimeChunk(&ctx, seed, -196, -147) == 1);
+    CU_ASSERT_TRUE(isSlimeChunk(&ctx, seed, -195, -147) == 1);
+    CU_ASSERT_TRUE(isSlimeChunk(&ctx, seed, -194, -147) == 1);
+    CU_ASSERT_TRUE(isSlimeChunk(&ctx, seed, -193, -147) == 1);
+}
+
 static void s1test(void)
 {
     int64_t seed = 0;
@@ -134,6 +156,7 @@ int main(int argc, char **argv)
     CU_add_test(testSuite, "stest", stest);
     //CU_add_test(testSuite, "s1test", s1test);
     CU_add_test(testSuite, "s2test", s2test);
+    CU_add_test(testSuite, "seedtest", seedtest);
 
     CU_basic_set_mode(CU_BRM_NORMAL);
     CU_basic_run_tests();

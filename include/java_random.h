@@ -4,7 +4,7 @@
 
 #include <stdint.h>
 
-int32_t next(int64_t *, int32_t);
+//int32_t next(int64_t *, int32_t);
 int64_t nextLong(int64_t *);
 int32_t nextInt(int64_t *);
 int32_t nextIntWithBounds(int64_t *, int32_t);

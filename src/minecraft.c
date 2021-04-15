@@ -3,14 +3,14 @@
 #include <stdint.h>
 #include <java_random.h>
 
-int64_t s(int64_t seed, int32_t x, int32_t z)
+int64_t s(int64_t seed, int32_t chunkX, int32_t chunkZ)
 {
-  return (seed + (long)(x * x * 0x4c1906) + (long)(x * 0x5ac0db) + (long)(z * z) * 0x4307a7L + (long)(z * 0x5f24f)) ^ 0x3ad8025f;
+  return seed + chunkX * chunkX * 0x4c1906 + chunkX * 0x5ac0db + chunkZ * chunkZ * 0x4307a7L + chunkZ * 0x5f24f ^ 0x3ad8025f;
 }
 
 int isSlimeChunk(int64_t *ctx, int64_t seed, int32_t x, int32_t z)
 {
-  *ctx = s(seed, x, z);
+  *ctx = initialScramble(s(seed, x, z));
   return !nextIntWithBounds(ctx, 10);
 }
 
