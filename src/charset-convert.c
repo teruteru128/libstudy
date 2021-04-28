@@ -11,11 +11,11 @@
 
 static int convert(iconv_t cd, char **dest, const char *src)
 {
-  const size_t srclen = strlen(src);
-  const size_t destlen = srclen * 3 + 1;
-  char *tmpsrc = src;
-  char *destbuf = malloc(destlen);
-  char *head = destbuf;
+  size_t srclen = strlen(src);
+  size_t destlen = srclen * 3 + 1;
+  char *tmpsrc = strdupa(src);
+  char *head = malloc(destlen);
+  char *destbuf = head;
   size_t ret = iconv(cd, &tmpsrc, &srclen, &destbuf, &destlen);
   if (ret == (size_t)-1)
   {
@@ -27,9 +27,9 @@ static int convert(iconv_t cd, char **dest, const char *src)
   return 0;
 }
 
-int encode_utf8_2_sjis(char **dest, const char *src)
+int encode_charset(char **dest, const char *src, const char *tocode, const char *fromcode)
 {
-  iconv_t cd = iconv_open("SHIFT_JIS", "UTF-8");
+  iconv_t cd = iconv_open(tocode, fromcode);
   if (cd == (iconv_t)-1)
   {
     perror("iconv_open");
@@ -40,15 +40,12 @@ int encode_utf8_2_sjis(char **dest, const char *src)
   return ret;
 }
 
+int encode_utf8_2_sjis(char **dest, const char *src)
+{
+  return encode_charset(dest, src, "SHIFT_JIS", "UTF-8");
+}
+
 int encode_utf8_2_unicode(char **dest, const char *src)
 {
-  iconv_t cd = iconv_open("Unicode", "UTF-8");
-  if (cd == (iconv_t)-1)
-  {
-    perror("iconv_open");
-    return -1;
-  }
-  int ret = convert(cd, dest, src);
-  iconv_close(cd);
-  return ret;
+  return encode_charset(dest, src, "Unicode", "UTF-8");
 }
