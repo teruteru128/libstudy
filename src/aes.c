@@ -1,7 +1,7 @@
 
 /*
-  https://github.com/kokke/tiny-AES-c/blob/master/aes.c
-*/
+ * https://github.com/kokke/tiny-AES-c/blob/master/aes.c
+ */
 #include <stdint.h>
 #include <string.h>
 

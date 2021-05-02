@@ -15,18 +15,18 @@
 
 static char divmod58(unsigned char *number, size_t length, size_t startAt)
 {
-  int remainder = 0;
-  for (size_t i = startAt; i < length; i++)
-  {
-    int digit256 = number[i] & 0xFF;
-    int temp = (remainder << 8) + digit256;
+    int remainder = 0;
+    for (size_t i = startAt; i < length; i++)
+    {
+        int digit256 = number[i] & 0xFF;
+        int temp = (remainder << 8) + digit256;
 
-    number[i] = (unsigned char)(temp / BASE_58);
+        number[i] = (unsigned char)(temp / BASE_58);
 
-    remainder = temp % BASE_58;
-  }
+        remainder = temp % BASE_58;
+    }
 
-  return (char)remainder;
+    return (char)remainder;
 }
 
 /*
@@ -85,54 +85,65 @@ static char divmod58(unsigned char *number, size_t length, size_t startAt)
  * decodeBase58
  * https://github.com/Bitmessage/PyBitmessage/blob/d09782e53d3f42132532b6e39011cd27e7f41d25/src/addresses.py#L33
  * 
+ * TODO: base58.cに移動する
+ * 
+ */
+/**
+ * @brief バイナリを渡して58進数文字列に変換する
+ * 
+ * @param input 
+ * @param length 
+ * @return char* 
  */
 char *base58encode(const unsigned char *input, const size_t length)
 {
-  if (input == NULL || length == 0)
-  {
-    return NULL;
-  }
-  unsigned char *work = alloca(length);
-  memcpy(work, input, length);
-  size_t zeroCount = 0;
-  while (zeroCount < length && work[zeroCount] == 0)
-    zeroCount++;
-  size_t templen = length * 2;
-  char *temp = alloca(templen);
-  size_t j = templen;
-  memset(temp, 0, j);
-
-  size_t startAt = zeroCount;
-  while (startAt < length)
-  {
-    int mod = divmod58(work, length, startAt);
-    if (work[startAt] == 0)
+    if (input == NULL || length == 0)
     {
-      ++startAt;
+        return NULL;
     }
+    unsigned char *work = alloca(length);
+    memcpy(work, input, length);
+    size_t zeroCount = 0;
+    while (zeroCount < length && work[zeroCount] == 0)
+        zeroCount++;
+    size_t templen = length * 2;
+    char *temp = alloca(templen);
+    size_t j = templen;
+    memset(temp, 0, j);
 
-    temp[--j] = ALPHABET[mod];
-  }
-  while (j < templen && temp[j] == ALPHABET[0])
-  {
-    ++j;
-  }
-  while (zeroCount--)
-  {
-    temp[--j] = ALPHABET[0];
-  }
-  size_t outputlen = templen - j;
-  char *output = malloc(outputlen);
-  memset(output, 0, outputlen);
-  memcpy(output, &temp[j], outputlen);
-  char *tmp = realloc(output, strlen(output));
-  if (!tmp)
-  {
-    free(output);
-    err(EXIT_FAILURE, "realloc in base58encode");
-  }
-  output = tmp;
-  return output;
+    size_t startAt = zeroCount;
+    while (startAt < length)
+    {
+        int mod = divmod58(work, length, startAt);
+        if (work[startAt] == 0)
+        {
+            ++startAt;
+        }
+
+        temp[--j] = ALPHABET[mod];
+    }
+    while (j < templen && temp[j] == ALPHABET[0])
+    {
+        ++j;
+    }
+    while (zeroCount--)
+    {
+        temp[--j] = ALPHABET[0];
+    }
+    size_t outputlen = templen - j;
+    char *output = malloc(outputlen + 1);
+    memset(output, 0, outputlen + 1);
+    memcpy(output, &temp[j], outputlen);
+    /*
+    char *tmp = realloc(output, strlen(output) + 1);
+    if (!tmp)
+    {
+        free(output);
+        err(EXIT_FAILURE, "realloc in base58encode");
+    }
+    output = tmp;
+    */
+    return output;
 }
 
 #define TABLE "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"                     \
@@ -159,18 +170,18 @@ char *base58encode(const unsigned char *input, const size_t length)
  */
 size_t parseHex(unsigned char **out, const char *str)
 {
-  size_t length = strlen(str) / 2;
-  size_t i = 0;
-  unsigned char *data = calloc(length, sizeof(char));
-  if (!data)
-  {
-    perror("calloc in parseHex");
-    exit(1);
-  }
-  for (i = 0; i < length; i++)
-  {
-    data[i] = (unsigned char)((TABLE[str[2 * i] & 0xff] << 4) | (TABLE[str[2 * i + 1] & 0xff]));
-  }
-  *out = data;
-  return length;
+    size_t length = strlen(str) / 2;
+    size_t i = 0;
+    unsigned char *data = calloc(length, sizeof(char));
+    if (!data)
+    {
+        perror("calloc in parseHex");
+        exit(1);
+    }
+    for (i = 0; i < length; i++)
+    {
+        data[i] = (unsigned char)((TABLE[str[2 * i] & 0xff] << 4) | (TABLE[str[2 * i + 1] & 0xff]));
+    }
+    *out = data;
+    return length;
 }
