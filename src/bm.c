@@ -228,7 +228,7 @@ char *encodeShorterV3Address(unsigned char *ripe, size_t r)
   return encodeAddress0(3UL, 1UL, ripe, r, 20);
 }
 
-char *encodeWIF(char *key)
+char *encodeWIF(unsigned char *key)
 {
   return NULL;
 }

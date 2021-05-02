@@ -86,7 +86,7 @@ static char divmod58(unsigned char *number, size_t length, size_t startAt)
  * https://github.com/Bitmessage/PyBitmessage/blob/d09782e53d3f42132532b6e39011cd27e7f41d25/src/addresses.py#L33
  * 
  */
-char *base58encode(unsigned char *input, size_t length)
+char *base58encode(const unsigned char *input, const size_t length)
 {
   if (input == NULL || length == 0)
   {

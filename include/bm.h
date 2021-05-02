@@ -63,7 +63,7 @@ char *encodeAddress(uint64_t version, uint64_t stream, unsigned char *ripe, size
 char *encodeV4Address(unsigned char *, size_t ripelen);
 char *encodeV3Address(unsigned char *ripe, size_t ripelen);
 char *encodeShorterV3Address(unsigned char *, size_t ripelen);
-char *encodeWIF(char *);
+char *encodeWIF(unsigned char *);
 char *formatKey(char *, char *, char *);
 int exportAddress(unsigned char *, unsigned char *, unsigned char *, unsigned char *, unsigned char *);
 
