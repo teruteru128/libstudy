@@ -1,8 +1,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "string_list.h"
-#include "internal_string_list.h"
+#include "string-list.h"
+#include "internal-string-list.h"
 
 /*
   XXX strを追加するときにコピー(strdup)して追加するかそのまま追加するか

@@ -1,22 +1,19 @@
 
+#include "internal-string-array.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "internal_string_array.h"
 
-string_array *string_array_create(size_t initialCapacity)
-{
-}
+string_array *string_array_create(size_t initialCapacity) {}
 
-int trimToSize(string_array *a)
-{
-}
+int trimToSize(string_array *a) {}
 
 static char *grow() {}
+
 static char *growOne() {}
-static int add_(char *a, char **e, size_t size, size_t length)
-{
-}
+
+static int add_(char *a, char **e, size_t size, size_t length) {}
+
 int string_array_add(string_array *data, char *a)
 {
     add_(a, data->str, data->size, data->length);
@@ -39,7 +36,8 @@ string_array *string_array_split(const char *in, const char *delim)
     size_t length = 10;
     size_t size = 0;
     char *tp = NULL, *catch = NULL;
-    for (tp = strtok_r(work, delim, &catch); tp; tp = strtok_r(NULL, delim, &catch), size++)
+    for (tp = strtok_r(work, delim, &catch); tp;
+         tp = strtok_r(NULL, delim, &catch), size++)
     {
         // string_array_add(data, tp);
         if (size > length)
@@ -96,3 +94,6 @@ string_array *string_array_split(const char *in, const char *delim)
     data->size = size;
     return data;
 }
+
+void string_array_free(string_array *arr)
+{}
