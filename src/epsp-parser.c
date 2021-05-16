@@ -28,21 +28,10 @@ static int pattern_initialized = 0;
 
 void parser_init(void)
 {
-    if (pattern_initialized == 0)
-    {
-        int errorcode = regcomp(&line_pattern, LINE_PATTERN, REG_EXTENDED | REG_NEWLINE);
-        if (errorcode == 0)
-            pattern_initialized = 1;
-    }
 }
 
 void parser_free(void)
 {
-    if (pattern_initialized != 0)
-    {
-        regfree(&line_pattern);
-        pattern_initialized = 0;
-    }
 }
 
 /**
@@ -96,7 +85,7 @@ static int parse_internal(epsp_packet_t *packet, const char *line)
 
     {
         char *catch = NULL;
-        packet->code = strtol(code_str, &catch, 10);
+        packet->code = (int)strtol(code_str, &catch, 10);
         if (*catch != '\0')
         {
             // 不正な文字が混入した
@@ -105,7 +94,7 @@ static int parse_internal(epsp_packet_t *packet, const char *line)
         }
         if (hop_str != NULL)
         {
-            packet->hop_count = strtol(hop_str, &catch, 10);
+            packet->hop_count = (int)strtol(hop_str, &catch, 10);
             if (*catch != '\0')
             {
                 // 不正な文字が混入した
@@ -140,8 +129,7 @@ void epsp_packet_free(epsp_packet_t *packet)
     packet->hop_count = 0;
     if (packet->data != NULL)
     {
-        size_t len = strlen(packet->data);
-        memset(packet->data, 0, len);
+        string_array_free(packet->data);
         free(packet->data);
         packet->data = NULL;
     }
@@ -226,7 +214,7 @@ int epsp_packet_parse(epsp_packet_t *packet, char *line)
 {
     if (pattern_initialized == 0 || line == NULL)
     {
-        return NULL;
+        return 0;
     }
 
     /**
@@ -254,7 +242,7 @@ int epsp_packet_parse(epsp_packet_t *packet, char *line)
     {
         //failed
         epsp_packet_free(packet);
-        return NULL;
+        return 0;
     }
 }
 
@@ -274,38 +262,17 @@ int split(string_array** dest, regex_t pattern, char* input, size_t limit){
 
 string_list *split(char *src, char *regex, int limit)
 {
-    char ch = 0;
-    size_t regex_len = strlen(regex);
-    if (((regex_len == 1 && strchr(".$|()[{^?*+\\", ch = regex[0]) == NULL) ||
-         (regex_len == 2 && regex[0] == '\\' && (((ch = regex[1]) - '0') | ('9' - ch)) < 0 && ((ch - 'a') | ('z' - ch)) < 0 && ((ch - 'A') | ('Z' - ch)) < 0)))
-    {
-        int off = 0;
-        int next = 0;
-        int limited = limit > 0;
-        string_list *list = malloc(sizeof(string_list));
-        while ((next = regex[off]) != '\0')
-        {
-            if (!limited || string_list_size(list) < limit - 1)
-            {
-                char *s = malloc(next - off + 1);
-                strncpy(s, regex, next - off);
-                s[next - off] = 0;
-                string_list_add(list, s);
-            }
-            else
-            {
-            }
-        }
-    }
     return NULL;
 }
 
 int split_regex(string_array **dest, char *pattern, char *str, size_t limit)
 {
+    return 0;
 }
 
 int split_strtok(string_array **dest, char *delim, char *src, size_t limit)
 {
+    return 0;
 }
 
 /*
@@ -322,6 +289,7 @@ int split_by_strtok(const char *str)
 void free_string_array(string_array *str)
 {
 }
+
 int split_by_regex(char *str, char *regex)
 {
     return EXIT_SUCCESS;

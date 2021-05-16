@@ -19,5 +19,6 @@ typedef struct string_array{
 string_array* string_array_create(size_t initialCapacity);
 int string_array_add(string_array *, char *);
 string_array *string_array_split(const char *in, const char *delim);
+string_array *string_array_free(string_array *arr);
 
 #endif

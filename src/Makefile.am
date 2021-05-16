@@ -18,8 +18,8 @@ libstudy_la_SOURCES  = \
                 internal_bitset.h \
                 internal_queue.h \
                 internal_random.h \
-                internal_string_array.h \
-                internal_string_list.h \
+                internal-string-array.h \
+                internal-string-list.h \
                 java_random.c \
                 md5.c \
                 minecraft.c \
@@ -34,9 +34,9 @@ libstudy_la_SOURCES  = \
                 sha-2.c \
                 sha-3.c \
                 sha.c \
-                string_array.c \
-                string_joiner.c \
-                string_list.c \
+                string-array.c \
+                string-joiner.c \
+                string-list.c \
                 strjoin.c \
                 study.c \
                 svgplot.c \

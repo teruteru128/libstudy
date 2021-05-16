@@ -2,8 +2,8 @@
 #ifndef EPSP_TYPE_H
 #define EPSP_TYPE_H
 
-#include <stdint.h>
 #include "string-array.h"
+#include <stdint.h>
 
 typedef struct server_point
 {
@@ -49,7 +49,7 @@ struct protocol_code_t
 struct protocol_code_t code_list[]
     = { { .code = 112, .str = "", .require = UNNECESSARY },
         { .code = 113, .str = "", .require = UNNECESSARY },
-        { .code = 0, .str = NULL, .require = NONE } };
+        { .code = 0, .str = "", .require = NONE } };
 // HOP_COUNT & MAX_HOP_COUNT
 
 #endif

@@ -13,30 +13,28 @@
 #define BUF_SIZE 8
 #include <random.h>
 
-int orz(int num)
+int orz(size_t num)
 {
-    int count = num > 0 ? num : 334;
+    size_t count = num > 0 ? num : 334;
     uint32_t seed;
     if (read_file(URANDOM_PATH, &seed, sizeof(uint32_t), 1) != 0)
     {
         warnx("failed");
         return EXIT_FAILURE;
     }
-    size_t i = 0;
 
-    char **messages = {
+    const char messages[][37] = {
         "orz",
         "申し訳ございませんでした",
         "ごめんなさい",
         "すみませんでした",
-        NULL};
+        ""};
     size_t messages_size = 0;
-    char **tmp = messages;
-    while (*tmp++ != NULL)
+    while(messages[messages_size][0] != 0)
     {
         messages_size++;
     }
-    for (i = 0; i < count; i++)
+    for (size_t i = 0; i < count; i++)
     {
         printf("%s\n", messages[(seed = xorshift(seed)) % messages_size]);
     }
