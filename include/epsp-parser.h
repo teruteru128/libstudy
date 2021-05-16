@@ -2,9 +2,9 @@
 #ifndef EPSP_PARSER_H
 #define EPSP_PARSER_H
 
-#include "string_list.h"
-#include "string_array.h"
-#include "epsp_type.h"
+#include "string-list.h"
+#include "string-array.h"
+#include "epsp-type.h"
 
 //int epsp_packet_parse(epsp_packet *packet, char *line);
 /*

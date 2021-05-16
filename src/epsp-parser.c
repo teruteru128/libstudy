@@ -15,9 +15,9 @@
 #include <string.h>
 #include <strings.h>
 #include <regex.h>
-#include "epsp_parser.h"
-#include "string_array.h"
-#include "string_list.h"
+#include "epsp-parser.h"
+#include "string-array.h"
+#include "string-list.h"
 
 // validateでだけ使う？
 #define LINE_PATTERN "[[:digit:]]{3} [[:digit:]]+( .+)?"

@@ -3,6 +3,7 @@
 #define EPSP_TYPE_H
 
 #include <stdint.h>
+#include "string-array.h"
 
 typedef struct server_point
 {
@@ -25,7 +26,7 @@ typedef struct epsp_packet
 {
     int code;
     int hop_count;
-    char **data;
+    string_array *data;
     size_t data_length;
     epsp_packet_t *next;
 } epsp_packet_t;
@@ -40,21 +41,15 @@ enum data_require
 struct protocol_code_t
 {
     int code;
-    char *str;
+    char str[24];
     enum data_require require;
     struct protocol_code_t *next;
 };
 
-struct protocol_code_t code_list[] = {
-    {.code = 112,
-     .str = "",
-     .require = UNNECESSARY},
-    {.code = 113,
-     .str = "",
-     .require = UNNECESSARY},
-    {.code = 0,
-     .str = NULL,
-     .require = NONE}};
+struct protocol_code_t code_list[]
+    = { { .code = 112, .str = "", .require = UNNECESSARY },
+        { .code = 113, .str = "", .require = UNNECESSARY },
+        { .code = 0, .str = NULL, .require = NONE } };
 // HOP_COUNT & MAX_HOP_COUNT
 
 #endif
