@@ -24,6 +24,7 @@ typedef struct SHAstate_st
 void sha_init(SHA_CTX *c)
 {
 }
+
 void sha_update(SHA_CTX *c, const void *data, const size_t len)
 {
 }
