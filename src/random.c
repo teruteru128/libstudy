@@ -34,7 +34,7 @@ int read_file(const char *const path, void *buf, const size_t size, const size_t
 
 size_t read_random(void *buf, const size_t size, size_t nmemb, int use_true_random)
 {
-    char *path[] = {
+    const char path[][14] = {
         "/dev/random",
         "/dev/urandom"};
     read_file(path[!use_true_random], buf, size, nmemb);
@@ -168,7 +168,7 @@ double genrand64_real3(void)
 
 int nextBytes(unsigned char *buf, size_t len)
 {
-    char *inf = "/dev/urandom";
+    const char inf[] = "/dev/urandom";
     FILE *in = fopen(inf, "rb");
     if (in == NULL)
     {
