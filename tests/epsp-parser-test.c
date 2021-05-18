@@ -5,8 +5,8 @@
 #include <string.h>
 #include <regex.h>
 #include <errno.h>
-#include <epsp_parser.h>
-#include <string_array.h>
+#include <epsp-parser.h>
+#include <string-array.h>
 #include <limits.h>
 
 /*
