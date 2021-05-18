@@ -15,7 +15,6 @@ jobs:
       - uses: actions/checkout@v2
       - name: Install dependents
         run: |
-          sudo apt update
           sudo apt install autopoint libcurl4-gnutls-dev libgmp-dev libsodium-dev libupnp-dev libxmlrpc-core-c3-dev uuid-dev libcunit1-dev
       - name: autogen.sh
         run: ./autogen.sh
