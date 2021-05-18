@@ -148,20 +148,14 @@ int64_t genrand64_int63(void)
     return (int64_t)(genrand64_int64() >> 1);
 }
 
-/* generates a random number on [0,1]-real-interval */
-double genrand64_real1(void)
-{
-    return (genrand64_int64() >> 11) * (1.0 / 9007199254740991.0);
-}
-
 /* generates a random number on [0,1)-real-interval */
-double genrand64_real2(void)
+double genrand64_real(void)
 {
-    return (genrand64_int64() >> 11) * (1.0 / 9007199254740992.0);
+    return (double)(genrand64_int64() >> 11) * (1.0 / 9007199254740992.0);
 }
 
 /* generates a random number on (0,1)-real-interval */
-double genrand64_real3(void)
+double genrand64_real2(void)
 {
     return ((genrand64_int64() >> 12) + 0.5) * (1.0 / 4503599627370496.0);
 }
