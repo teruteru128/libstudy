@@ -44,4 +44,27 @@ libstudy_la_SOURCES  = \
                 xorshift.c
 
 ## "本当に"これが正しいんですか？
-AM_CPPFLAGS =-Wall -Wextra -pedantic-errors -Wcast-align -Wcast-qual -Wconversion -Wdisabled-optimization -Wendif-labels -Wfloat-equal -Winit-self -Winline -Wlogical-op -Wmissing-include-dirs -Wpacked -Wpointer-arith -Wredundant-decls -Wshadow -Wswitch-default -Wswitch-enum -Wunsafe-loop-optimizations -Wvariadic-macros -Wwrite-strings -I$(top_srcdir)/include -DLOCALEDIR='"$(localedir)"'
+AM_CPPFLAGS =-Wall \
+    -Wextra \
+    -pedantic-errors \
+    -Wcast-align \
+    -Wcast-qual \
+    -Wconversion \
+    -Wdisabled-optimization \
+    -Wendif-labels \
+    -Wfloat-equal \
+    -Winit-self \
+    -Winline \
+    -Wlogical-op \
+    -Wmissing-include-dirs \
+    -Wpacked \
+    -Wpointer-arith \
+    -Wredundant-decls \
+    -Wshadow \
+    -Wswitch-default \
+    -Wswitch-enum \
+    -Wunsafe-loop-optimizations \
+    -Wvariadic-macros \
+    -Wwrite-strings \
+    -I$(top_srcdir)/include \
+    -DLOCALEDIR='"\"$(localedir)\""'
