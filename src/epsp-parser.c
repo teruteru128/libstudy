@@ -19,19 +19,17 @@
 #include "string-array.h"
 #include "string-list.h"
 
-// validateでだけ使う？
-#define LINE_PATTERN "[[:digit:]]{3} [[:digit:]]+( .+)?"
-
-// XXX: 可能ならばグローバル領域に置きたくない
-static regex_t line_pattern;
-static int pattern_initialized = 0;
-
 void parser_init(void)
 {
 }
 
 void parser_free(void)
 {
+}
+
+int split_packet(char *code_str, char *hop_str, char *data_str, char *line)
+{
+
 }
 
 /**
@@ -105,6 +103,7 @@ static int parse_internal(epsp_packet_t *packet, const char *line)
     }
     if (data_str != NULL)
     {
+        /*
         string_array *data = string_array_split(data_str, ":");
         if (data == NULL)
         {
@@ -112,6 +111,7 @@ static int parse_internal(epsp_packet_t *packet, const char *line)
             goto clean;
         }
         packet->data = data;
+        */
     }
     else
     {
@@ -129,8 +129,10 @@ void epsp_packet_free(epsp_packet_t *packet)
     packet->hop_count = 0;
     if (packet->data != NULL)
     {
+        /*
         string_array_free(packet->data);
         free(packet->data);
+        */
         packet->data = NULL;
     }
     if (packet->next)
@@ -140,6 +142,13 @@ void epsp_packet_free(epsp_packet_t *packet)
     }
     free(packet);
 }
+
+// validateでだけ使う？
+#define LINE_PATTERN "^[[:digit:]]{3}( [[:digit:]]+( .+)?)?$"
+
+// XXX: 可能ならばグローバル領域に置きたくない
+static regex_t line_pattern;
+static int pattern_initialized = 0;
 
 /**
  * @brief 文字列がスペース区切りで1つ以上3追加であることを検証する.
@@ -156,7 +165,7 @@ int validate_epsp_packet_line(char *line)
     // sscanfは空白文字を読めないので不可
     regex_t packet_pattern;
     // "^[[:digit:]]{3} [[:digit:]]+( .+)?$"
-    int ret = regcomp(&packet_pattern, "^[[:digit:]]{3}( [[:digit:]]+( .*)?)?$",
+    int ret = regcomp(&packet_pattern, LINE_PATTERN,
                       REG_EXTENDED | REG_NEWLINE | REG_ICASE);
     ret = regexec(&packet_pattern, line, 0, NULL, 0);
     regfree(&packet_pattern);
@@ -212,7 +221,7 @@ epsp_packet_t *epsp_packet_new(char *line)
  */
 int epsp_packet_parse(epsp_packet_t *packet, char *line)
 {
-    if (pattern_initialized == 0 || line == NULL)
+    if (line == NULL)
     {
         return 0;
     }
@@ -230,6 +239,9 @@ int epsp_packet_parse(epsp_packet_t *packet, char *line)
      * そもそも単スレッド前提だったら最初に1個作って使い回せばいいんだし
      * あ゛ー……そもそもデータの中に受け取ったら経由数インクリメントして
      * ブロードキャストしないといけないデータがあるんだった、つっら
+     * 
+     * 関心の分離
+     * 分割する関数とパースする関数を分離する？
      * 
      * 改行コードの処理
      * ungetc様万歳！

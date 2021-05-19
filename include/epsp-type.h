@@ -18,6 +18,7 @@ typedef struct peer_data
 } peer_data;
 
 typedef struct epsp_packet epsp_packet_t;
+
 /**
  * TODO: 送受信両方に使いたい
  * TODO: move to epsp_protocol.h
@@ -26,7 +27,13 @@ typedef struct epsp_packet
 {
     int code;
     int hop_count;
-    string_array *data;
+    // 独自データ構造
+    //string_list *data;
+    //string_array *data;
+    // 文字列の配列
+    //char **data;
+    // 分割しない
+    char *data;
     size_t data_length;
     epsp_packet_t *next;
 } epsp_packet_t;

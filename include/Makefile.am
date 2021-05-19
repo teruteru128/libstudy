@@ -11,6 +11,7 @@ include_HEADERS += bmapi.h
 include_HEADERS += changebase.h
 include_HEADERS += charset-convert.h
 include_HEADERS += epsp-parser.h
+include_HEADERS += epsp-protocol.h
 include_HEADERS += epsp-type.h
 include_HEADERS += java_random.h
 include_HEADERS += md5.h
