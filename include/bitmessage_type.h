@@ -5,7 +5,7 @@
 #include <netdb.h>
 #define PRIVATE_KEY_LENGTH 32
 #define PUBLIC_KEY_LENGTH 65
-typedef unsigned char PrivateKey[PUBLIC_KEY_LENGTH];
+typedef unsigned char PrivateKey[PRIVATE_KEY_LENGTH];
 typedef unsigned char PublicKey[PUBLIC_KEY_LENGTH];
 
 struct BMAddressPubKeySet
