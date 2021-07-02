@@ -4,12 +4,12 @@
 
 #include <stdio.h>
 
-static size_t getNLZ(unsigned char *ripe, const size_t size)
+static size_t getNLZ(unsigned char *ripe, const size_t limit)
 {
     size_t nlz = 0;
     /*
     unsigned long *ripe_ul = (unsigned long *)ripe;
-    size_t size_ul = size >> 3;
+    size_t size_ul = limit >> 3;
     while(ripe_ul[nlz] == 0 && nlz < size_ul)
     {
         nlz++;
@@ -18,14 +18,14 @@ static size_t getNLZ(unsigned char *ripe, const size_t size)
     */
     /*
     unsigned int *ripe_u = (unsigned int *)ripe;
-    size_t size_ul = size >> 2;
+    size_t size_ul = limit >> 2;
     while(ripe_ul[nlz] == 0 && nlz < size_ul)
     {
         nlz++;
     }
     nlz <<= 2;
     */
-    while (ripe[nlz] == 0 && nlz < size)
+    while (ripe[nlz] == 0 && nlz < limit)
     {
         nlz++;
     }
