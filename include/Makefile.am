@@ -5,6 +5,7 @@ include_HEADERS += args.h
 include_HEADERS += args_parse.h
 include_HEADERS += base64.h
 include_HEADERS += bitmessage.h
+include_HEADERS += bitmessage_type.h
 include_HEADERS += bitset.h
 include_HEADERS += bm.h
 include_HEADERS += bmapi.h

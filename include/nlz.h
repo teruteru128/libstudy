@@ -4,6 +4,11 @@
 
 #include <stdio.h>
 
+/*flg = 0
+for(int i = 0; i < 5; i++)
+    flg |= hash[i] != 0;
+
+*/
 static size_t getNLZ(unsigned char *ripe, const size_t limit)
 {
     size_t nlz = 0;
