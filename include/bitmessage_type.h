@@ -16,32 +16,32 @@ struct BMAddressPubKeySet
 
 typedef struct endpointinfo
 {
-  char host[NI_MAXHOST];
-  char port[NI_MAXSERV];
+    char host[NI_MAXHOST];
+    char port[NI_MAXSERV];
 } endpointinfo_t;
 
 typedef struct peerinfo
 {
-  int peer_id;
+    int peer_id;
 } peerinfo_t;
 
 typedef struct serverinfo
 {
-  endpointinfo_t ep;
+    endpointinfo_t ep;
 } serverinfo_t;
 
 typedef struct connectioninfo
 {
-  peerinfo_t client;
-  serverinfo_t server;
+    peerinfo_t client;
+    serverinfo_t server;
 } connectioninfo_t;
 
 const endpointinfo_t server_addresses_list[5];
 
 struct chararray
 {
-  char *data;
-  size_t length;
+    char *data;
+    size_t length;
 };
 
-#endif // BITMESSAGE_TYPE_H 
+#endif // BITMESSAGE_TYPE_H

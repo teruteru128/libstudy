@@ -18,11 +18,11 @@
 #define NAME "TR BM TEST CLIENT"
 #define SERVER_URL "http://127.0.0.1:8442/"
 
-void hashSHA512(EVP_MD_CTX *mdctx, const EVP_MD *sha512, unsigned char *cache64, unsigned char *publicKey, size_t signkeyindex, size_t enckeyindex)
+void hashSHA512(EVP_MD_CTX *mdctx, const EVP_MD *sha512, unsigned char *cache64, PublicKey *singPublicKey, PublicKey *encPublicKey)
 {
     EVP_DigestInit(mdctx, sha512);
-    EVP_DigestUpdate(mdctx, publicKey + signkeyindex * PUBLIC_KEY_LENGTH, PUBLIC_KEY_LENGTH);
-    EVP_DigestUpdate(mdctx, publicKey + enckeyindex * PUBLIC_KEY_LENGTH, PUBLIC_KEY_LENGTH);
+    EVP_DigestUpdate(mdctx, singPublicKey, PUBLIC_KEY_LENGTH);
+    EVP_DigestUpdate(mdctx, encPublicKey, PUBLIC_KEY_LENGTH);
     EVP_DigestFinal(mdctx, cache64, NULL);
 }
 
@@ -33,16 +33,17 @@ void hashRIPEMD160(EVP_MD_CTX *mdctx, const EVP_MD *ripemd160, unsigned char *ca
     EVP_DigestFinal(mdctx, cache64, NULL);
 }
 
-int calcRipe(EVP_MD_CTX *mdctx, const EVP_MD *sha512, const EVP_MD *ripemd160, unsigned char *cache64, unsigned char *publicKey, size_t signkeyindex, size_t enckeyindex)
+int calcRipe(EVP_MD_CTX *mdctx, const EVP_MD *sha512, const EVP_MD *ripemd160, unsigned char *cache64, PublicKey *singPublicKey, PublicKey *encPublicKey)
 {
-    hashSHA512(mdctx, sha512, cache64, publicKey, signkeyindex, enckeyindex);
+    hashSHA512(mdctx, sha512, cache64, singPublicKey, encPublicKey);
     hashRIPEMD160(mdctx, ripemd160, cache64);
     return 0;
 }
 
-size_t ripe(RIPE_CTX *ctx, unsigned char *signpubkey, unsigned char *encpubkey)
+size_t ripe(RIPE_CTX *ripectx, unsigned char *signpubkey, unsigned char *encpubkey)
 {
-    unsigned char *cache64 = ctx->cache64;
+    unsigned char *cache64 = ripectx->hash;
+    EVP_MD_CTX *mdctx = ripectx->ctx;
     SHA512_CTX sha512ctx;
     RIPEMD160_CTX ripemd160ctx;
     SHA512_Init(&sha512ctx);
@@ -61,7 +62,7 @@ size_t ripe(RIPE_CTX *ctx, unsigned char *signpubkey, unsigned char *encpubkey)
  * https://github.com/Bitmessage/PyBitmessage/blob/d09782e53d3f42132532b6e39011cd27e7f41d25/src/addresses.py#L63
  * https://docs.python.org/ja/3/library/struct.html
  */
-struct chararray *encodeVarint(uint64_t u)
+static struct chararray *encodeVarint(uint64_t u)
 {
     struct chararray *p = malloc(sizeof(struct chararray));
     if (p == NULL)
@@ -223,12 +224,11 @@ char *encodeShorterV3Address(unsigned char *ripe, size_t r)
     return encodeAddress0(3UL, 1UL, ripe, r, 20);
 }
 
-char *encodeWIF(unsigned char *key)
+char *encodeWIF(PrivateKey *key)
 {
-    unsigned char rawkey[37] = "";
+    unsigned char rawkey[37] = {0x80U, 0};
     unsigned char hash[EVP_MAX_MD_SIZE] = "";
 
-    rawkey[0] = 0x80;
     memcpy(rawkey + 1, key, 32);
 
     const EVP_MD *sha256 = EVP_sha256();
@@ -255,7 +255,7 @@ char *formatKey(char *address, char *privateSigningKeyWIF, char *privateEncrypti
     return buf;
 }
 
-int exportAddress(unsigned char *privateSigningKey, unsigned char *publicSigningKey, unsigned char *privateEncryptionKey, unsigned char *publicEncryptionKey, unsigned char *ripe)
+int exportAddress(PrivateKey *privateSigningKey, PublicKey *publicSigningKey, PrivateKey *privateEncryptionKey, PublicKey *publicEncryptionKey, unsigned char *ripe)
 {
     // 秘密鍵をWIF(Wallet import format)にエンコード
     char *privateSigningKeyWIF = encodeWIF(privateSigningKey);
