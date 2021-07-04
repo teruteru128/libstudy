@@ -25,13 +25,13 @@ void hashRIPEMD160(EVP_MD_CTX *mdctx, const EVP_MD *ripemd160,
                    unsigned char *cache64);
 void chararrayfree(struct chararray *p);
 char *encodeBase58();
-char *formatKey(char *, char *, char *);
+char *formatKey(char *address, char *privateSigningKeyWIF, char *privateEncryptionKeyWIF);
 int exportAddress(PrivateKey *, PublicKey *, PrivateKey *,
                   PublicKey *, unsigned char *);
 // secp256k1上でプライベート鍵をパブリック鍵に変換する
 int getPublicKey(PublicKey *pubKey, PrivateKey *priKey);
 // 秘密鍵を財布インポート形式に変換する
-char *encodeWIF(PrivateKey *);
+char *encodeWIF(PrivateKey *key);
 // 公開鍵2個からripeハッシュを計算
 int calcRipe(EVP_MD_CTX *mdctx, const EVP_MD *sha512, const EVP_MD *ripemd160,
              unsigned char *cache64, PublicKey *signPublicKey,
