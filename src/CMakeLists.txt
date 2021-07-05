@@ -1,4 +1,4 @@
-add_library(study 
+add_library(study
 aes.c
 args.c
 args_parse.c
@@ -40,4 +40,3 @@ svgplot.c
 xmlrpc.c
 xorshift.c
 )
-target_include_directories(study PUBLIC ${PROJECT_SOURCE_DIR}/include)
