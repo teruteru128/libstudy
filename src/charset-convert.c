@@ -13,7 +13,13 @@ static int convert(iconv_t cd, char **dest, const char *src)
 {
     size_t srclen = strlen(src);
     size_t destlen = srclen * 3 + 1;
+#ifdef _GNU_SOURCE
     char *tmpsrc = strdupa(src);
+#else
+    size_t len = strlen(src) + 1;
+    char *tmpsrc = alloca(len);
+    memcpy(tmpsrc, src, len);
+#endif
     char *head = malloc(destlen);
     char *destbuf = head;
     size_t ret = iconv(cd, &tmpsrc, &srclen, &destbuf, &destlen);
