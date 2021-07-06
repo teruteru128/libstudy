@@ -31,7 +31,7 @@ void parser_free(void)
 
 int split_packet(char *code_str, char *hop_str, char *data_str, char *line)
 {
-
+    return 0;
 }
 
 /**
@@ -53,7 +53,9 @@ static int parse_internal(epsp_packet_t *packet, const char *line)
     char *trash_str = NULL;
     {
         // 作業用コピー copy_lineはfreeしてはいけない
-        char *work_line = strdupa(line);
+        size_t worklen = strlen(line) + 1;
+        char *work_line = alloca(worklen);
+        memcpy(work_line, line, worklen);
         char *catch = NULL;
         code_str = strtok_r(work_line, " ", &catch);
         hop_str = strtok_r(NULL, " ", &catch);
@@ -171,7 +173,9 @@ int validate_epsp_packet_line(char *line)
                       REG_EXTENDED | REG_NEWLINE | REG_ICASE);
     ret = regexec(&packet_pattern, line, 0, NULL, 0);
     regfree(&packet_pattern);
-    char *tmp = strdupa(line);
+    size_t len = strlen(line) + 1;
+    char *tmp = alloca(len);
+    memcpy(tmp, line, len);
     if (tmp == NULL)
     {
         perror("strdupa");
