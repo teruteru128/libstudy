@@ -157,7 +157,7 @@ char *bmapi_createChan(xmlrpc_env *env, xmlrpc_client *clientP, xmlrpc_server_in
     size_t len = strlen(adb64tmp);
     char *adbtmp2 = calloc(sizeof(char), len + 2);
     memcpy(adbtmp2, adb64tmp, len);
-    strncat(adbtmp2 + len, "\n", 1);
+    strncat(adbtmp2 + len, "\n", 2);
 
     xmlrpc_value *passArray = NULL;
     passArray = xmlrpc_array_new(env);
