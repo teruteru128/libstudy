@@ -17,7 +17,7 @@ char *strjoin(char *delimiter, char **array, size_t arraylen)
         return rtnstr;
     }
     size_t strcap = 0;
-    size_t *arrayitemslen = alloca(arraylen * sizeof(size_t));
+    size_t *arrayitemslen = malloc(arraylen * sizeof(size_t));
     // sum array texts
     for (size_t i = 0; i < arraylen; i++)
     {
@@ -43,5 +43,6 @@ char *strjoin(char *delimiter, char **array, size_t arraylen)
         memcpy(rtnstr + pos, array[i], arrayitemslen[i]);
         pos += arrayitemslen[i];
     }
+    free(arrayitemslen);
     return rtnstr;
 }

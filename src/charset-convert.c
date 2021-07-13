@@ -1,25 +1,21 @@
-//charset-convert.c
+// charset-convert.c
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
+#include <charset-convert.h>
+#include <iconv.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <iconv.h>
-#include <charset-convert.h>
 
 static int convert(iconv_t cd, char **dest, const char *src)
 {
     size_t srclen = strlen(src);
     size_t destlen = srclen * 3 + 1;
-#ifdef _GNU_SOURCE
-    char *tmpsrc = strdupa(src);
-#else
     size_t len = strlen(src) + 1;
-    char *tmpsrc = alloca(len);
+    char *tmpsrc = malloc(len);
     memcpy(tmpsrc, src, len);
-#endif
     char *head = malloc(destlen);
     char *destbuf = head;
     size_t ret = iconv(cd, &tmpsrc, &srclen, &destbuf, &destlen);
@@ -29,11 +25,21 @@ static int convert(iconv_t cd, char **dest, const char *src)
         return -1;
     }
     *destbuf = '\0';
-    *dest = realloc(head, strlen(head) + 1);
-    return 0;
+    free(tmpsrc);
+    char *tmp = realloc(head, strlen(head) + 1);
+    if (tmp != NULL)
+    {
+        *dest = tmp;
+        return EXIT_SUCCESS;
+    }
+    else
+    {
+        return EXIT_FAILURE;
+    }
 }
 
-int encode_charset(char **dest, const char *src, const char *tocode, const char *fromcode)
+int encode_charset(char **dest, const char *src, const char *tocode,
+                   const char *fromcode)
 {
     iconv_t cd = iconv_open(tocode, fromcode);
     if (cd == (iconv_t)-1)

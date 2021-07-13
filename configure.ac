@@ -23,7 +23,6 @@ AC_CHECK_LIB([xmlrpc_server], [main], [], [AC_MSG_FAILURE([could not find lib xm
 AC_CHECK_LIB([cunit], [main], [], [AC_MSG_FAILURE([could not find lib cunit])])
 
 # Checks for header files.
-AC_FUNC_ALLOCA
 AC_CHECK_HEADERS([argz.h fcntl.h float.h inttypes.h langinfo.h libintl.h limits.h locale.h malloc.h stddef.h stdint.h stdio_ext.h stdlib.h string.h sys/param.h unistd.h wchar.h])
 
 # Checks for typedefs, structures, and compiler characteristics.

@@ -9,7 +9,7 @@ for(int i = 0; i < 5; i++)
     flg |= hash[i] != 0;
 
 */
-static size_t getNLZ(unsigned char *ripe, const size_t limit)
+static size_t getNLZ(const unsigned char *ripe, const size_t limit)
 {
     size_t nlz = 0;
     /*

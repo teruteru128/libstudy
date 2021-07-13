@@ -2,32 +2,28 @@
 /**
  * @file epsp-parser.c
  * @author Teruteru (teruterubouU1024@gmail.com)
- * @brief 
+ * @brief
  * @version 0.1
  * @date 2020-11-20
- * 
+ *
  * @copyright GPL
- * 
+ *
  */
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
+#include "epsp-parser.h"
+#include "string-array.h"
+#include "string-list.h"
+#include <regex.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <strings.h>
-#include <regex.h>
-#include "epsp-parser.h"
-#include "string-array.h"
-#include "string-list.h"
 
-void parser_init(void)
-{
-}
+void parser_init(void) {}
 
-void parser_free(void)
-{
-}
+void parser_free(void) {}
 
 int split_packet(char *code_str, char *hop_str, char *data_str, char *line)
 {
@@ -53,14 +49,16 @@ static int parse_internal(epsp_packet_t *packet, const char *line)
     char *trash_str = NULL;
     {
         // 作業用コピー copy_lineはfreeしてはいけない
-        size_t worklen = strlen(line) + 1;
-        char *work_line = alloca(worklen);
+        size_t worklen = strlen(line);
+        char *work_line = malloc(worklen + 1);
         memcpy(work_line, line, worklen);
+        work_line[worklen] = '\0';
         char *catch = NULL;
         code_str = strtok_r(work_line, " ", &catch);
         hop_str = strtok_r(NULL, " ", &catch);
         data_str = strtok_r(NULL, " ", &catch);
         trash_str = strtok_r(NULL, " ", &catch);
+        free(work_line);
     }
     // 分割した結果0個以下または4個以上の場合失敗
     if (code_str == NULL)
@@ -80,9 +78,9 @@ static int parse_internal(epsp_packet_t *packet, const char *line)
 
     // 初期値
     packet->code = -1;
-    //packet->code_str = NULL;
+    // packet->code_str = NULL;
     packet->hop_count = -1;
-    //packet->hop_count_str = NULL;
+    // packet->hop_count_str = NULL;
     packet->data = NULL;
 
     {
@@ -150,16 +148,13 @@ void epsp_packet_free(epsp_packet_t *packet)
 // validateでだけ使う？
 #define LINE_PATTERN "^[[:digit:]]{3}( [[:digit:]]+( .+)?)?$"
 
-// XXX: 可能ならばグローバル領域に置きたくない
-static regex_t line_pattern;
-static int pattern_initialized = 0;
-
 /**
  * @brief 文字列がスペース区切りで1つ以上3追加であることを検証する.
- * @link https://p2pquake.github.io/epsp-specifications/epsp-specifications.html#base-2
- * 
- * @param line 
- * @return int 
+ * @link
+ * https://p2pquake.github.io/epsp-specifications/epsp-specifications.html#base-2
+ *
+ * @param line
+ * @return int
  */
 int validate_epsp_packet_line(char *line)
 {
@@ -171,33 +166,33 @@ int validate_epsp_packet_line(char *line)
     // "^[[:digit:]]{3} [[:digit:]]+( .+)?$"
     int ret = regcomp(&packet_pattern, LINE_PATTERN,
                       REG_EXTENDED | REG_NEWLINE | REG_ICASE);
+    if (ret != 0)
+    {
+        perror("regcomp");
+        return EXIT_FAILURE;
+    }
     ret = regexec(&packet_pattern, line, 0, NULL, 0);
     regfree(&packet_pattern);
     size_t len = strlen(line) + 1;
-    char *tmp = alloca(len);
+    char *tmp = malloc(len);
     memcpy(tmp, line, len);
-    if (tmp == NULL)
-    {
-        perror("strdupa");
-        exit(EXIT_FAILURE);
-    }
+    tmp[len] = '\0';
     size_t count = 0;
-    char *str = NULL;
-    char *token = NULL;
     char *catch = NULL;
-    for (str = tmp;; count++, tmp = NULL)
+    char *token = strtok_r(tmp, " ", &catch);
+    while (token != NULL)
     {
-        token = strtok_r(tmp, " ", &catch);
-        if (token == NULL)
-            break;
+        token = strtok_r(NULL, " ", &catch);
+        count++;
     }
+    free(tmp);
     return 1 > count || count > 3;
 }
 
 /**
- * @brief 
- * 
- * @param line 
+ * @brief
+ *
+ * @param line
  * @return epsp_packet_t* new epsp packet object
  */
 epsp_packet_t *epsp_packet_new(char *line)
@@ -245,10 +240,10 @@ int epsp_packet_parse(epsp_packet_t *packet, char *line)
      * そもそも単スレッド前提だったら最初に1個作って使い回せばいいんだし
      * あ゛ー……そもそもデータの中に受け取ったら経由数インクリメントして
      * ブロードキャストしないといけないデータがあるんだった、つっら
-     * 
+     *
      * 関心の分離
      * 分割する関数とパースする関数を分離する？
-     * 
+     *
      * 改行コードの処理
      * ungetc様万歳！
      * LF:そのまま続行
@@ -258,8 +253,9 @@ int epsp_packet_parse(epsp_packet_t *packet, char *line)
     memset(packet, 0, sizeof(epsp_packet_t));
     if (parse_internal(packet, line) != 0)
     {
-        //failed
+        // failed
         epsp_packet_free(packet);
-        return 0;
+        return EXIT_FAILURE;
     }
+    return EXIT_SUCCESS;
 }
