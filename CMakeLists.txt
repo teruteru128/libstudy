@@ -19,7 +19,10 @@ endif(GETTEXT_FOUND)
 
 find_package(Intl)
 if(Intl_FOUND)
-    include_directories(${Intl_INCLUDE_DIRS})
+        include_directories(${Intl_INCLUDE_DIRS})
+        set(LIBINTL_LIBRARIES ${Intl_LIBRARIES})
+    else()
+        set(LIBINTL_LIBRARIES)
 endif(Intl_FOUND)
 
 find_package(OpenSSL)
@@ -28,6 +31,8 @@ if(OPENSSL_FOUND)
 endif(OPENSSL_FOUND)
 
 find_package(Git)
+
+find_package(Iconv)
 
 include(GNUInstallDirs)
 
