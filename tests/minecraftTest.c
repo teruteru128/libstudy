@@ -1,14 +1,18 @@
 
+#ifdef HAVE_CONFIG_H
 #include <config.h>
-#include <assert.h>
-#include <stdbool.h>
-#include <stdio.h>
-#include <stdint.h>
-#include <stdlib.h>
-#include <CUnit/CUnit.h>
+#endif
+#include <CUnit/Automated.h>
 #include <CUnit/Basic.h>
-#include <minecraft.h>
+#include <CUnit/CUnit.h>
+#include <CUnit/Console.h>
+#include <assert.h>
 #include <limits.h>
+#include <minecraft.h>
+#include <stdbool.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 static int64_t *seeds;
 
@@ -26,7 +30,9 @@ static void stest(void)
         {
             cseed = s(seed, x, z);
             snprintf(msg, 64, "s(%ld, %d, %d)", seed, x, z);
-            CU_assertImplementation(seeds[(z + 625) * 1250 + (x + 625)] == cseed, __LINE__, msg, __FILE__, "", CU_FALSE);
+            CU_assertImplementation(seeds[(z + 625) * 1250 + (x + 625)]
+                                        == cseed,
+                                    __LINE__, msg, __FILE__, "", CU_FALSE);
         }
     }
 }
@@ -67,7 +73,9 @@ static void s1test(void)
         {
             cseed1 = s1(seed, x, z);
             snprintf(msg, 64, "s1(%ld, %d, %d)", seed, x, z);
-            CU_assertImplementation(seeds[(z + 625) * 1250 + (x + 625)] == cseed1, __LINE__, msg, __FILE__, "", CU_FALSE);
+            CU_assertImplementation(seeds[(z + 625) * 1250 + (x + 625)]
+                                        == cseed1,
+                                    __LINE__, msg, __FILE__, "", CU_FALSE);
         }
     }
 }
@@ -83,7 +91,9 @@ static void s2test(void)
         for (x = -625; x < 625; x++)
         {
             snprintf(msg, 64, "s2(%ld, %d, %d)", seed, x, z);
-            CU_assertImplementation(seeds[(z + 625) * 1250 + (x + 625)] == s2(seed, x, z), __LINE__, msg, __FILE__, "", CU_FALSE);
+            CU_assertImplementation(seeds[(z + 625) * 1250 + (x + 625)]
+                                        == s2(seed, x, z),
+                                    __LINE__, msg, __FILE__, "", CU_FALSE);
         }
     }
 }
@@ -154,15 +164,13 @@ int main(int argc, char **argv)
     testSuite = CU_add_suite("minecraft test suite", NULL, NULL);
 
     CU_add_test(testSuite, "stest", stest);
-    //CU_add_test(testSuite, "s1test", s1test);
+    // CU_add_test(testSuite, "s1test", s1test);
     CU_add_test(testSuite, "s2test", s2test);
     CU_add_test(testSuite, "seedtest", seedtest);
 
-    CU_basic_set_mode(CU_BRM_NORMAL);
-    CU_basic_run_tests();
-    unsigned int f = CU_get_number_of_tests_failed();
+    CU_automated_run_tests();
     CU_cleanup_registry();
     free(seeds);
 
-    return f >= 1;
+    return 0;
 }

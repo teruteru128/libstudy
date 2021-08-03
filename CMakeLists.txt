@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.0.0)
 project(libstudy VERSION 1.0.2 LANGUAGES C CXX)
 
-#include(CTest)
+include(CTest)
 enable_testing()
 find_package(Threads)
 if(Threads_FOUND)
@@ -45,4 +45,4 @@ add_subdirectory(tests)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
-include(CPack)
+#include(CPack)
