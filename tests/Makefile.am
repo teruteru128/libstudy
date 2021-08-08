@@ -1,6 +1,6 @@
 
 METASOURCES=AUTO
-check_PROGRAMS=epsp-parser-test minecraft-test base58test ripeencode changebasetest string_list_test chainCookiesTest random-test
+check_PROGRAMS=epsp-parser-test minecraftTest base58test ripeencode changebasetest string_list_test chainCookiesTest random-test
 TESTS=test.sh xfail.sh $(check_PROGRAMS)
 XFAIL_TESTS=xfail.sh
 dist_check_DATA=epsp-packet-sample-fail.txt epsp-packet-sample-success.txt seeds.txt
@@ -13,8 +13,8 @@ chainCookiesTest_SOURCES=chainCookiesTest.c
 chainCookiesTest_LDADD=$(top_builddir)/src/libstudy.la
 epsp_parser_test_SOURCES=epsp-parser-test.c
 epsp_parser_test_LDADD=$(top_builddir)/src/libstudy.la
-minecraft_test_LDADD=$(top_builddir)/src/libstudy.la
-minecraft_test_LDFLAGS=-static
+minecraftTest_LDADD=$(top_builddir)/src/libstudy.la
+minecraftTest_LDFLAGS=-static
 base58test_LDADD=$(top_builddir)/src/libstudy.la
 base58test_SOURCES=base58test.c
 ripeencode_LDADD=$(top_builddir)/src/libstudy.la
