@@ -9,7 +9,4 @@
 #include <args.h>
 #include "bitmessage_type.h"
 
-int BM_init(void);
-
 #endif // BITMESSAGE_H 
-

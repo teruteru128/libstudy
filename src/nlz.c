@@ -8,7 +8,12 @@
 
 size_t getNLZ(const unsigned char *ripe, const size_t limit)
 {
-    size_t nlz = 0;
+    size_t lnlz = 0;
+    const size_t longlimit = limit >> 3;
+    while (*(long *)(ripe + lnlz) == 0 && lnlz < longlimit)
+    {
+        lnlz++;
+    }
     /*
     unsigned long *ripe_ul = (unsigned long *)ripe;
     size_t size_ul = limit >> 3;
@@ -27,6 +32,7 @@ size_t getNLZ(const unsigned char *ripe, const size_t limit)
     }
     nlz <<= 2;
     */
+    size_t nlz = lnlz << 3;
     while (ripe[nlz] == 0 && nlz < limit)
     {
         nlz++;
