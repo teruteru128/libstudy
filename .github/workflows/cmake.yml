@@ -1,0 +1,19 @@
+name: cmake
+
+on: [push]
+
+  # Sample when vcpkg is a submodule of your repository (highly recommended!)
+
+jobs: 
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2.3.4
+        with:
+          submodules: 'recursive'
+      - name: Install dependents
+        run: sudo apt install ninja-build
+      - name: Configuration
+        run: cmake . -G Ninja -B build
+      - name: build
+        run: cmake -j 0 -B build
