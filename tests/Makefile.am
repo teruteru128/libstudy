@@ -5,6 +5,7 @@ TESTS=test.sh xfail.sh $(check_PROGRAMS)
 XFAIL_TESTS=xfail.sh
 dist_check_DATA=epsp-packet-sample-fail.txt epsp-packet-sample-success.txt seeds.txt
 EXTRA_DIST=test.sh xfail.sh
+DISTCLEANFILES=CUnitAutomated-Results.xml
 
 AM_CPPFLAGS = -I$(top_srcdir)/include
 
