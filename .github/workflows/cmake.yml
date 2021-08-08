@@ -16,4 +16,4 @@ jobs:
       - name: Configuration
         run: cmake . -G Ninja -B build
       - name: build
-        run: cmake -j 0 -B build
+        run: ninja -j 0 -C build
