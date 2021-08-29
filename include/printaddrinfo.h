@@ -1,6 +1,6 @@
 
-#ifndef PRINT_ADDRINFO_H
-#define PRINT_ADDRINFO_H 1
+#ifndef PRINTADDRINFO_H
+#define PRINTADDRINFO_H 1
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -13,7 +13,7 @@
 #ifdef HAVE_NETDB_H
 #include <netdb.h>
 #endif
-void print_addrinfo0(struct addrinfo *, FILE *);
-void print_addrinfo(struct addrinfo *);
+void printaddrinfo0(struct addrinfo *, FILE *);
+void printaddrinfo(struct addrinfo *);
 
 #endif

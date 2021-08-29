@@ -23,7 +23,7 @@ minecraft.c
 nlz.c
 numsys.c
 orz.c
-print_addrinfo.c
+printaddrinfo.c
 printint.c
 queue.c
 random.c

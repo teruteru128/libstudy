@@ -15,8 +15,12 @@
  * <I> adrinf: アドレス情報
  * <I> stream: 出力ストリーム
  */
-void print_addrinfo0(struct addrinfo *adrinf, FILE *stream)
+void printaddrinfo0(struct addrinfo *adrinf, FILE *stream)
 {
+    if(adrinf == NULL || stream == NULL)
+    {
+        return;
+    }
     char hbuf[NI_MAXHOST]; /* 返されるアドレスを格納する */
     char sbuf[NI_MAXSERV]; /* 返されるポート番号を格納する */
     char protocol[16] = "";
@@ -66,7 +70,7 @@ void print_addrinfo0(struct addrinfo *adrinf, FILE *stream)
  * アドレスとポート番号を標準出力ストリームへ表示する。
  * <I> adrinf: アドレス情報
  */
-void print_addrinfo(struct addrinfo *adrinf)
+void printaddrinfo(struct addrinfo *adrinf)
 {
-    print_addrinfo0(adrinf, stdout);
+    printaddrinfo0(adrinf, stdout);
 }
