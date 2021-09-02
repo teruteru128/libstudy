@@ -2,23 +2,26 @@
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
-#include <stdio.h>
-#include <stdlib.h>
-#include <uuid/uuid.h>
-#include <openssl/evp.h>
-#include <byteswap.h>
-#include <changebase.h>
-#include <err.h>
 #include "bitmessage.h"
 #include "bm.h"
 #include "bmapi.h"
 #include "nlz.h"
+#include <byteswap.h>
+#include <changebase.h>
+#include <err.h>
+#include <openssl/ec.h>
+#include <openssl/evp.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <uuid/uuid.h>
 #define localhost_ip "127.0.0.1"
 #define bitmessage_port 8442
 #define NAME "TR BM TEST CLIENT"
 #define SERVER_URL "http://127.0.0.1:8442/"
 
-void hashSHA512(EVP_MD_CTX *mdctx, const EVP_MD *sha512, unsigned char *cache64, PublicKey *singPublicKey, PublicKey *encPublicKey)
+void hashSHA512(EVP_MD_CTX *mdctx, const EVP_MD *sha512,
+                unsigned char *cache64, PublicKey *singPublicKey,
+                PublicKey *encPublicKey)
 {
     EVP_DigestInit(mdctx, sha512);
     EVP_DigestUpdate(mdctx, singPublicKey, PUBLIC_KEY_LENGTH);
@@ -26,21 +29,25 @@ void hashSHA512(EVP_MD_CTX *mdctx, const EVP_MD *sha512, unsigned char *cache64,
     EVP_DigestFinal(mdctx, cache64, NULL);
 }
 
-void hashRIPEMD160(EVP_MD_CTX *mdctx, const EVP_MD *ripemd160, unsigned char *cache64)
+void hashRIPEMD160(EVP_MD_CTX *mdctx, const EVP_MD *ripemd160,
+                   unsigned char *cache64)
 {
     EVP_DigestInit(mdctx, ripemd160);
     EVP_DigestUpdate(mdctx, cache64, 64);
     EVP_DigestFinal(mdctx, cache64, NULL);
 }
 
-int calcRipe(EVP_MD_CTX *mdctx, const EVP_MD *sha512, const EVP_MD *ripemd160, unsigned char *cache64, PublicKey *singPublicKey, PublicKey *encPublicKey)
+int calcRipe(EVP_MD_CTX *mdctx, const EVP_MD *sha512, const EVP_MD *ripemd160,
+             unsigned char *cache64, PublicKey *singPublicKey,
+             PublicKey *encPublicKey)
 {
     hashSHA512(mdctx, sha512, cache64, singPublicKey, encPublicKey);
     hashRIPEMD160(mdctx, ripemd160, cache64);
     return 0;
 }
 
-size_t ripe(RIPE_CTX *ripectx, unsigned char *signpubkey, unsigned char *encpubkey)
+size_t ripe(RIPE_CTX *ripectx, unsigned char *signpubkey,
+            unsigned char *encpubkey)
 {
     unsigned char *cache64 = ripectx->hash;
     EVP_MD_CTX *mdctx = ripectx->ctx;
@@ -58,7 +65,7 @@ size_t ripe(RIPE_CTX *ripectx, unsigned char *signpubkey, unsigned char *encpubk
 }
 
 /*
- * 
+ *
  * https://github.com/Bitmessage/PyBitmessage/blob/d09782e53d3f42132532b6e39011cd27e7f41d25/src/addresses.py#L63
  * https://docs.python.org/ja/3/library/struct.html
  */
@@ -112,12 +119,14 @@ void chararrayfree(struct chararray *p)
     free(p);
 }
 
-char *encodeAddress0(uint64_t version, uint64_t stream, unsigned char *ripe, size_t ripelen, size_t max)
+char *encodeAddress0(uint64_t version, uint64_t stream, unsigned char *ripe,
+                     size_t ripelen, size_t max)
 {
     unsigned char *workripe = ripe;
     size_t workripelen = ripelen;
     if (version >= 2 && version < 4)
     {
+        /* version 2以上4未満 */
         if (ripelen != 20)
         {
             return NULL;
@@ -126,12 +135,12 @@ char *encodeAddress0(uint64_t version, uint64_t stream, unsigned char *ripe, siz
         {
             if (memcmp(ripe, "\0\0", 2) == 0)
             {
-                workripe = &ripe[2];
+                workripe = ripe + 2;
                 workripelen -= 2;
             }
             else if (memcmp(ripe, "\0", 1) == 0)
             {
-                workripe = &ripe[1];
+                workripe = ripe + 1;
                 workripelen -= 1;
             }
         }
@@ -145,6 +154,7 @@ char *encodeAddress0(uint64_t version, uint64_t stream, unsigned char *ripe, siz
     }
     else
     {
+        /* version 4 */
         if (ripelen != 20)
         {
             return NULL;
@@ -158,11 +168,15 @@ char *encodeAddress0(uint64_t version, uint64_t stream, unsigned char *ripe, siz
     }
     struct chararray *variantVersion = encodeVarint(version);
     struct chararray *variantStream = encodeVarint(stream);
-    size_t storedBinaryDataLen = variantVersion->length + variantStream->length + workripelen + 4;
-    unsigned char *storedBinaryData = malloc(variantVersion->length + variantStream->length + workripelen + 4);
+    size_t storedBinaryDataLen
+        = variantVersion->length + variantStream->length + workripelen + 4;
+    unsigned char *storedBinaryData = malloc(
+        variantVersion->length + variantStream->length + workripelen + 4);
     memcpy(storedBinaryData, variantVersion->data, variantVersion->length);
-    memcpy(storedBinaryData + variantVersion->length, variantStream->data, variantStream->length);
-    memcpy(storedBinaryData + variantVersion->length + variantStream->length, workripe, workripelen);
+    memcpy(storedBinaryData + variantVersion->length, variantStream->data,
+           variantStream->length);
+    memcpy(storedBinaryData + variantVersion->length + variantStream->length,
+           workripe, workripelen);
 
     {
         const EVP_MD *sha512 = EVP_sha512();
@@ -176,7 +190,9 @@ char *encodeAddress0(uint64_t version, uint64_t stream, unsigned char *ripe, siz
         EVP_DigestUpdate(ctx, cache64, 64);
         EVP_DigestFinal(ctx, cache64, &s);
         EVP_MD_CTX_free(ctx);
-        memcpy(storedBinaryData + variantVersion->length + variantStream->length + workripelen, cache64, 4);
+        memcpy(storedBinaryData + variantVersion->length
+                   + variantStream->length + workripelen,
+               cache64, 4);
     }
     chararrayfree(variantVersion);
     chararrayfree(variantStream);
@@ -200,11 +216,12 @@ char *encodeAddress0(uint64_t version, uint64_t stream, unsigned char *ripe, siz
 
 /*
  * ripeをBitMessageアドレスにエンコードします。
- * 
+ *
  * https://github.com/Bitmessage/PyBitmessage/blob/d09782e53d3f42132532b6e39011cd27e7f41d25/src/addresses.py#L143
  * https://github.com/teruteru128/java-study/blob/03906187223ad8e5e8f8629e23ecbe2fbca5b7b4/src/main/java/com/twitter/teruteru128/study/bitmessage/genaddress/BMAddress.java#L18
  */
-char *encodeAddress(uint64_t version, uint64_t stream, unsigned char *ripe, size_t ripelen)
+char *encodeAddress(uint64_t version, uint64_t stream, unsigned char *ripe,
+                    size_t ripelen)
 {
     return encodeAddress0(version, stream, ripe, ripelen, 20);
 }
@@ -226,7 +243,7 @@ char *encodeShorterV3Address(unsigned char *ripe, size_t r)
 
 char *encodeWIF(PrivateKey *key)
 {
-    unsigned char rawkey[37] = {0x80U, 0};
+    unsigned char rawkey[37] = { 0x80U, 0 };
     unsigned char hash[EVP_MAX_MD_SIZE] = "";
 
     memcpy(rawkey + 1, key, 32);
@@ -247,15 +264,22 @@ char *encodeWIF(PrivateKey *key)
     return base58encode(rawkey, 37);
 }
 
-char *formatKey(char *address, char *privateSigningKeyWIF, char *privateEncryptionKeyWIF)
+char *formatKey(char *address, char *privateSigningKeyWIF,
+                char *privateEncryptionKeyWIF)
 {
     char *buf = malloc(301);
     memset(buf, 0, 301);
-    snprintf(buf, 301, "[%s]]\nlabel = relpace this label\nenabled = true\ndecoy = false\nnoncetrialsperbyte = 1000\npayloadlengthextrabytes = 1000\nprivsigningkey = %s\nprivencryptionkey = %s\n", address, privateSigningKeyWIF, privateEncryptionKeyWIF);
+    snprintf(buf, 301,
+             "[%s]\nlabel = relpace this label\nenabled = true\ndecoy = "
+             "false\nnoncetrialsperbyte = 1000\npayloadlengthextrabytes = "
+             "1000\nprivsigningkey = %s\nprivencryptionkey = %s\n",
+             address, privateSigningKeyWIF, privateEncryptionKeyWIF);
     return buf;
 }
 
-int exportAddress(PrivateKey *privateSigningKey, PublicKey *publicSigningKey, PrivateKey *privateEncryptionKey, PublicKey *publicEncryptionKey, unsigned char *ripe)
+int exportAddress(PrivateKey *privateSigningKey, PublicKey *publicSigningKey,
+                  PrivateKey *privateEncryptionKey,
+                  PublicKey *publicEncryptionKey, unsigned char *ripe)
 {
     // 秘密鍵をWIF(Wallet import format)にエンコード
     char *privateSigningKeyWIF = encodeWIF(privateSigningKey);
@@ -263,14 +287,16 @@ int exportAddress(PrivateKey *privateSigningKey, PublicKey *publicSigningKey, Pr
 
     // generate version3 address
     char *address3 = encodeShorterV3Address(ripe, 20);
-    char *formatedV3 = formatKey(address3, privateSigningKeyWIF, privateEncryptionKeyWIF);
+    char *formatedV3
+        = formatKey(address3, privateSigningKeyWIF, privateEncryptionKeyWIF);
     printf("%s\n", formatedV3);
     free(formatedV3);
     free(address3);
 
     // generate version4 address
     char *address4 = encodeV4Address(ripe, 20);
-    char *formatedV4 = formatKey(address4, privateSigningKeyWIF, privateEncryptionKeyWIF);
+    char *formatedV4
+        = formatKey(address4, privateSigningKeyWIF, privateEncryptionKeyWIF);
     printf("%s\n", formatedV4);
     free(formatedV4);
 
@@ -295,8 +321,24 @@ int exportAddress(PrivateKey *privateSigningKey, PublicKey *publicSigningKey, Pr
         snprintf(enckeyhexstr + offset, 3, "%02x", privateEncryptionKey[i]);
     }
     char buf[227];
-    snprintf(buf, 227, "ripe = %s\nprivate signing key = %s\nprivate encryption key = %s\n\n", ripehexstr, sigkeyhexstr, enckeyhexstr);
-    fputs(buf, stdout);
+    snprintf(buf, 227, "ripe = %s\nprivate signing key = %s\nprivate encryption
+    key = %s\n\n", ripehexstr, sigkeyhexstr, enckeyhexstr); fputs(buf, stdout);
     */
+    return EXIT_SUCCESS;
+}
+
+int getPublicKey(PublicKey *pubKey, PrivateKey *priKey)
+{
+    EC_GROUP *secp256k1 = EC_GROUP_new_by_curve_name(NID_secp256k1);
+    BN_CTX *ctx = BN_CTX_new();
+    BN_CTX_start(ctx);
+    BIGNUM *prikeybn = BN_CTX_get(ctx);
+    if (BN_bin2bn(*priKey, 32, prikeybn) == NULL)
+    {
+        return EXIT_FAILURE;
+    }
+    EC_POINT *pubkeyp = EC_POINT_new(secp256k1);
+    EC_POINT_mul(secp256k1, pubkeyp, prikeybn, NULL, NULL, ctx);
+    EC_POINT_point2oct(secp256k1, pubkeyp, POINT_CONVERSION_UNCOMPRESSED, *pubKey, 65, ctx);
     return EXIT_SUCCESS;
 }

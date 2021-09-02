@@ -3,10 +3,13 @@
 #define BITMESSAGE_TYPE_H
 
 #include <netdb.h>
+#include <openssl/evp.h>
 #define PRIVATE_KEY_LENGTH 32
 #define PUBLIC_KEY_LENGTH 65
+#define RIPE_HASH_LENGTH 20
 typedef unsigned char PrivateKey[PRIVATE_KEY_LENGTH];
 typedef unsigned char PublicKey[PUBLIC_KEY_LENGTH];
+typedef unsigned char RipeHash[RIPE_HASH_LENGTH];
 
 struct BMAddressPubKeySet
 {
