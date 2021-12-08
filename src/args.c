@@ -4,4 +4,6 @@
 #endif
 #include <stddef.h>
 
-int get_arg(){}
+int get_arg(){
+    return 0;
+}

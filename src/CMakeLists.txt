@@ -40,3 +40,4 @@ svgplot.c
 xmlrpc.c
 xorshift.c
 )
+target_link_libraries(study xmlrpc xmlrpc_client)

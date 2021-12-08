@@ -18,7 +18,7 @@ int read_file(const char *const path, void *buf, const size_t size, const size_t
         return -1;
     }
     size_t r = fread(buf, size, nmemb, rnd);
-    if (r < 0)
+    if (r < nmemb)
     {
         perror("fread rnd");
         return -1;

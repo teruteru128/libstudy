@@ -241,6 +241,14 @@ char *encodeShorterV3Address(unsigned char *ripe, size_t r)
     return encodeAddress0(3UL, 1UL, ripe, r, 20);
 }
 
+/**
+ * @brief 
+ * 
+ * @param key データ型をPrivateKey *にするか unsigned char*にするか判断に悩む。
+ * PrivateKey: いちいち変換する手間を掛けたくない
+ * unsigned char*: 固定長のデータのサイズ(32byte)がわからない
+ * @return char* 
+ */
 char *encodeWIF(PrivateKey *key)
 {
     unsigned char rawkey[37] = { 0x80U, 0 };
@@ -267,14 +275,19 @@ char *encodeWIF(PrivateKey *key)
 char *formatKey(char *address, char *privateSigningKeyWIF,
                 char *privateEncryptionKeyWIF)
 {
-    char *buf = malloc(301);
-    memset(buf, 0, 301);
-    snprintf(buf, 301,
+    // FIXME: 確保する領域はもっと小さくてもいい
+    char *buf = calloc(1, 512);
+    snprintf(buf, 500,
              "[%s]\nlabel = relpace this label\nenabled = true\ndecoy = "
              "false\nnoncetrialsperbyte = 1000\npayloadlengthextrabytes = "
              "1000\nprivsigningkey = %s\nprivencryptionkey = %s\n",
              address, privateSigningKeyWIF, privateEncryptionKeyWIF);
-    return buf;
+    char *tmp = realloc(buf, strlen(buf) + 1);
+    if (tmp == NULL)
+    {
+        return buf;
+    }
+    return tmp;
 }
 
 int exportAddress(PrivateKey *privateSigningKey, PublicKey *publicSigningKey,
@@ -339,6 +352,7 @@ int getPublicKey(PublicKey *pubKey, PrivateKey *priKey)
     }
     EC_POINT *pubkeyp = EC_POINT_new(secp256k1);
     EC_POINT_mul(secp256k1, pubkeyp, prikeybn, NULL, NULL, ctx);
-    EC_POINT_point2oct(secp256k1, pubkeyp, POINT_CONVERSION_UNCOMPRESSED, *pubKey, 65, ctx);
+    EC_POINT_point2oct(secp256k1, pubkeyp, POINT_CONVERSION_UNCOMPRESSED,
+                       *pubKey, 65, ctx);
     return EXIT_SUCCESS;
 }

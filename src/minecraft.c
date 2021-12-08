@@ -25,7 +25,7 @@ void mc_slime_init()
     int64_t pos = 0;
     int64_t square = 0;
     //int64_t x1, x2;
-    for (size_t i = 0; i < MC_CACHE_SIZE; i++)
+    for (int64_t i = 0; i < MC_CACHE_SIZE; i++)
     {
         pos = i - OFFSET;
         square = pos * pos;
