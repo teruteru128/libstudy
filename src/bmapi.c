@@ -21,7 +21,7 @@ void die_if_fault_occurred(xmlrpc_env *e)
     /* Check our error-handling environment for an XML-RPC fault. */
     if (e->fault_occurred)
     {
-        fprintf(stderr, "XML-RPC Fault: %s (%d)\n",
+        fprintf(stderr, "XML-RPC Fault: %d %s (%d)\n", e->fault_occurred,
                 e->fault_string, e->fault_code);
         exit(1);
     }
@@ -55,7 +55,7 @@ char *bmapi_helloWorld(xmlrpc_env *env, xmlrpc_client *clientP, xmlrpc_server_in
     xmlrpc_DECREF(paramArray);
     xmlrpc_DECREF(resultP);
 
-    return (char *)msg;
+    return strdup(msg);
 }
 
 #define GET_STATUS_METHOD_NAME "getStatus"
