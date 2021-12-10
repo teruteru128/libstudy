@@ -87,6 +87,7 @@ const char *bmapi_simpleSendMessage(const char *toaddress, const char *fromaddre
 
 char *bmapi_sendMessage(xmlrpc_env *env, xmlrpc_client *clientP, xmlrpc_server_info *serverP, xmlrpc_value *toaddressV, xmlrpc_value *fromaddressV, xmlrpc_value *subjectV, xmlrpc_value *messageV, xmlrpc_value *encodingTypeV, xmlrpc_value *TTLV)
 {
+    // create args array
     xmlrpc_value *paramArray = xmlrpc_array_new(env);
     die_if_fault_occurred(env);
 
@@ -103,6 +104,7 @@ char *bmapi_sendMessage(xmlrpc_env *env, xmlrpc_client *clientP, xmlrpc_server_i
     xmlrpc_array_append_item(env, paramArray, TTLV);
     die_if_fault_occurred(env);
 
+    // call xmlrpc api
     xmlrpc_value *resultP = NULL;
     xmlrpc_client_call2(env, clientP, serverP, SEND_MESSAGE_METHOD_NAME, paramArray, &resultP);
     die_if_fault_occurred(env);
@@ -120,7 +122,7 @@ char *bmapi_sendMessage(xmlrpc_env *env, xmlrpc_client *clientP, xmlrpc_server_i
     //xmlrpc_DECREF(TTLV);
     xmlrpc_DECREF(resultP);
 
-    return (char *)msg;
+    return strdup(msg);
 }
 
 #define GET_DETERMINISTIC_ADDRESS_METHOD_NAME "getDeterministicAddress"
