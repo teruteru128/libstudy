@@ -16,6 +16,7 @@ const endpointinfo_t server_addresses_list[5] = {
     {"p2pquake.ddo.jp", "6910"},
     {"", ""}};
 
+// error check function
 void die_if_fault_occurred(xmlrpc_env *e)
 {
     /* Check our error-handling environment for an XML-RPC fault. */
@@ -85,6 +86,20 @@ const char *bmapi_simpleSendMessage(const char *toaddress, const char *fromaddre
 
 #define SEND_MESSAGE_METHOD_NAME "sendMessage"
 
+/**
+ * @brief 
+ * 
+ * @param env error environment variable
+ * @param clientP client object
+ * @param serverP auth config object
+ * @param toaddressV to address xmlrpc value
+ * @param fromaddressV from address xmlrpc value
+ * @param subjectV Base64 encoded subject xmlrpc value
+ * @param messageV Base64 encoded message xmlrpc value
+ * @param encodingTypeV encoding type xmlrpc value. If you specify this parameter, the value is always 2.
+ * @param TTLV ttl xmlrpc value. 3600 <= ttl <= 2419200
+ * @return char* message(Must be free.)
+ */
 char *bmapi_sendMessage(xmlrpc_env *env, xmlrpc_client *clientP, xmlrpc_server_info *serverP, xmlrpc_value *toaddressV, xmlrpc_value *fromaddressV, xmlrpc_value *subjectV, xmlrpc_value *messageV, xmlrpc_value *encodingTypeV, xmlrpc_value *TTLV)
 {
     // create args array
