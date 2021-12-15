@@ -108,7 +108,7 @@ int main(int argc, char **argv)
     }
     {
         // データファイルのロードってどうやるんだぁ？
-        char path[PATH_MAX] = PROJECT_SOURCE_DIR;
+        char path[PATH_MAX] = "";
         snprintf(path, PATH_MAX, "%s/seeds.txt", getenv("srcdir"));
 #ifdef _GNU_SOURCE
         char *p = canonicalize_file_name(path);
