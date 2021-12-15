@@ -56,12 +56,12 @@ int32_t nextIntWithBounds(int64_t *rnd, int32_t bound)
 
 double nextDouble(int64_t *rnd)
 {
-    return (((int64_t)(next(rnd, 26)) << 27) + next(rnd, 27)) * DOUBLE_UNIT;
+    return (double)(((int64_t)(next(rnd, 26)) << 27) + next(rnd, 27)) * DOUBLE_UNIT;
 }
 
 float nextFloat(int64_t *rnd)
 {
-    return next(rnd, 24) / ((float)(1 << 24));
+    return (float)next(rnd, 24) / ((float)(1 << 24));
 }
 
 //
