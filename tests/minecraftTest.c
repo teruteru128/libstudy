@@ -107,7 +107,8 @@ int main(int argc, char **argv)
         return EXIT_FAILURE;
     }
     {
-        char path[PATH_MAX];
+        // データファイルのロードってどうやるんだぁ？
+        char path[PATH_MAX] = PROJECT_SOURCE_DIR;
         snprintf(path, PATH_MAX, "%s/seeds.txt", getenv("srcdir"));
 #ifdef _GNU_SOURCE
         char *p = canonicalize_file_name(path);
@@ -168,7 +169,8 @@ int main(int argc, char **argv)
     CU_add_test(testSuite, "s2test", s2test);
     CU_add_test(testSuite, "seedtest", seedtest);
 
-    CU_automated_run_tests();
+    //CU_automated_run_tests();
+    CU_console_run_tests();
     CU_cleanup_registry();
     free(seeds);
 

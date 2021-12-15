@@ -1,5 +1,4 @@
 add_library(study
-aes.c
 args.c
 args_parse.c
 base64.c
