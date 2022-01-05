@@ -137,7 +137,9 @@ char *bmapi_sendMessage(xmlrpc_env *env, xmlrpc_client *clientP, xmlrpc_server_i
     //xmlrpc_DECREF(TTLV);
     xmlrpc_DECREF(resultP);
 
-    return strdup(msg);
+#pragma GCC diagnostic ignored "-Wcast-qual"
+    return (char *)msg;
+#pragma GCC diagnostic warning "-Wcast-qual"
 }
 
 #define GET_DETERMINISTIC_ADDRESS_METHOD_NAME "getDeterministicAddress"

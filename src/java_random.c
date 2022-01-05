@@ -1,13 +1,10 @@
 
-#include <stdio.h>
-#include <stdint.h>
-#include <stdlib.h>
 #include "internal_random.h"
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
 
-int64_t initialScramble(int64_t seed)
-{
-    return (seed ^ MULTIPLIER) & MASK;
-}
+int64_t initialScramble(int64_t seed) { return (seed ^ MULTIPLIER) & MASK; }
 
 int64_t *setSeed(int64_t *rnd, int64_t seed)
 {
@@ -27,10 +24,7 @@ int64_t nextLong(int64_t *rnd)
     return ((int64_t)(next(rnd, 32)) << 32) + next(rnd, 32);
 }
 
-int32_t nextInt(int64_t *rnd)
-{
-    return next(rnd, 32);
-}
+int32_t nextInt(int64_t *rnd) { return next(rnd, 32); }
 
 int32_t nextIntWithBounds(int64_t *rnd, int32_t bound)
 {
@@ -56,7 +50,8 @@ int32_t nextIntWithBounds(int64_t *rnd, int32_t bound)
 
 double nextDouble(int64_t *rnd)
 {
-    return (double)(((int64_t)(next(rnd, 26)) << 27) + next(rnd, 27)) * DOUBLE_UNIT;
+    return (double)(((int64_t)(next(rnd, 26)) << 27) + next(rnd, 27))
+           * DOUBLE_UNIT;
 }
 
 float nextFloat(int64_t *rnd)
@@ -68,12 +63,9 @@ float nextFloat(int64_t *rnd)
 // nextもrandomも使われているので適当にpとする
 // rかn関数のほうがいいかな？
 // next関数の略としてn
-int64_t n(int64_t seed)
-{
-    return (seed * MULTIPLIER + ADDEND) & MASK;
-}
+int64_t lcg(int64_t seed) { return (seed * MULTIPLIER + ADDEND) & MASK; }
 
-int64_t nInverse(int64_t seed)
+int64_t lcgInverse(int64_t seed)
 {
     return (seed - ADDEND) * INVERSE_MULTIPLIER & MASK;
 }
