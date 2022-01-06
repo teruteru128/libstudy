@@ -38,14 +38,14 @@ char *bmapi_simpleSendMessage(const char *, const char *, const char *, const ch
 #endif
 char *bmapi_sendMessage(xmlrpc_env *, xmlrpc_client *, xmlrpc_server_info *, xmlrpc_value *, xmlrpc_value *, xmlrpc_value *, xmlrpc_value *, xmlrpc_value *, xmlrpc_value *) __wur;
 int bmapi_sendBroadcast();
-char *bmapi_getStatus(xmlrpc_env *, xmlrpc_client *, xmlrpc_server_info *, const char *);
+char *bmapi_getStatus(xmlrpc_env *, xmlrpc_client *, xmlrpc_server_info *, const char *) __wur;
 int bmapi_listSubscriptions();
 int bmapi_addSubscription();
 int bmapi_deleteSubscriptions();
 int bmapi_listAddressBookEntries();
 int bmapi_addAddressBookEntry();
 int bmapi_deleteAddressBookEntry();
-char *bmapi_createChan(xmlrpc_env *, xmlrpc_client *, xmlrpc_server_info *, const char *);
+char *bmapi_createChan(xmlrpc_env *, xmlrpc_client *, xmlrpc_server_info *, const char *) __wur;
 int bmapi_deleteAddress();
 int bmapi_decodeAddress();
 int bmapi_addAddressToBlackWhiteList();

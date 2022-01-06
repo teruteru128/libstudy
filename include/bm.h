@@ -24,7 +24,7 @@ void hashSHA512(EVP_MD_CTX *mdctx, const EVP_MD *sha512,
 void hashRIPEMD160(EVP_MD_CTX *mdctx, const EVP_MD *ripemd160,
                    unsigned char *cache64);
 void chararrayfree(struct chararray *p);
-char *encodeBase58();
+// use base58encode from changebase.h
 /**encode private key pair to bitmessage keys.dat format*/
 char *formatKey(char *address, char *privateSigningKeyWIF, char *privateEncryptionKeyWIF);
 int exportAddress(PrivateKey *, PublicKey *, PrivateKey *,
