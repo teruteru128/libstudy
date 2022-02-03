@@ -100,7 +100,7 @@ const char *bmapi_simpleSendMessage(const char *toaddress, const char *fromaddre
  * @param TTLV ttl xmlrpc value. 3600 <= ttl <= 2419200
  * @return ackData(You must be free.)
  */
-char *bmapi_sendMessage(xmlrpc_env *env, xmlrpc_client *clientP, xmlrpc_server_info *serverP, xmlrpc_value *toaddressV, xmlrpc_value *fromaddressV, xmlrpc_value *subjectV, xmlrpc_value *messageV, xmlrpc_value *encodingTypeV, xmlrpc_value *TTLV) __wur
+__wur char *bmapi_sendMessage(xmlrpc_env *env, xmlrpc_client *clientP, xmlrpc_server_info *serverP, xmlrpc_value *toaddressV, xmlrpc_value *fromaddressV, xmlrpc_value *subjectV, xmlrpc_value *messageV, xmlrpc_value *encodingTypeV, xmlrpc_value *TTLV)
 {
     // create args array
     xmlrpc_value *paramArray = xmlrpc_array_new(env);
