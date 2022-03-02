@@ -3,6 +3,7 @@
 #include "config.h"
 #endif
 #include <CUnit/Automated.h>
+#include <CUnit/Basic.h>
 #include <CUnit/Console.h>
 #include <epsp-parser.h>
 #include <errno.h>
@@ -43,7 +44,10 @@ int main(int argc, char *argv[])
     CU_add_test(testSuite, "Fail", fail);
 
     // CU_automated_run_tests();
-    CU_console_run_tests();
+    CU_basic_set_mode(CU_BRM_VERBOSE);
+    CU_basic_run_tests();
+    int ret = CU_get_number_of_failures();
+    // CU_console_run_tests();
     CU_cleanup_registry();
     /*
         char path[PATH_MAX];
@@ -115,5 +119,5 @@ int main(int argc, char *argv[])
       return EXIT_FAILURE;
     }
     */
-    return CU_get_error();
+    return ret;
 }
