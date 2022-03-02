@@ -2,6 +2,7 @@
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
+#include <CUnit/Automated.h>
 #include <epsp-parser.h>
 #include <errno.h>
 #include <limits.h>
@@ -28,35 +29,46 @@ void print_reg_error(int errorcode, regex_t *buf)
     free(msg);
 }
 
+void fail(void) { CU_FAIL(""); }
+
 /*
  * 文字列の配列を返す。テストデータファイルの改行コードはCRLFにすること。
  */
 int main(int argc, char *argv[])
 {
-    char path[PATH_MAX];
-    snprintf(path, PATH_MAX, "%s/epsp-packet-sample-success.txt",
-             getenv("srcdir"));
-    printf("%d\n", PATH_MAX);
-    printf("%s\n", path);
-    FILE *in = fopen(path, "r");
-    if (!in)
-    {
-        perror("fopen");
-        return EXIT_FAILURE;
-    }
-    char buf[BUFSIZ];
-    printf("%d\n", BUFSIZ);
-    size_t len = 0L;
-    while (fgets(buf, BUFSIZ, in))
-    {
-        fprintf(stdout, "%s", buf);
-    }
-    int r = fclose(in);
-    if (r)
-    {
-        perror("fopen");
-        return EXIT_FAILURE;
-    }
+    CU_initialize_registry();
+    CU_pSuite testSuite = CU_add_suite("epsp parser test", NULL, NULL);
+
+    CU_add_test(testSuite, "Fail", fail);
+
+    CU_automated_run_tests();
+    // CU_console_run_tests();
+    CU_cleanup_registry();
+    /*
+        char path[PATH_MAX];
+        snprintf(path, PATH_MAX, "%s/epsp-packet-sample-success.txt",
+                 getenv("srcdir"));
+        printf("%d\n", PATH_MAX);
+        printf("%s\n", path);
+        FILE *in = fopen(path, "r");
+        if (!in)
+        {
+            perror("fopen");
+            return EXIT_FAILURE;
+        }
+        char buf[BUFSIZ];
+        printf("%d\n", BUFSIZ);
+        size_t len = 0L;
+        while (fgets(buf, BUFSIZ, in))
+        {
+            fprintf(stdout, "%s", buf);
+        }
+        int r = fclose(in);
+        if (r)
+        {
+            perror("fopen");
+            return EXIT_FAILURE;
+        } */
     /*
     // 正規表現で分割 OR strtokで分割
     //
@@ -102,5 +114,5 @@ int main(int argc, char *argv[])
       return EXIT_FAILURE;
     }
     */
-    return EXIT_SUCCESS;
+    return CU_get_error();
 }

@@ -11,5 +11,5 @@ void chainCookiesTest(void)
     double cookies = 5.877e+32;
     fprintf(stderr, "%f\n", chainCookies(chain, cookiesPs * 7, cookies));
     fprintf(stderr, "%f = 10^%f\n", 15., log10(15));
-    CU_PASS("");
+    CU_FAIL("a");
 }

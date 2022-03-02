@@ -27,5 +27,5 @@ int main(void)
     // CU_console_run_tests();
     CU_cleanup_registry();
 
-    return 0;
+    return CU_get_error();
 }
