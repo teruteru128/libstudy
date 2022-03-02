@@ -14,6 +14,8 @@ jobs:
       - name: Install dependents
         run: sudo apt install ninja-build autopoint libcurl4-gnutls-dev libgmp-dev libsodium-dev libupnp-dev libxmlrpc-core-c3-dev uuid-dev libcunit1-dev gettext
       - name: Configuration
-        run: cmake . -G Ninja -B build
+        run: cmake . -G Ninja -B build -DCMAKE_BUILD_TYPE=Debug
       - name: build
-        run: ninja -j 0 -C build
+        run: ninja -C build
+      - name: test
+        run: ninja -C test
