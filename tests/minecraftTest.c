@@ -23,8 +23,8 @@ int main(void)
 
     CU_add_test(testSuite, "Fail", fail);
 
-    CU_automated_run_tests();
-    // CU_console_run_tests();
+    // CU_automated_run_tests();
+    CU_console_run_tests();
     CU_cleanup_registry();
 
     return CU_get_error();

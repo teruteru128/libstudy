@@ -3,6 +3,7 @@
 #include "config.h"
 #endif
 #include <CUnit/Automated.h>
+#include <CUnit/Console.h>
 #include <epsp-parser.h>
 #include <errno.h>
 #include <limits.h>
@@ -41,8 +42,8 @@ int main(int argc, char *argv[])
 
     CU_add_test(testSuite, "Fail", fail);
 
-    CU_automated_run_tests();
-    // CU_console_run_tests();
+    // CU_automated_run_tests();
+    CU_console_run_tests();
     CU_cleanup_registry();
     /*
         char path[PATH_MAX];
