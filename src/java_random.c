@@ -60,9 +60,6 @@ float nextFloat(int64_t *rnd)
 }
 
 //
-// nextもrandomも使われているので適当にpとする
-// rかn関数のほうがいいかな？
-// next関数の略としてn
 int64_t lcg(int64_t seed) { return (seed * MULTIPLIER + ADDEND) & MASK; }
 
 int64_t lcgInverse(int64_t seed)
