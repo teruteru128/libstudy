@@ -2,39 +2,27 @@
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
-#include <stdio.h>
 #include <err.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/random.h>
 #include <xorshift.h>
-
-#define URANDOM_PATH "/dev/urandom"
-#define BUF_SIZE 8
-#include <random.h>
 
 int orz(size_t num)
 {
-    size_t count = num > 0 ? num : 334;
     uint32_t seed;
-    if (read_file(URANDOM_PATH, &seed, sizeof(uint32_t), 1) != 0)
-    {
-        warnx("failed");
-        return EXIT_FAILURE;
-    }
+    getrandom(&seed, sizeof(uint32_t), GRND_NONBLOCK);
 
-    const char messages[][37] = {
-        "orz",
-        "申し訳ございませんでした",
-        "ごめんなさい",
-        "すみませんでした",
-        ""};
+    const char messages[][37] = { "orz", "申し訳ございませんでした",
+                                  "ごめんなさい", "すみませんでした", "" };
     size_t messages_size = 0;
-    while(messages[messages_size][0] != 0)
+    while (messages[messages_size][0] != 0)
     {
         messages_size++;
     }
-    for (size_t i = 0; i < count; i++)
+    for (size_t i = 0; i < num; i++)
     {
         printf("%s\n", messages[(seed = xorshift(seed)) % messages_size]);
     }

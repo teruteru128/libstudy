@@ -2,44 +2,12 @@
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
+#include "internal_random.h"
 #include <err.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdint.h>
-#include "internal_random.h"
-
-int read_file(const char *const path, void *buf, const size_t size, const size_t nmemb)
-{
-
-    FILE *rnd = fopen(path, "rb");
-    if (rnd == NULL)
-    {
-        perror("fopen rnd");
-        return -1;
-    }
-    size_t r = fread(buf, size, nmemb, rnd);
-    if (r < nmemb)
-    {
-        perror("fread rnd");
-        return -1;
-    }
-    if (r != nmemb)
-    {
-        warnx("reading failed");
-    }
-
-    (void)fclose(rnd);
-    return 0;
-}
-
-size_t read_random(void *buf, const size_t size, size_t nmemb, int use_true_random)
-{
-    const char path[][14] = {
-        "/dev/random",
-        "/dev/urandom"};
-    read_file(path[!use_true_random], buf, size, nmemb);
-    return 0;
-}
+#include <sys/random.h>>
 
 static int64_t initialScramble(uint64_t seed)
 {
@@ -60,7 +28,9 @@ void init_genrand64(uint64_t seed)
     mt[0] = seed;
     for (mti = 1; mti < NN; mti++)
     {
-        mt[mti] = (UINT64_C(6364136223846793005) * (mt[mti - 1] ^ (mt[mti - 1] >> 62)) + 1);
+        mt[mti] = (UINT64_C(6364136223846793005)
+                       * (mt[mti - 1] ^ (mt[mti - 1] >> 62))
+                   + 1);
     }
 }
 
@@ -74,7 +44,10 @@ void init_by_array64(uint64_t *init_key, size_t key_length)
     k = (NN > key_length ? NN : key_length);
     for (; k; k--)
     {
-        mt[i] = (mt[i] ^ ((mt[i - 1] ^ (mt[i - 1] >> 62)) * UINT64_C(3935559000370003845))) + init_key[j] + j;
+        mt[i] = (mt[i]
+                 ^ ((mt[i - 1] ^ (mt[i - 1] >> 62))
+                    * UINT64_C(3935559000370003845)))
+                + init_key[j] + j;
         i++;
         j++;
         if (i >= NN)
@@ -89,7 +62,10 @@ void init_by_array64(uint64_t *init_key, size_t key_length)
     }
     for (k = NN - 1; k; k--)
     {
-        mt[i] = (mt[i] ^ ((mt[i - 1] ^ (mt[i - 1] >> 62)) * UINT64_C(2862933555777941757))) - i; /* non linear */
+        mt[i] = (mt[i]
+                 ^ ((mt[i - 1] ^ (mt[i - 1] >> 62))
+                    * UINT64_C(2862933555777941757)))
+                - i; /* non linear */
         i++;
         if (i >= NN)
         {
@@ -106,7 +82,7 @@ uint64_t genrand64_int64(void)
 {
     int i;
     uint64_t x;
-    static uint64_t mag01[2] = {UINT64_C(0), MATRIX_A};
+    static uint64_t mag01[2] = { UINT64_C(0), MATRIX_A };
 
     if (mti >= NN)
     { /* generate NN words at one time */
@@ -124,7 +100,8 @@ uint64_t genrand64_int64(void)
         for (; i < NN - 1; i++)
         {
             x = (mt[i] & UM) | (mt[i + 1] & LM);
-            mt[i] = mt[i + (MM - NN)] ^ (x >> 1) ^ mag01[(int)(x & UINT64_C(1))];
+            mt[i]
+                = mt[i + (MM - NN)] ^ (x >> 1) ^ mag01[(int)(x & UINT64_C(1))];
         }
         x = (mt[NN - 1] & UM) | (mt[0] & LM);
         mt[NN - 1] = mt[MM - 1] ^ (x >> 1) ^ mag01[(int)(x & UINT64_C(1))];
@@ -143,10 +120,7 @@ uint64_t genrand64_int64(void)
 }
 
 /* generates a random number on [0, 2^63-1]-interval */
-int64_t genrand64_int63(void)
-{
-    return (int64_t)(genrand64_int64() >> 1);
-}
+int64_t genrand64_int63(void) { return (int64_t)(genrand64_int64() >> 1); }
 
 /* generates a random number on [0,1)-real-interval */
 double genrand64_real(void)
@@ -158,31 +132,4 @@ double genrand64_real(void)
 double genrand64_real2(void)
 {
     return ((genrand64_int64() >> 12) + 0.5) * (1.0 / 4503599627370496.0);
-}
-
-int nextBytes(unsigned char *buf, size_t len)
-{
-    const char inf[] = "/dev/urandom";
-    FILE *in = fopen(inf, "rb");
-    if (in == NULL)
-    {
-        return EXIT_FAILURE;
-    }
-
-    size_t r = fread(buf, 1, len, in);
-
-    if (len != r)
-    {
-        perror("fread");
-        fclose(in);
-        return EXIT_FAILURE;
-    }
-    int i = fclose(in);
-
-    if (i != 0)
-    {
-        return EXIT_FAILURE;
-    }
-
-    return EXIT_SUCCESS;
 }
