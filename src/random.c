@@ -7,7 +7,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/random.h>>
+#include <sys/random.h>
 
 static int64_t initialScramble(uint64_t seed)
 {
