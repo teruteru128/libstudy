@@ -39,4 +39,4 @@ svgplot.c
 xmlrpc.c
 xorshift.c
 )
-target_link_libraries(study xmlrpc xmlrpc_client)
+target_link_libraries(study ${OPENSSL_CRYPTO_LIBRARIES} xmlrpc xmlrpc_client)
