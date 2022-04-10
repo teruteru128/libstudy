@@ -128,6 +128,10 @@ __wur char *bmapi_sendMessage(xmlrpc_env *env, xmlrpc_client *clientP, xmlrpc_se
     xmlrpc_read_string(env, resultP, &msg);
     die_if_fault_occurred(env);
 
+    char *ret = strdup(msg);
+    free((void *)msg);
+    msg = NULL;
+
     xmlrpc_DECREF(paramArray);
     //xmlrpc_DECREF(toaddressV);
     //xmlrpc_DECREF(fromaddressV);
@@ -137,9 +141,7 @@ __wur char *bmapi_sendMessage(xmlrpc_env *env, xmlrpc_client *clientP, xmlrpc_se
     //xmlrpc_DECREF(TTLV);
     xmlrpc_DECREF(resultP);
 
-#pragma GCC diagnostic ignored "-Wcast-qual"
-    return (char *)msg;
-#pragma GCC diagnostic warning "-Wcast-qual"
+    return ret;
 }
 
 #define GET_DETERMINISTIC_ADDRESS_METHOD_NAME "getDeterministicAddress"
