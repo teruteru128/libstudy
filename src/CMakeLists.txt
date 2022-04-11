@@ -10,7 +10,7 @@ chainCookies.c
 changebase.c
 charset-convert.c
 epsp-parser.c
-gettext.h
+genackpayload.c
 internal_bitset.h
 internal_queue.h
 internal_random.h
