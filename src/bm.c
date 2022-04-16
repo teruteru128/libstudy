@@ -6,7 +6,6 @@
 #include "bm.h"
 #include "bmapi.h"
 #include "nlz.h"
-#include <byteswap.h>
 #include <changebase.h>
 #include <err.h>
 #include <openssl/ec.h>
@@ -69,54 +68,45 @@ size_t ripe(RIPE_CTX *ripectx, unsigned char *signpubkey,
  * https://github.com/Bitmessage/PyBitmessage/blob/d09782e53d3f42132532b6e39011cd27e7f41d25/src/addresses.py#L63
  * https://docs.python.org/ja/3/library/struct.html
  */
-static struct chararray *encodeVarint(uint64_t u)
+int encodeVarint(uint64_t u, unsigned char **out, size_t *outlen)
 {
-    struct chararray *p = malloc(sizeof(struct chararray));
-    if (p == NULL)
+    if (out == NULL || outlen == NULL)
     {
-        return NULL;
+        return 1;
     }
     if (u < 253)
     {
-        p->data = malloc(sizeof(char));
-        *p->data = (int8_t)u;
-        p->length = 1;
-        return p;
+        *outlen = sizeof(char);
+        *out = malloc(*outlen);
+        **out = (int8_t)u;
+        return 0;
     }
     if (253 <= u && u < 65536)
     {
-        p->data = malloc(sizeof(char) + sizeof(uint16_t));
-        *p->data = -3;
-        *((uint16_t *)&p->data[1]) = bswap_16((uint16_t)u);
-        p->length = 3;
-        return p;
+        *outlen = sizeof(char) + sizeof(uint16_t);
+        *out = malloc(*outlen);
+        **out = 0xfd;
+        *((uint16_t *)(*out + 1)) = htobe16((uint16_t)u);
+        return 0;
     }
     if (65536 <= u && u < 4294967296L)
     {
-        p->data = malloc(sizeof(char) + sizeof(uint32_t));
-        *p->data = -2;
-        *((uint32_t *)&p->data[1]) = bswap_32((uint32_t)u);
-        p->length = 5;
-        return p;
+        *outlen = sizeof(char) + sizeof(uint32_t);
+        *out = malloc(*outlen);
+        **out = 0xfe;
+        *((uint32_t *)(*out + 1)) = htobe32((uint32_t)u);
+        return 0;
     }
     if (4294967296L <= u && u <= 18446744073709551615UL)
     {
-        p->data = malloc(sizeof(char) + sizeof(uint64_t));
-        *p->data = -1;
-        *((uint64_t *)&p->data[1]) = bswap_64((uint64_t)u);
-        p->length = 9;
-        return p;
+        *outlen = sizeof(char) + sizeof(uint64_t);
+        *out = malloc(*outlen);
+        **out = 0xff;
+        *((uint64_t *)(*out + 1)) = htobe64((uint64_t)u);
+        return 0;
     }
     // おそらくここには来ない
-    free(p);
-    return NULL;
-}
-
-void chararrayfree(struct chararray *p)
-{
-    if (p->data)
-        free(p->data);
-    free(p);
+    return 2;
 }
 
 char *encodeAddress0(uint64_t version, uint64_t stream, unsigned char *ripe,
@@ -166,16 +156,20 @@ char *encodeAddress0(uint64_t version, uint64_t stream, unsigned char *ripe,
         workripe = &ripe[i];
         workripelen -= i;
     }
-    struct chararray *variantVersion = encodeVarint(version);
-    struct chararray *variantStream = encodeVarint(stream);
+    unsigned char *variantVersionout = NULL;
+    size_t variantVersionoutlen = 0;
+    unsigned char *variantStreamout = NULL;
+    size_t variantStreamoutlen = 0;
+    encodeVarint(version, &variantVersionout, &variantVersionoutlen);
+    encodeVarint(stream, &variantStreamout, &variantStreamoutlen);
     size_t storedBinaryDataLen
-        = variantVersion->length + variantStream->length + workripelen + 4;
+        = variantVersionoutlen + variantStreamoutlen + workripelen + 4;
     unsigned char *storedBinaryData = malloc(
-        variantVersion->length + variantStream->length + workripelen + 4);
-    memcpy(storedBinaryData, variantVersion->data, variantVersion->length);
-    memcpy(storedBinaryData + variantVersion->length, variantStream->data,
-           variantStream->length);
-    memcpy(storedBinaryData + variantVersion->length + variantStream->length,
+        variantVersionoutlen + variantStreamoutlen + workripelen + 4);
+    memcpy(storedBinaryData, variantVersionout, variantVersionoutlen);
+    memcpy(storedBinaryData + variantVersionoutlen, variantStreamout,
+           variantStreamoutlen);
+    memcpy(storedBinaryData + variantVersionoutlen + variantStreamoutlen,
            workripe, workripelen);
 
     {
@@ -190,12 +184,12 @@ char *encodeAddress0(uint64_t version, uint64_t stream, unsigned char *ripe,
         EVP_DigestUpdate(ctx, cache64, 64);
         EVP_DigestFinal(ctx, cache64, &s);
         EVP_MD_CTX_free(ctx);
-        memcpy(storedBinaryData + variantVersion->length
-                   + variantStream->length + workripelen,
+        memcpy(storedBinaryData + variantVersionoutlen
+                   + variantStreamoutlen + workripelen,
                cache64, 4);
     }
-    chararrayfree(variantVersion);
-    chararrayfree(variantStream);
+    free(variantVersionout);
+    free(variantStreamout);
 
     char *a = base58encode(storedBinaryData, storedBinaryDataLen);
     free(storedBinaryData);
@@ -242,12 +236,12 @@ char *encodeShorterV3Address(unsigned char *ripe, size_t r)
 }
 
 /**
- * @brief 
- * 
+ * @brief
+ *
  * @param key データ型をPrivateKey *にするか unsigned char*にするか判断に悩む。
  * PrivateKey: いちいち変換する手間を掛けたくない
  * unsigned char*: 固定長のデータのサイズ(32byte)がわからない
- * @return char* 
+ * @return char*
  */
 char *encodeWIF(PrivateKey *key)
 {

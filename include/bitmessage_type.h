@@ -41,10 +41,4 @@ typedef struct connectioninfo
 
 const endpointinfo_t server_addresses_list[5];
 
-struct chararray
-{
-    char *data;
-    size_t length;
-};
-
 #endif // BITMESSAGE_TYPE_H
