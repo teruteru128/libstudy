@@ -13,8 +13,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-
-void fail(void) { CU_FAIL(""); }
+#include "simpletestcases.h"
 
 int main(void)
 {
@@ -25,7 +24,8 @@ int main(void)
         return CU_get_error();
     }
 
-    CU_add_test(testSuite, "Fail", fail);
+    // CU_add_test(testSuite, "Fail", fail);
+    CU_add_test(testSuite, "Pass", pass);
 
     // CU_automated_run_tests();
     CU_basic_set_mode(CU_BRM_VERBOSE);

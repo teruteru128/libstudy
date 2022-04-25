@@ -1,6 +1,6 @@
 
 # https://qiita.com/mrk_21/items/25ee7f00cebb9934b472
-add_executable(minecraftTest minecraftTest.c)
+add_executable(minecraftTest minecraftTest.c simpletestcases.c)
 target_link_libraries(minecraftTest cunit study)
 add_test(NAME mc_seed COMMAND $<TARGET_FILE:minecraftTest>)
 
@@ -13,7 +13,7 @@ add_test(NAME mc_seed COMMAND $<TARGET_FILE:minecraftTest>)
 #add_test(NAME xfail.sh COMMAND ./xfail.sh)
 #set_tests_properties(xfail.sh PROPERTIES WILL_FAIL true)
 
-add_executable(epsp-parser-test epsp-parser-test.c)
+add_executable(epsp-parser-test epsp-parser-test.c simpletestcases.c)
 target_link_libraries(epsp-parser-test cunit study)
 add_test(NAME hoge_epsp-parser-test COMMAND $<TARGET_FILE:epsp-parser-test>)
 
