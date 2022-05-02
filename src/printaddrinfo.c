@@ -48,7 +48,7 @@ void printaddrinfo0(struct addrinfo *adrinf, FILE *stream)
         return;
     }
 
-    fprintf(stream, "[%s]:%s(%s), flags : %d, family : %d, socktype : %d, protocol : %d", hbuf, sbuf, protocol, adrinf->ai_flags, adrinf->ai_family, adrinf->ai_socktype, adrinf->ai_protocol);
+    fprintf(stream, "[%s]:%s(%s), addrlen : %u, flags : %d, family : %d, socktype : %d, protocol : %d", hbuf, sbuf, protocol, adrinf->ai_addrlen, adrinf->ai_flags, adrinf->ai_family, adrinf->ai_socktype, adrinf->ai_protocol);
     /*
      * if (adrinf->ai_family == AF_INET6)
      * {
