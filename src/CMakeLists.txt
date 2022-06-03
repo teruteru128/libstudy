@@ -9,6 +9,7 @@ bmapi.c
 chainCookies.c
 changebase.c
 charset-convert.c
+crlffd.c
 epsp-parser.c
 genackpayload.c
 internal_bitset.h
