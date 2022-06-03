@@ -45,24 +45,6 @@ int calcRipe(EVP_MD_CTX *mdctx, const EVP_MD *sha512, const EVP_MD *ripemd160,
     return 0;
 }
 
-size_t ripe(RIPE_CTX *ripectx, unsigned char *signpubkey,
-            unsigned char *encpubkey)
-{
-    unsigned char *cache64 = ripectx->hash;
-    EVP_MD_CTX *mdctx = ripectx->ctx;
-    SHA512_CTX sha512ctx;
-    RIPEMD160_CTX ripemd160ctx;
-    SHA512_Init(&sha512ctx);
-    SHA512_Update(&sha512ctx, signpubkey, PUBLIC_KEY_LENGTH);
-    SHA512_Update(&sha512ctx, encpubkey, PUBLIC_KEY_LENGTH);
-    SHA512_Final(cache64, &sha512ctx);
-    RIPEMD160_Init(&ripemd160ctx);
-    RIPEMD160_Update(&ripemd160ctx, cache64, SHA512_DIGEST_LENGTH);
-    RIPEMD160_Final(cache64, &ripemd160ctx);
-    size_t nlz = getNLZ(cache64, RIPEMD160_DIGEST_LENGTH);
-    return nlz;
-}
-
 /*
  *
  * https://github.com/Bitmessage/PyBitmessage/blob/d09782e53d3f42132532b6e39011cd27e7f41d25/src/addresses.py#L63
