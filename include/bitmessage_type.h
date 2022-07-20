@@ -39,6 +39,6 @@ typedef struct connectioninfo
     serverinfo_t server;
 } connectioninfo_t;
 
-const endpointinfo_t server_addresses_list[5];
+extern const endpointinfo_t server_addresses_list[5];
 
 #endif // BITMESSAGE_TYPE_H
