@@ -1,7 +1,5 @@
 
 #include <CUnit/Automated.h>
-#include <CUnit/Basic.h>
-#include <CUnit/Console.h>
 #include <chainCookies.h>
 
 void chainCookies_test1(void)
@@ -28,11 +26,7 @@ int main(void)
         return CU_get_error();
     }
 
-    // CU_automated_run_tests();
-    CU_basic_set_mode(CU_BRM_VERBOSE);
-    CU_basic_run_tests();
-    int ret = CU_get_number_of_failures();
-    // CU_console_run_tests();
+    CU_automated_run_tests();
     CU_cleanup_registry();
-    return ret;
+    return 0;
 }

@@ -17,6 +17,11 @@ add_executable(epsp-parser-test epsp-parser-test.c simpletestcases.c)
 target_link_libraries(epsp-parser-test cunit study)
 add_test(NAME hoge_epsp-parser-test COMMAND $<TARGET_FILE:epsp-parser-test>)
 
+add_executable(string_list_test string_list_test.c)
+
+add_executable(ripeencode ripeencode.c)
+target_link_libraries(ripeencode cunit study)
+
 add_executable(testChainCookies testChainCookies.c testChainCookies2.c)
 target_link_libraries(testChainCookies cunit study m)
 #target_compile_options(testChainCookies PRIVATE -fprofile-arcs -ftest-coverage --coverage)
