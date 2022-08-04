@@ -57,6 +57,7 @@ size_t snprintUInt64(char *restrict s, size_t n, uint64_t l)
     while (tmp > 0x7FFFFFFFULL)
     {
         q = tmp / 100;
+        // r = tmp % 100;
         r = (uint32_t)(tmp - ((q << 6) + (q << 5) + (q << 2)));
         tmp = q;
         s[--charPos] = DigitOnes[r];
@@ -76,6 +77,7 @@ size_t snprintUInt64(char *restrict s, size_t n, uint64_t l)
     for (;;)
     {
         q2 = (i2 * 52429) >> (16 + 3);
+        // r = i2 % 10
         r = i2 - ((q2 << 3) + (q2 << 1));
         s[--charPos] = DIGITS[r];
         i2 = q2;
