@@ -10,14 +10,6 @@
 #include <xmlrpc.h>
 #include <xmlrpc_client.h>
 
-typedef struct
-{
-    SHA512_CTX sha512ctx;
-    RIPEMD160_CTX ripemd160ctx;
-    EVP_MD_CTX *ctx;
-    unsigned char hash[SHA512_DIGEST_LENGTH];
-} RIPE_CTX;
-
 void hashSHA512(EVP_MD_CTX *mdctx, const EVP_MD *sha512,
                 unsigned char *cache64, PublicKey *signPublicKey,
              PublicKey *encPublicKey);

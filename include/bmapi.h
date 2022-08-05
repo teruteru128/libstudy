@@ -36,8 +36,11 @@ int bmapi_trashMessages();
 #if 0
 char *bmapi_simpleSendMessage(const char *, const char *, const char *, const char *);
 #endif
-char *bmapi_sendMessage(xmlrpc_env *, xmlrpc_client *, xmlrpc_server_info *, xmlrpc_value *, xmlrpc_value *, xmlrpc_value *, xmlrpc_value *, xmlrpc_value *, xmlrpc_value *) __wur;
-int bmapi_sendBroadcast();
+__wur int bmapi_sendMessage(xmlrpc_env *, xmlrpc_client *, xmlrpc_server_info *, xmlrpc_value *, xmlrpc_value *, xmlrpc_value *, xmlrpc_value *, xmlrpc_value *, xmlrpc_value *, char **ackData);
+int bmapi_sendBroadcast(xmlrpc_env *env, xmlrpc_client *clientP,
+                        xmlrpc_server_info *serverP, const char *fromaddress,
+                        const char *subject, const char *message,
+                        int encodingType, int32_t TTL, char **ackData);
 char *bmapi_getStatus(xmlrpc_env *, xmlrpc_client *, xmlrpc_server_info *, const char *) __wur;
 int bmapi_listSubscriptions();
 int bmapi_addSubscription();

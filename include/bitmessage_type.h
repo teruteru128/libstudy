@@ -4,6 +4,8 @@
 
 #include <netdb.h>
 #include <openssl/evp.h>
+#include <openssl/ripemd.h>
+#include <openssl/sha.h>
 #define PRIVATE_KEY_LENGTH 32
 #define PUBLIC_KEY_LENGTH 65
 #define RIPE_HASH_LENGTH 20
@@ -39,6 +41,24 @@ typedef struct connectioninfo
     serverinfo_t server;
 } connectioninfo_t;
 
+typedef struct
+{
+    SHA512_CTX sha512ctx;
+    RIPEMD160_CTX ripemd160ctx;
+    EVP_MD *sha512md;
+    EVP_MD *ripemd160md;
+    EVP_MD_CTX *ctx;
+    unsigned char hash[EVP_MAX_MD_SIZE];
+} RIPE_CTX;
+
 extern const endpointinfo_t server_addresses_list[5];
+
+enum EncodingType
+{
+    IGNORE = 0,
+    TRIVAL = 1,
+    SIMPLE = 2,
+    EXTENDED = 3
+};
 
 #endif // BITMESSAGE_TYPE_H
