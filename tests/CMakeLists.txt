@@ -18,6 +18,7 @@ target_link_libraries(epsp-parser-test cunit study)
 add_test(NAME hoge_epsp-parser-test COMMAND $<TARGET_FILE:epsp-parser-test>)
 
 add_executable(string_list_test string_list_test.c)
+target_link_libraries(string_list_test cunit study)
 
 add_executable(ripeencode ripeencode.c)
 target_link_libraries(ripeencode cunit study)
