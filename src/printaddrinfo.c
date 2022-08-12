@@ -10,6 +10,8 @@
 #include <string.h>
 #include <byteswap.h>
 
+#define PROTOCOL_LEN 16
+
 /**
  * アドレスとポート番号を指定されたストリームへ表示する。
  * <I> adrinf: アドレス情報
@@ -23,17 +25,17 @@ void printaddrinfo0(struct addrinfo *adrinf, FILE *stream)
     }
     char hbuf[NI_MAXHOST]; /* 返されるアドレスを格納する */
     char sbuf[NI_MAXSERV]; /* 返されるポート番号を格納する */
-    char protocol[16] = "";
+    char protocol[PROTOCOL_LEN] = "";
     switch (adrinf->ai_protocol)
     {
     case IPPROTO_TCP:
-        strncpy(protocol, "TCP", 4);
+        strncpy(protocol, "TCP", PROTOCOL_LEN);
         break;
     case IPPROTO_UDP:
-        strncpy(protocol, "UDP", 4);
+        strncpy(protocol, "UDP", PROTOCOL_LEN);
         break;
     default:
-        strncpy(protocol, "UNKNOWN", 8);
+        strncpy(protocol, "UNKNOWN", PROTOCOL_LEN);
         break;
     }
 
