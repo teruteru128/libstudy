@@ -31,6 +31,7 @@ sha-1.c
 sha-2.c
 sha-3.c
 sha.c
+shuffle.c
 string-array.c
 string-joiner.c
 string-list.c
