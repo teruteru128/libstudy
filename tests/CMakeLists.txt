@@ -23,6 +23,10 @@ target_link_libraries(string_list_test cunit study)
 add_executable(ripeencode ripeencode.c)
 target_link_libraries(ripeencode cunit study)
 
+add_executable(base58test base58test.c)
+target_link_libraries(base58test cunit study)
+add_test(name base58test command $<target_file:base58test>)
+
 add_executable(testChainCookies testChainCookies.c testChainCookies2.c)
 target_link_libraries(testChainCookies cunit study m)
 #target_compile_options(testChainCookies PRIVATE -fprofile-arcs -ftest-coverage --coverage)

@@ -1,7 +1,7 @@
 
 #include <stdio.h>
 #include <math.h>
-#include <inttypes.h>
+#include <stdint.h>
 
 double chainCookies(int64_t chain, double cookiesPs, double cookies)
 {

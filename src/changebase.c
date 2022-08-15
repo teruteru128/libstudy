@@ -193,3 +193,53 @@ size_t parseHex(unsigned char **out, const char *str)
     *out = data;
     return length;
 }
+
+#define BASE32_TABLE "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"
+
+const char base32table[33] = BASE32_TABLE;
+
+// TODO base32decodeの実装しんどいれす^q^
+// changebaseにbase32を導入？
+/**
+ * @brief
+ * https://qiita.com/waaaaRapy/items/8549890bda4f8ad33963#%E5%8B%95%E4%BD%9C%E3%83%86%E3%82%B9%E3%83%88
+ *
+ * @param src
+ * @param srclen
+ * @param out
+ * @param outlen
+ * @return int
+ */
+int base32decode(const char *src, const size_t srclen, unsigned char **out,
+                 size_t *outlen)
+{
+    //
+    if (out == NULL || outlen == NULL)
+        return 1;
+
+    *outlen = (srclen * 5) / 8;
+
+    unsigned char *data = malloc(srclen);
+    char *j = NULL;
+    for (size_t i = 0; i < srclen; i++)
+    {
+        if ((j = strchr(base32table, src[i])) != NULL)
+        {
+            data[i] = j - base32table;
+        }
+    }
+
+    *out = malloc(*outlen);
+    uint32_t tmp = 0;
+    for (size_t i = 0, k = 0; i < srclen; i += 8, k += 5)
+    {
+        *out[k] = data[i + 0] << 3 | data[i + 1] >> 2;
+        tmp = 0;
+        for (size_t shift = 30, l = 1; shift >= 0; shift -= 5, l++)
+        {
+            tmp |= data[i + l] << shift;
+        }
+    }
+
+    return 0;
+}
