@@ -3,9 +3,6 @@
 #include <config.h>
 #endif
 #include <CUnit/Automated.h>
-#include <CUnit/Basic.h>
-#include <CUnit/CUnit.h>
-#include <CUnit/Console.h>
 #include <assert.h>
 #include <limits.h>
 #include <minecraft.h>
@@ -27,12 +24,11 @@ int main(void)
     // CU_add_test(testSuite, "Fail", fail);
     CU_add_test(testSuite, "Pass", pass);
 
-    // CU_automated_run_tests();
-    CU_basic_set_mode(CU_BRM_VERBOSE);
-    CU_basic_run_tests();
+    CU_automated_run_tests();
     int ret = CU_get_number_of_failures();
+    CU_ErrorCode code = CU_list_tests_to_file();
     // CU_console_run_tests();
     CU_cleanup_registry();
 
-    return ret;
+    return (int)code;
 }

@@ -13,19 +13,25 @@ add_test(NAME mc_seed COMMAND $<TARGET_FILE:minecraftTest>)
 #add_test(NAME xfail.sh COMMAND ./xfail.sh)
 #set_tests_properties(xfail.sh PROPERTIES WILL_FAIL true)
 
-add_executable(epsp-parser-test epsp-parser-test.c simpletestcases.c)
-target_link_libraries(epsp-parser-test cunit study)
-add_test(NAME hoge_epsp-parser-test COMMAND $<TARGET_FILE:epsp-parser-test>)
+add_executable(epsp_parser_test epsp-parser-test.c simpletestcases.c)
+target_link_libraries(epsp_parser_test cunit study)
+add_test(NAME hoge_epsp_parser_test COMMAND $<TARGET_FILE:epsp_parser_test>)
 
 add_executable(string_list_test string_list_test.c)
 target_link_libraries(string_list_test cunit study)
+add_test(NAME string_list_test COMMAND $<TARGET_FILE:string_list_test>)
+
+add_executable(changebasetest changebasetest.c)
+target_link_libraries(changebasetest cunit study)
+add_test(NAME changebasetest COMMAND $<TARGET_FILE:changebasetest>)
 
 add_executable(ripeencode ripeencode.c)
 target_link_libraries(ripeencode cunit study)
+add_test(NAME ripeencode COMMAND $<TARGET_FILE:ripeencode>)
 
 add_executable(base58test base58test.c)
 target_link_libraries(base58test cunit study)
-add_test(name base58test command $<target_file:base58test>)
+add_test(NAME base58test COMMAND $<TARGET_FILE:base58test>)
 
 add_executable(testChainCookies testChainCookies.c testChainCookies2.c)
 target_link_libraries(testChainCookies cunit study m)

@@ -27,6 +27,8 @@ int main(void)
     }
 
     CU_automated_run_tests();
+    CU_ErrorCode code = CU_list_tests_to_file();
+    int ret = CU_get_number_of_failures();
     CU_cleanup_registry();
-    return 0;
+    return ret;
 }

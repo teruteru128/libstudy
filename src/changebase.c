@@ -210,36 +210,21 @@ const char base32table[33] = BASE32_TABLE;
  * @param outlen
  * @return int
  */
-int base32decode(const char *src, const size_t srclen, unsigned char **out,
-                 size_t *outlen)
+int base32decode(const char *src, unsigned char *out, size_t *outlen)
 {
-    //
-    if (out == NULL || outlen == NULL)
+    if (src == NULL)
+    {
         return 1;
-
-    *outlen = (srclen * 5) / 8;
-
-    unsigned char *data = malloc(srclen);
-    char *j = NULL;
-    for (size_t i = 0; i < srclen; i++)
+    }
+    if (out == NULL && out == NULL)
     {
-        if ((j = strchr(base32table, src[i])) != NULL)
-        {
-            data[i] = j - base32table;
-        }
+        return 1;
+    }
+    if (out == NULL && outlen != NULL)
+    {
+        *outlen = (strlen(src) * 5 / 8);
+        return 0;
     }
 
-    *out = malloc(*outlen);
-    uint32_t tmp = 0;
-    for (size_t i = 0, k = 0; i < srclen; i += 8, k += 5)
-    {
-        *out[k] = data[i + 0] << 3 | data[i + 1] >> 2;
-        tmp = 0;
-        for (size_t shift = 30, l = 1; shift >= 0; shift -= 5, l++)
-        {
-            tmp |= data[i + l] << shift;
-        }
-    }
-
-    return 0;
+    return 1;
 }
