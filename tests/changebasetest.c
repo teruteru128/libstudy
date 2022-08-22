@@ -1,7 +1,6 @@
 
 #include <CUnit/Automated.h>
 #include <changebase.h>
-#include <config.h>
 #include <stdlib.h>
 #include <string.h>
 
