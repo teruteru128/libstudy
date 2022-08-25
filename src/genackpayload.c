@@ -97,7 +97,11 @@ int genAckPayload(int streamNumber, int stealthLevel, unsigned char **payload,
     {
         ackdatalen = 32;
         ackdata = malloc(ackdatalen);
+#if defined(GRND_INSECURE)
         getrandom(ackdata, ackdatalen, GRND_INSECURE);
+#else
+        getrandom(ackdata, ackdatalen, 0);
+#endif
         acktype = 2;
         version = 1;
     }
