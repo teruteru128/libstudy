@@ -21,9 +21,13 @@ int encrypt(unsigned char *message, size_t messagelen, unsigned char *pubkey,
             unsigned char *out, size_t *outlen)
 {
 
-#if OPENSSL_VERSION_NUMBER >= 0x30000000L
     // 一時鍵を作る
     EVP_PKEY *ephem = NULL;
+    // 一時鍵と引数の公開鍵で共有秘密を作る
+    // EVP_PKEY_derive_init / EVP_KEYEXCH
+    unsigned char shared_secret[EVP_MAX_MD_SIZE];
+    size_t sslen = EVP_MAX_MD_SIZE;
+#if OPENSSL_VERSION_NUMBER >= 0x30000000L
     EVP_PKEY_CTX *keygenctx = EVP_PKEY_CTX_new_from_name(NULL, "EC", NULL);
     OSSL_PARAM_BLD *param_bld = OSSL_PARAM_BLD_new();
     OSSL_PARAM_BLD_push_utf8_string(param_bld, OSSL_PKEY_PARAM_GROUP_NAME,
@@ -35,10 +39,6 @@ int encrypt(unsigned char *message, size_t messagelen, unsigned char *pubkey,
     OSSL_PARAM_free(params);
     OSSL_PARAM_BLD_free(param_bld);
     EVP_PKEY_CTX_free(keygenctx);
-    // 一時鍵と引数の公開鍵で共有秘密を作る
-    // EVP_PKEY_derive_init / EVP_KEYEXCH
-    unsigned char shared_secret[EVP_MAX_MD_SIZE];
-    size_t sslen = EVP_MAX_MD_SIZE;
 #else
     EVP_PKEY_CTX *kxctx = EVP_PKEY_CTX_new(ephem, NULL);
     EVP_PKEY_derive_init(kxctx);
