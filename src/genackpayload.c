@@ -21,6 +21,7 @@ int encrypt(unsigned char *message, size_t messagelen, unsigned char *pubkey,
             unsigned char *out, size_t *outlen)
 {
 
+#if OPENSSL_VERSION_NUMBER >= 0x30000000L
     // 一時鍵を作る
     EVP_PKEY *ephem = NULL;
     EVP_PKEY_CTX *keygenctx = EVP_PKEY_CTX_new_from_name(NULL, "EC", NULL);
@@ -38,7 +39,6 @@ int encrypt(unsigned char *message, size_t messagelen, unsigned char *pubkey,
     // EVP_PKEY_derive_init / EVP_KEYEXCH
     unsigned char shared_secret[EVP_MAX_MD_SIZE];
     size_t sslen = EVP_MAX_MD_SIZE;
-#if OPENSSL_VERSION_NUMBER >= 0x30000000L
 #else
     EVP_PKEY_CTX *kxctx = EVP_PKEY_CTX_new(ephem, NULL);
     EVP_PKEY_derive_init(kxctx);
