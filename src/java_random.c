@@ -14,9 +14,7 @@ int64_t *setSeed(int64_t *rnd, int64_t seed)
 
 static int32_t next(int64_t *rnd, int32_t bits)
 {
-    int64_t oldseed = *rnd;
-    *rnd = (oldseed * MULTIPLIER + ADDEND) & MASK;
-    return (int32_t)(*rnd >> (48 - bits));
+    return (int32_t)((*rnd = (*rnd * MULTIPLIER + ADDEND) & MASK) >> (48 - bits));
 }
 
 int64_t nextLong(int64_t *rnd)
