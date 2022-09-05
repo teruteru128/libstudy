@@ -4,10 +4,11 @@
 #endif
 #include "base64.h"
 #include <stdio.h>
-static const char BASE64_TABLE[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+#define BASE64_TABLE                                                          \
+    ("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/")
 #define PAD ('=')
 
-char *base64encode(const char *data, const size_t size)
+char *base64encode(const unsigned char *data, const size_t size)
 {
     size_t length = 0;
     char *base64 = NULL;
@@ -40,21 +41,24 @@ char *base64encode(const char *data, const size_t size)
             *(cursor++) = BASE64_TABLE[(data[i + 0] << 4 & 0x30)];
             *(cursor++) = PAD;
             *(cursor++) = PAD;
-            //j += 2;
+            // j += 2;
         }
         else if (j == 2)
         {
             *(cursor++) = BASE64_TABLE[(data[i + 0] >> 2 & 0x3f)];
-            *(cursor++) = BASE64_TABLE[(data[i + 0] << 4 & 0x30) | (data[i + 1] >> 4 & 0x0f)];
+            *(cursor++) = BASE64_TABLE[(data[i + 0] << 4 & 0x30)
+                                       | (data[i + 1] >> 4 & 0x0f)];
             *(cursor++) = BASE64_TABLE[(data[i + 1] << 2 & 0x3c)];
             *(cursor++) = PAD;
-            //j += 1;
+            // j += 1;
         }
         else
         {
             *(cursor++) = BASE64_TABLE[(data[i + 0] >> 2 & 0x3f)];
-            *(cursor++) = BASE64_TABLE[(data[i + 0] << 4 & 0x30) | (data[i + 1] >> 4 & 0x0f)];
-            *(cursor++) = BASE64_TABLE[(data[i + 1] << 2 & 0x3c) | (data[i + 2] >> 6 & 0x03)];
+            *(cursor++) = BASE64_TABLE[(data[i + 0] << 4 & 0x30)
+                                       | (data[i + 1] >> 4 & 0x0f)];
+            *(cursor++) = BASE64_TABLE[(data[i + 1] << 2 & 0x3c)
+                                       | (data[i + 2] >> 6 & 0x03)];
             *(cursor++) = BASE64_TABLE[(data[i + 2] << 0 & 0x3f)];
         }
     }
