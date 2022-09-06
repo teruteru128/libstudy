@@ -4,6 +4,7 @@
 #include <openssl/sha.h>
 #include <stdio.h>
 #include <stdlib.h>
+// "sys/random.h" includes "endian.h" via "sys/types.h".
 #include <sys/random.h>
 
 #if OPENSSL_VERSION_NUMBER >= 0x30000000L
@@ -70,20 +71,23 @@ int genAckPayload(int streamNumber, int stealthLevel, unsigned char **payload,
     int version = 0;
     unsigned char *ackdata = NULL;
     size_t ackdatalen = 0;
+    unsigned char priv[32] = "";
+    unsigned char *pubkey = NULL;
+    int64_t seed = 0;
+    size_t dummyMessageLength = 0;
+    unsigned char *dummyMessage = 0;
 
     switch (stealthLevel)
     {
     case 2:
-        unsigned char priv[32];
+        // get private key
         getrandom(priv, 32, GRND_RANDOM);
-        unsigned char *pubkey;
-        int64_t seed;
         // get 0xXXXXXXXXXXXX0000L
         getrandom(&seed, 6, GRND_RANDOM);
         // convert to 0x0000XXXXXXXXXXXXL
         seed = initialScramble(le64toh(seed));
-        const size_t dummyMessageLength = nextIntWithBounds(&seed, 567) + 234;
-        unsigned char *dummyMessage = malloc(dummyMessageLength);
+        dummyMessageLength = nextIntWithBounds(&seed, 567) + 234;
+        dummyMessage = malloc(dummyMessageLength);
         getrandom(dummyMessage, dummyMessageLength, 0);
         acktype = 2;
         version = 1;
