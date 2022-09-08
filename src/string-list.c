@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-static string_list *peek_last_node(string_list *tmp)
+string_list *string_list_get_last_node(string_list *tmp)
 {
     while (tmp->next != NULL)
     {
@@ -32,7 +32,7 @@ string_list *string_list_add(string_list *dest, char *str)
     else
     {
         // 末尾に新しいノードを追加する
-        last = peek_last_node(dest);
+        last = string_list_get_last_node(dest);
         last->next = malloc(sizeof(string_list));
         last = last->next;
     }
@@ -46,13 +46,9 @@ string_list *string_list_add(string_list *dest, char *str)
 
 size_t string_list_size(string_list *list)
 {
-    if (list == NULL)
-    {
-        return 0;
-    }
     string_list *tmp = list;
-    size_t count = 1;
-    while (tmp->next != NULL)
+    size_t count = 0;
+    while (tmp != NULL)
     {
         count++;
         tmp = tmp->next;
@@ -69,23 +65,24 @@ void string_list_free(string_list *list)
         return;
     }
     string_list *tmp = list;
-    while (tmp->next != NULL)
+    string_list *work = NULL;
+    while (tmp != NULL)
     {
         free(tmp->str);
         tmp->str = NULL;
-        string_list *tmp_b = tmp; // 一つ前のノードを取る
+        // 現在のノードを取る
+        work = tmp;
+        // nextをtmpに手繰り寄せる
         tmp = tmp->next;
-        free(tmp_b);
+        free(work);
     }
-    // free(tmp->str);
-    tmp->str = NULL;
     free(tmp);
 }
 
 void string_list_foreach(string_list *list, void (*func)(const char *))
 {
     string_list *p = list;
-    while (p->next != NULL)
+    while (p != NULL)
     {
         func(p->str);
         p = p->next;
@@ -96,7 +93,7 @@ void string_list_foreach_r(string_list *list,
                            void (*func)(const char *, void *), void *arg)
 {
     string_list *p = list;
-    while (p->next != NULL)
+    while (p != NULL)
     {
         func(p->str, arg);
         p = p->next;

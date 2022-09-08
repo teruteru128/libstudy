@@ -11,5 +11,8 @@ string_list *str_split(char *, char *);
 size_t string_list_size(string_list *);
 void string_list_free(string_list *);
 string_list *string_list_get_last_node(string_list *);
+void string_list_foreach(string_list *list, void (*func)(const char *));
+void string_list_foreach_r(string_list *list,
+                           void (*func)(const char *, void *), void *arg);
 
 #endif
