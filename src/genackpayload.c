@@ -25,7 +25,6 @@ static EVP_PKEY *generatekey()
     EVP_PKEY_CTX_set_params(keygenctx, params);
     EVP_PKEY_keygen_init(keygenctx);
     EVP_PKEY_keygen(keygenctx, &ephem);
-    OSSL_PARAM_free(params);
     EVP_PKEY_CTX_free(keygenctx);
 #else
     // TODO まだよ

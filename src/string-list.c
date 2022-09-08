@@ -102,3 +102,15 @@ void string_list_foreach_r(string_list *list,
         p = p->next;
     }
 }
+
+char *string_list_element(string_list *list)
+{
+    if (list == NULL)
+    {
+        return NULL;
+    }
+    size_t len = strlen(list->str) + 1;
+    char *ret = malloc(len);
+    memcpy(ret, list->str, len);
+    return ret;
+}
