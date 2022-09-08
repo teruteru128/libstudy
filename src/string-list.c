@@ -23,6 +23,10 @@ string_list *string_list_get_last_node(string_list *tmp)
  */
 string_list *string_list_add(string_list *dest, char *str)
 {
+    if (str == NULL)
+    {
+        return NULL;
+    }
     string_list *last = NULL;
     if (dest == NULL)
     {
