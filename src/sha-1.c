@@ -1,5 +1,6 @@
 
 #include <stdio.h>
+#include <sha-1.h>
 
 #define h0 0x67452301
 #define h1 0xEFCDAB89
@@ -13,13 +14,6 @@
 #define SHA_CBLOCK (SHA_LBLOCK * 4)
 #define SHA_LAST_BLOCK (SHA_CBLOCK - 8)
 #define SHA_DIGEST_LENGTH 20
-
-typedef struct SHAstate_st
-{
-    SHA_LONG s0, s1, s2, s3, s4;
-    SHA_LONG Nl, Nh;
-    SHA_LONG data[SHA_LBLOCK];
-} SHA_CTX;
 
 void sha_init(SHA_CTX *c)
 {
