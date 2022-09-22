@@ -7,7 +7,7 @@
 // "sys/random.h" includes "endian.h" via "sys/types.h".
 #include <sys/random.h>
 
-#if OPENSSL_VERSION_PREREQ(3, 0)
+#if OPENSSL_VERSION_NUMBER >= 0x30000000L
 #include <openssl/core_names.h>
 #include <openssl/param_build.h>
 #include <openssl/types.h>
@@ -16,7 +16,7 @@
 static EVP_PKEY *generatekey()
 {
     EVP_PKEY *ephem = NULL;
-#if OPENSSL_VERSION_PREREQ(3, 0)
+#if OPENSSL_VERSION_NUMBER >= 0x30000000L
     EVP_PKEY_CTX *keygenctx = EVP_PKEY_CTX_new_from_name(NULL, "EC", NULL);
     const OSSL_PARAM params[]
         = { OSSL_PARAM_utf8_string(OSSL_PKEY_PARAM_GROUP_NAME, "secp256k1", 0),
@@ -50,7 +50,7 @@ int encrypt(unsigned char *message, size_t messagelen, unsigned char *pubkey,
     size_t sslen = EVP_MAX_MD_SIZE;
     // SHA-512でハッシュを作り前半32バイトが暗号化鍵、後半32バイトがMAC鍵
     unsigned char key[EVP_MAX_MD_SIZE];
-#if OPENSSL_VERSION_PREREQ(3, 0)
+#if OPENSSL_VERSION_NUMBER >= 0x30000000L
     EVP_Q_digest(NULL, "SHA256", NULL, shared_secret, EVP_MAX_MD_SIZE, key,
                  NULL);
 #else
