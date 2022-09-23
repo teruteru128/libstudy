@@ -2,7 +2,7 @@
 #ifndef SHA_1_H
 #define SHA_1_H
 
-#define SHA_LONG unsigned int
+typedef unsigned int SHA_LONG;
 
 #define SHA_LBLOCK 16
 /* SHA treats input data as a 
