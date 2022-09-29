@@ -13,7 +13,12 @@
 int orz(size_t num)
 {
     uint32_t seed;
-    getrandom(&seed, sizeof(uint32_t), GRND_NONBLOCK);
+    ssize_t siz = getrandom(&seed, sizeof(uint32_t), GRND_NONBLOCK);
+    if (siz < 0)
+    {
+        perror("getrandom");
+        return 1;
+    }
 
     const char messages[][37] = { "orz", "申し訳ございませんでした",
                                   "ごめんなさい", "すみませんでした", "" };
