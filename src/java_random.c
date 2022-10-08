@@ -14,7 +14,8 @@ int64_t *setSeed(int64_t *rnd, int64_t seed)
 
 static int32_t next(int64_t *rnd, int32_t bits)
 {
-    return (int32_t)((*rnd = (*rnd * MULTIPLIER + ADDEND) & MASK) >> (48 - bits));
+    return (int32_t)((*rnd = (*rnd * MULTIPLIER + ADDEND) & MASK)
+                     >> (48 - bits));
 }
 
 int64_t nextLong(int64_t *rnd)
@@ -41,6 +42,30 @@ int32_t nextIntWithBounds(int64_t *rnd, int32_t bound)
     {
         int32_t u;
         for (u = r; u - (r = u % bound) + m < 0; u = next(rnd, 31))
+            ;
+    }
+    return r;
+}
+
+typedef int32_t(nextfunc)(int bits, void *args);
+
+int32_t nextintwithbounds2_r(int32_t bound, nextfunc *next, void *args)
+{
+    if (bound <= 0)
+    {
+        // err!
+        return 0;
+    }
+    int32_t r = next(31, args);
+    int32_t m = bound - 1;
+    if ((bound & m) == 0)
+    {
+        r = (int32_t)((bound * (int64_t)r) >> 31);
+    }
+    else
+    {
+        int32_t u;
+        for (u = r; u - (r = u % bound) + m < 0; u = next(31, args))
             ;
     }
     return r;
