@@ -16,14 +16,18 @@
 static char divmod58(unsigned char *number, size_t length, size_t startAt)
 {
     int remainder = 0;
+    int digit256;
+    int temp;
+    div_t d;
     for (size_t i = startAt; i < length; i++)
     {
-        int digit256 = number[i] & 0xFF;
-        int temp = (remainder << 8) + digit256;
+        digit256 = number[i] & 0xFF;
+        temp = (remainder << 8) + digit256;
 
-        number[i] = (unsigned char)(temp / BASE_58);
+        d = div(temp, BASE_58);
+        number[i] = (unsigned char)d.quot;
 
-        remainder = temp % BASE_58;
+        remainder = d.rem;
     }
 
     return (char)remainder;
