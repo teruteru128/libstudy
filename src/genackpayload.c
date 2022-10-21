@@ -19,9 +19,8 @@ static EVP_PKEY *generatekey()
 #if OPENSSL_VERSION_NUMBER >= 0x30000000L
     EVP_PKEY_CTX *keygenctx = EVP_PKEY_CTX_new_from_name(NULL, "EC", NULL);
     const OSSL_PARAM params[]
-        = { OSSL_PARAM_utf8_string(OSSL_PKEY_PARAM_GROUP_NAME, "secp256k1", 0),
+        = { OSSL_PARAM_utf8_string(OSSL_PKEY_PARAM_GROUP_NAME, SN_secp256k1, 0),
             OSSL_PARAM_END };
-    EVP_PKEY_CTX_set_params(keygenctx, params);
     EVP_PKEY_CTX_set_params(keygenctx, params);
     EVP_PKEY_keygen_init(keygenctx);
     EVP_PKEY_keygen(keygenctx, &ephem);
