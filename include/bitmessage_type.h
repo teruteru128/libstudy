@@ -43,8 +43,8 @@ typedef struct connectioninfo
 
 typedef struct
 {
-    SHA512_CTX sha512ctx;
-    RIPEMD160_CTX ripemd160ctx;
+    EVP_MD_CTX *sha512ctx;
+    EVP_MD_CTX *ripemd160ctx;
     EVP_MD *sha512md;
     EVP_MD *ripemd160md;
     EVP_MD_CTX *ctx;
