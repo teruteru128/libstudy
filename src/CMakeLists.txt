@@ -41,4 +41,6 @@ svgplot.c
 xmlrpc.c
 xorshift.c
 )
-target_link_libraries(study ${OPENSSL_CRYPTO_LIBRARIES} xmlrpc xmlrpc_client)
+target_link_libraries(study ${OPENSSL_CRYPTO_LIBRARIES} $<$<BOOL:${GNUTLS_FOUND}>:${GNUTLS_LIBRARIES}> xmlrpc xmlrpc_client)
+target_include_directories(study PRIVATE ${OPENSSL_INCLUDE_DIR} $<$<BOOL:${GNUTLS_FOUND}>:${GNUTLS_INCLUDE_DIR}>)
+target_compile_definitions(study PRIVATE $<$<BOOL:${GNUTLS_FOUND}>:${GNUTLS_DEFINITIONS}>)
