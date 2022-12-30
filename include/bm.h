@@ -21,6 +21,7 @@ int encodeVarint(uint64_t u, unsigned char **out, size_t *outlen);
 char *formatKey(char *address, char *privateSigningKeyWIF, char *privateEncryptionKeyWIF);
 int exportAddress(PrivateKey *, PublicKey *, PrivateKey *,
                   PublicKey *, unsigned char *);
+int deriviedPrivateKey(unsigned char *out, const char *passphrase, const int64_t nonce);
 // secp256k1上でプライベート鍵をパブリック鍵に変換する
 int getPublicKey(PublicKey *pubKey, PrivateKey *priKey);
 // 秘密鍵を財布インポート形式に変換する

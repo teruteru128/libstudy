@@ -146,8 +146,8 @@ char *encodeAddress0(uint64_t version, uint64_t stream, unsigned char *ripe,
     encodeVarint(stream, &variantStreamout, &variantStreamoutlen);
     size_t storedBinaryDataLen
         = variantVersionoutlen + variantStreamoutlen + workripelen + 4;
-    unsigned char *storedBinaryData = malloc(
-        variantVersionoutlen + variantStreamoutlen + workripelen + 4);
+    unsigned char *storedBinaryData
+        = malloc(variantVersionoutlen + variantStreamoutlen + workripelen + 4);
     memcpy(storedBinaryData, variantVersionout, variantVersionoutlen);
     memcpy(storedBinaryData + variantVersionoutlen, variantStreamout,
            variantStreamoutlen);
@@ -166,8 +166,8 @@ char *encodeAddress0(uint64_t version, uint64_t stream, unsigned char *ripe,
         EVP_DigestUpdate(ctx, cache64, 64);
         EVP_DigestFinal(ctx, cache64, &s);
         EVP_MD_CTX_free(ctx);
-        memcpy(storedBinaryData + variantVersionoutlen
-                   + variantStreamoutlen + workripelen,
+        memcpy(storedBinaryData + variantVersionoutlen + variantStreamoutlen
+                   + workripelen,
                cache64, 4);
     }
     free(variantVersionout);
@@ -316,6 +316,22 @@ int exportAddress(PrivateKey *privateSigningKey, PublicKey *publicSigningKey,
     return EXIT_SUCCESS;
 }
 
+int deriviedPrivateKey(unsigned char *out, const char *passphrase, const int64_t nonce)
+{
+    const EVP_MD *m = EVP_sha512();
+    EVP_MD_CTX *ctx = EVP_MD_CTX_new();
+    EVP_DigestInit_ex2(ctx, m, NULL);
+    EVP_DigestUpdate(ctx, passphrase, strlen(passphrase));
+    unsigned char *varintout = NULL;
+    size_t len = 0;
+    encodeVarint(nonce, &varintout, &len);
+    EVP_DigestUpdate(ctx, varintout, len);
+    free(varintout);
+    EVP_DigestFinal_ex(ctx, out, NULL);
+    EVP_MD_CTX_free(ctx);
+    return 0;
+}
+
 int getPublicKey(PublicKey *pubKey, PrivateKey *priKey)
 {
     EC_GROUP *secp256k1 = EC_GROUP_new_by_curve_name(NID_secp256k1);
@@ -330,5 +346,7 @@ int getPublicKey(PublicKey *pubKey, PrivateKey *priKey)
     EC_POINT_mul(secp256k1, pubkeyp, prikeybn, NULL, NULL, ctx);
     EC_POINT_point2oct(secp256k1, pubkeyp, POINT_CONVERSION_UNCOMPRESSED,
                        *pubKey, 65, ctx);
+    BN_CTX_end(ctx);
+    BN_CTX_free(ctx);
     return EXIT_SUCCESS;
 }
