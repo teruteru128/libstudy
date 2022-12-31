@@ -348,5 +348,6 @@ int getPublicKey(PublicKey *pubKey, PrivateKey *priKey)
                        *pubKey, 65, ctx);
     BN_CTX_end(ctx);
     BN_CTX_free(ctx);
+    EC_GROUP_free(secp256k1);
     return EXIT_SUCCESS;
 }
