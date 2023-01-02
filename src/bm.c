@@ -10,6 +10,7 @@
 #include <err.h>
 #include <openssl/ec.h>
 #include <openssl/evp.h>
+#include <openssl/opensslv.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <uuid/uuid.h>
@@ -316,11 +317,16 @@ int exportAddress(PrivateKey *privateSigningKey, PublicKey *publicSigningKey,
     return EXIT_SUCCESS;
 }
 
-int deriviedPrivateKey(unsigned char *out, const char *passphrase, const int64_t nonce)
+int deriviedPrivateKey(unsigned char *out, const char *passphrase,
+                       const int64_t nonce)
 {
     const EVP_MD *m = EVP_sha512();
     EVP_MD_CTX *ctx = EVP_MD_CTX_new();
+#if OPENSSL_VERSION_NUMBER >= 0x30000000L
     EVP_DigestInit_ex2(ctx, m, NULL);
+#else
+    EVP_DigestInit_ex(ctx, m, NULL);
+#endif
     EVP_DigestUpdate(ctx, passphrase, strlen(passphrase));
     unsigned char *varintout = NULL;
     size_t len = 0;
