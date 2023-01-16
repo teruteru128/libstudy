@@ -156,6 +156,7 @@ char *encodeAddress0(uint64_t version, uint64_t stream, unsigned char *ripe,
            workripe, workripelen);
 
     {
+        // make checksum
         const EVP_MD *sha512 = EVP_sha512();
         EVP_MD_CTX *ctx = EVP_MD_CTX_new();
         EVP_DigestInit(ctx, sha512);
