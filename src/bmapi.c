@@ -107,7 +107,8 @@ const char *bmapi_simpleSendMessage(const char *toaddress,
  * @param encodingTypeV encoding type xmlrpc value. If you specify this
  * parameter, the value is always 2.
  * @param TTLV ttl xmlrpc value. 3600 <= ttl <= 2419200
- * @param ackData If the ackData parameter is non-NULL, the ackData string(char *) will be set. This should be freed.
+ * @param ackData If the ackData parameter is non-NULL, the ackData string
+ * (char *) will be set. This should be freed.
  */
 __wur int bmapi_sendMessage(xmlrpc_env *env, xmlrpc_client *clientP,
                             xmlrpc_server_info *serverP,
@@ -140,16 +141,15 @@ __wur int bmapi_sendMessage(xmlrpc_env *env, xmlrpc_client *clientP,
                         paramArray, &resultP);
     die_if_fault_occurred(env);
 
-    const char *msg = NULL;
-    xmlrpc_read_string(env, resultP, &msg);
-    die_if_fault_occurred(env);
-
     if (ackData != NULL)
     {
+        const char *msg = NULL;
+        xmlrpc_read_string(env, resultP, &msg);
+        die_if_fault_occurred(env);
         *ackData = strdup(msg);
+        free((void *)msg);
+        msg = NULL;
     }
-    free((void *)msg);
-    msg = NULL;
 
     xmlrpc_DECREF(paramArray);
     // xmlrpc_DECREF(toaddressV);
