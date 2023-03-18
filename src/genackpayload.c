@@ -90,7 +90,7 @@ int genAckPayload(int streamNumber, int stealthLevel, unsigned char **payload,
         {
             return 1;
         }
-        // convert to 0x0000XXXXXXXXXXXXL
+        // convert to 0x0000XXXXXXXXXXXXL from 0xXXXXXXXXXXXX0000L
         seed = initialScramble(le64toh(seed));
         dummyMessageLength = nextIntWithBounds(&seed, 567) + 234;
         dummyMessage = malloc(dummyMessageLength);
