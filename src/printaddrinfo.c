@@ -1,14 +1,16 @@
 
+#define _GNU_SOURCE
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
-#include <sys/socket.h>
-#include <sys/select.h>
 #include <netdb.h>
+#include <sys/select.h>
+#include <sys/socket.h>
+#include <sys/types.h>
 
+#include <byteswap.h>
 #include <stdio.h>
 #include <string.h>
-#include <byteswap.h>
 
 #define PROTOCOL_LEN 16
 
@@ -19,7 +21,7 @@
  */
 void printaddrinfo0(struct addrinfo *adrinf, FILE *stream)
 {
-    if(adrinf == NULL || stream == NULL)
+    if (adrinf == NULL || stream == NULL)
     {
         return;
     }
@@ -35,22 +37,25 @@ void printaddrinfo0(struct addrinfo *adrinf, FILE *stream)
         strncpy(protocol, "UDP", PROTOCOL_LEN);
         break;
     default:
-        strncpy(protocol, "UNKNOWN", PROTOCOL_LEN);
+        snprintf(protocol, PROTOCOL_LEN, "UNKNOWN(%d)", adrinf->ai_protocol);
         break;
     }
 
     /* アドレス情報に対応するアドレスとポート番号を得る */
-    int rc = getnameinfo(adrinf->ai_addr, adrinf->ai_addrlen,
-                         hbuf, sizeof(hbuf),
-                         sbuf, sizeof(sbuf),
-                         NI_NUMERICHOST | NI_NUMERICSERV);
+    int rc
+        = getnameinfo(adrinf->ai_addr, adrinf->ai_addrlen, hbuf, sizeof(hbuf),
+                      sbuf, sizeof(sbuf), NI_NUMERICHOST | NI_NUMERICSERV);
     if (rc != 0)
     {
         perror("getnameinfo");
         return;
     }
 
-    fprintf(stream, "[%s]:%s(%s), addrlen : %u, flags : %d, family : %d, socktype : %d, protocol : %d", hbuf, sbuf, protocol, adrinf->ai_addrlen, adrinf->ai_flags, adrinf->ai_family, adrinf->ai_socktype, adrinf->ai_protocol);
+    fprintf(stream,
+            "[%s]:%s(%s), addrlen : %u, flags : %d, family : %d, socktype : "
+            "%d, protocol : %d",
+            hbuf, sbuf, protocol, adrinf->ai_addrlen, adrinf->ai_flags,
+            adrinf->ai_family, adrinf->ai_socktype, adrinf->ai_protocol);
     /*
      * if (adrinf->ai_family == AF_INET6)
      * {
@@ -72,7 +77,4 @@ void printaddrinfo0(struct addrinfo *adrinf, FILE *stream)
  * アドレスとポート番号を標準出力ストリームへ表示する。
  * <I> adrinf: アドレス情報
  */
-void printaddrinfo(struct addrinfo *adrinf)
-{
-    printaddrinfo0(adrinf, stdout);
-}
+void printaddrinfo(struct addrinfo *adrinf) { printaddrinfo0(adrinf, stdout); }
