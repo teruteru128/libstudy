@@ -17,14 +17,20 @@ static size_t wordIndex(size_t bitIndex)
     return bitIndex >> ADDRESS_BITS_PER_WORD;
 }
 
-#define max(a, b) (((a) >= (b)) ? (a) : (b))
-#define min(a, b) (((a) <= (b)) ? (a) : (b))
+#define MAX(a, b) \
+   ({ __typeof__ (a) _a = (a); \
+       __typeof__ (b) _b = (b); \
+     _a > _b ? _a : _b; })
+#define MIN(a, b) \
+   ({ __typeof__ (a) _a = (a); \
+       __typeof__ (b) _b = (b); \
+     _a < _b ? _a : _b; })
 
 static void ensureCapacity(bitset *set, size_t wordsRequired)
 {
     if (set->wordsLength < wordsRequired)
     {
-        size_t request = max(2 * set->wordsLength, wordsRequired);
+        size_t request = MAX(2 * set->wordsLength, wordsRequired);
         int64_t *tmp = realloc(set->words, sizeof(int64_t) * request);
         if (tmp != NULL)
         {
@@ -115,7 +121,7 @@ static void trimToSize(bitset *set)
     if (set->wordsInUse != set->wordsLength)
     {
         int64_t *tmp = calloc(set->wordsInUse, sizeof(int64_t));
-        size_t length = min(set->wordsLength, set->wordsInUse);
+        size_t length = MIN(set->wordsLength, set->wordsInUse);
         memcpy(tmp, set->words, length * sizeof(int64_t));
         set->words = tmp;
         set->wordsLength = length;
