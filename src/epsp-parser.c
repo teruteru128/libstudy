@@ -12,6 +12,7 @@
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
+#define _GNU_SOURCE 1
 #include "epsp-parser.h"
 #include "string-array.h"
 #include "string-list.h"
@@ -258,4 +259,32 @@ int epsp_packet_parse(epsp_packet_t *packet, char *line)
         return EXIT_FAILURE;
     }
     return EXIT_SUCCESS;
+}
+
+struct packet
+{
+    int code;
+    int hop;
+    char *data;
+};
+
+struct packet *parsePacket(char *line)
+{
+    char *work = strdupa(line);
+    char *catch = NULL;
+    char *code_data = strtok_r(work, " ", &catch);
+    char *hop_data = strtok_r(NULL, " ", &catch);
+    char *data = strtok_r(NULL, " ", &catch);
+    struct packet *pack = malloc(sizeof(struct packet));
+    pack->code = strtoul(code_data, NULL, 10);
+    pack->hop = strtoul(hop_data, NULL, 10);
+    if (data != NULL)
+    {
+        pack->data = strdup(data);
+    }
+    else
+    {
+        pack->data = NULL;
+    }
+    return pack;
 }
