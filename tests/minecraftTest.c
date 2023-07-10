@@ -10,7 +10,9 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "simpletestcases.h"
+#include <minecraft.h>
+
+
 
 int main(void)
 {
@@ -20,9 +22,6 @@ int main(void)
     {
         return CU_get_error();
     }
-
-    // CU_add_test(testSuite, "Fail", fail);
-    CU_add_test(testSuite, "Pass", pass);
 
     CU_automated_run_tests();
     int ret = CU_get_number_of_failures();

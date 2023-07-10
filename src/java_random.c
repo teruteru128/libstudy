@@ -12,20 +12,23 @@ int64_t *setSeed(int64_t *rnd, int64_t seed)
     return rnd;
 }
 
-static int32_t next(int64_t *rnd, int32_t bits)
+static int32_t next(struct drand48_data *rnd, int32_t bits)
 {
-    return (int32_t)((*rnd = (*rnd * MULTIPLIER + ADDEND) & MASK)
-                     >> (48 - bits));
+    long r;
+    lrand48_r(rnd, &r);
+    return ((int32_t)r) >> (32 - bits);
 }
 
-int64_t nextLong(int64_t *rnd)
+int64_t nextLong(struct drand48_data *rnd)
 {
-    return ((int64_t)(next(rnd, 32)) << 32) + next(rnd, 32);
+    register int64_t r = ((int64_t)next(rnd, 32)) << 32;
+    r += next(rnd, 32);
+    return r;
 }
 
-int32_t nextInt(int64_t *rnd) { return next(rnd, 32); }
+int32_t nextInt(struct drand48_data *rnd) { return next(rnd, 32); }
 
-int32_t nextIntWithBounds(int64_t *rnd, int32_t bound)
+int32_t nextIntWithBounds(struct drand48_data *rnd, int32_t bound)
 {
     if (bound <= 0)
     {
@@ -71,13 +74,14 @@ int32_t nextintwithbounds2_r(int32_t bound, nextfunc *next, void *args)
     return r;
 }
 
-double nextDouble(int64_t *rnd)
+double nextDouble(struct drand48_data *rnd)
 {
-    return (double)(((int64_t)(next(rnd, 26)) << 27) + next(rnd, 27))
-           * DOUBLE_UNIT;
+    register int64_t r = (int64_t)next(rnd, 26) << 27;
+    r += next(rnd, 27);
+    return (double)r * DOUBLE_UNIT;
 }
 
-float nextFloat(int64_t *rnd)
+float nextFloat(struct drand48_data *rnd)
 {
     return (float)next(rnd, 24) / ((float)(1 << 24));
 }

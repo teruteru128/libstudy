@@ -12,7 +12,6 @@
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
-#define _GNU_SOURCE 1
 #include "epsp-parser.h"
 #include "string-array.h"
 #include "string-list.h"
