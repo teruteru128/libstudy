@@ -1,4 +1,7 @@
 
+#if !defined _DEFAULT_SOURCE
+#define _DEFAULT_SOURCE 1
+#endif
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -11,6 +14,11 @@ static uint64_t seeding(uint64_t seed, uint32_t chunkX, uint32_t chunkZ)
 
 int isSlimeChunk(struct drand48_data *ctx, uint64_t seed, uint32_t x, uint32_t z)
 {
-    srand48_r(seeding(seed, x, z), ctx);
+    uint64_t a = initialScramble(seeding(seed, x, z));
+    unsigned short buf[3];
+    buf[0] = (unsigned short)(a >> 0);
+    buf[1] = (unsigned short)(a >> 16);
+    buf[2] = (unsigned short)(a >> 32);
+    seed48_r(buf, ctx);
     return !nextIntWithBounds(ctx, 10);
 }

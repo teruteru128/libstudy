@@ -17,6 +17,6 @@ float nextFloat(struct drand48_data *);
 // java.util.Random 内部状態計算ユーティリティ
 int64_t lcg(int64_t);
 int64_t lcgInverse(int64_t);
-int64_t initialScramble(int64_t);
+uint64_t initialScramble(uint64_t);
 
 #endif

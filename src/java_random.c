@@ -1,10 +1,11 @@
 
+#define _DEFAULT_SOURCE 1
 #include "internal_random.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-int64_t initialScramble(int64_t seed) { return (seed ^ MULTIPLIER) & MASK; }
+uint64_t initialScramble(uint64_t seed) { return (seed ^ MULTIPLIER) & MASK; }
 
 int64_t *setSeed(int64_t *rnd, int64_t seed)
 {
@@ -15,8 +16,9 @@ int64_t *setSeed(int64_t *rnd, int64_t seed)
 static int32_t next(struct drand48_data *rnd, int32_t bits)
 {
     long r;
-    lrand48_r(rnd, &r);
-    return ((int32_t)r) >> (32 - bits);
+    mrand48_r(rnd, &r);
+    // 符号付き右シフトは未定義のため一度符号なしに変換する
+    return ((uint32_t)r) >> (32 - bits);
 }
 
 int64_t nextLong(struct drand48_data *rnd)
