@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0.0)
+cmake_minimum_required(VERSION 3.25.0)
 project(libstudy VERSION 1.0.2 LANGUAGES C CXX)
 
 #include(CTest)
