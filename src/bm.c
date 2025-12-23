@@ -51,45 +51,65 @@ int calcRipe(EVP_MD_CTX *mdctx, const EVP_MD *sha512, const EVP_MD *ripemd160,
  * https://github.com/Bitmessage/PyBitmessage/blob/d09782e53d3f42132532b6e39011cd27e7f41d25/src/addresses.py#L63
  * https://docs.python.org/ja/3/library/struct.html
  */
-int encodeVarint(uint64_t u, unsigned char **out, size_t *outlen)
+unsigned char *encodeVarint(uint64_t len, size_t *outlen)
 {
-    if (out == NULL || outlen == NULL)
+    unsigned char *result = NULL;
+    if (len < 0xfd)
     {
-        return 1;
+        result = malloc(1);
+        result[0] = (unsigned char)len;
+        if (outlen != NULL)
+        {
+            *outlen = len;
+        }
     }
-    if (u < 253)
+    else if (len <= 0xffff)
     {
-        *outlen = sizeof(char);
-        *out = malloc(*outlen);
-        **out = (int8_t)u;
-        return 0;
+        result = malloc(3);
+        result[0] = 0xfd;
+        result[1] = (unsigned char)(len & 0xff);
+        result[2] = (unsigned char)((len >> 8) & 0xff);
+        if (outlen != NULL)
+        {
+            *outlen = 3 + len;
+        }
     }
-    if (253 <= u && u < 65536)
+    else if (len <= 0xffffffff)
     {
-        *outlen = sizeof(char) + sizeof(uint16_t);
-        *out = malloc(*outlen);
-        **out = 0xfd;
-        *((uint16_t *)(*out + 1)) = htobe16((uint16_t)u);
-        return 0;
+        result = malloc(5);
+        result[0] = 0xfe;
+        result[1] = (unsigned char)(len & 0xff);
+        result[2] = (unsigned char)((len >> 8) & 0xff);
+        result[3] = (unsigned char)((len >> 16) & 0xff);
+        result[4] = (unsigned char)((len >> 24) & 0xff);
+        if (outlen != NULL)
+        {
+            *outlen = 5 + len;
+        }
     }
-    if (65536 <= u && u < 4294967296L)
+    else if (len <= 0xffffffffffffffffULL)
     {
-        *outlen = sizeof(char) + sizeof(uint32_t);
-        *out = malloc(*outlen);
-        **out = 0xfe;
-        *((uint32_t *)(*out + 1)) = htobe32((uint32_t)u);
-        return 0;
+        result = malloc(9);
+        result[0] = 0xff;
+        result[1] = (unsigned char)(len & 0xff);
+        result[2] = (unsigned char)((len >> 8) & 0xff);
+        result[3] = (unsigned char)((len >> 16) & 0xff);
+        result[4] = (unsigned char)((len >> 24) & 0xff);
+        result[5] = (unsigned char)((len >> 32) & 0xff);
+        result[6] = (unsigned char)((len >> 40) & 0xff);
+        result[7] = (unsigned char)((len >> 48) & 0xff);
+        result[8] = (unsigned char)((len >> 56) & 0xff);
+        if (outlen != NULL)
+        {
+            *outlen = 9 + len;
+        }
     }
-    if (4294967296L <= u && u <= 18446744073709551615UL)
+    else
     {
-        *outlen = sizeof(char) + sizeof(uint64_t);
-        *out = malloc(*outlen);
-        **out = 0xff;
-        *((uint64_t *)(*out + 1)) = htobe64((uint64_t)u);
-        return 0;
+        // 長すぎる場合はエラー
+        return NULL;
     }
-    // おそらくここには来ない
-    return 2;
+    return result;
 }
 
 char *encodeAddress0(uint64_t version, uint64_t stream, unsigned char *ripe,
@@ -143,12 +163,10 @@ char *encodeAddress0(uint64_t version, uint64_t stream, unsigned char *ripe,
     size_t variantVersionoutlen = 0;
     unsigned char *variantStreamout = NULL;
     size_t variantStreamoutlen = 0;
-    encodeVarint(version, &variantVersionout, &variantVersionoutlen);
-    encodeVarint(stream, &variantStreamout, &variantStreamoutlen);
-    size_t storedBinaryDataLen
-        = variantVersionoutlen + variantStreamoutlen + workripelen + 4;
-    unsigned char *storedBinaryData
-        = malloc(variantVersionoutlen + variantStreamoutlen + workripelen + 4);
+    variantVersionout = encodeVarint(version, &variantVersionoutlen);
+    variantStreamout = encodeVarint(stream, &variantStreamoutlen);
+    size_t storedBinaryDataLen = variantVersionoutlen + variantStreamoutlen + workripelen + 4;
+    unsigned char *storedBinaryData = malloc(variantVersionoutlen + variantStreamoutlen + workripelen + 4);
     memcpy(storedBinaryData, variantVersionout, variantVersionoutlen);
     memcpy(storedBinaryData + variantVersionoutlen, variantStreamout,
            variantStreamoutlen);
@@ -168,8 +186,7 @@ char *encodeAddress0(uint64_t version, uint64_t stream, unsigned char *ripe,
         EVP_DigestUpdate(ctx, cache64, 64);
         EVP_DigestFinal(ctx, cache64, &s);
         EVP_MD_CTX_free(ctx);
-        memcpy(storedBinaryData + variantVersionoutlen + variantStreamoutlen
-                   + workripelen,
+        memcpy(storedBinaryData + variantVersionoutlen + variantStreamoutlen + workripelen,
                cache64, 4);
     }
     free(variantVersionout);
@@ -229,7 +246,7 @@ char *encodeShorterV3Address(unsigned char *ripe, size_t r)
  */
 char *encodeWIF(PrivateKey *key)
 {
-    unsigned char rawkey[37] = { 0x80U, 0 };
+    unsigned char rawkey[37] = {0x80U, 0};
     unsigned char hash[EVP_MAX_MD_SIZE] = "";
 
     memcpy(rawkey + 1, key, 32);
@@ -278,16 +295,14 @@ int exportAddress(PrivateKey *privateSigningKey, PublicKey *publicSigningKey,
 
     // generate version3 address
     char *address3 = encodeShorterV3Address(ripe, 20);
-    char *formatedV3
-        = formatKey(address3, privateSigningKeyWIF, privateEncryptionKeyWIF);
+    char *formatedV3 = formatKey(address3, privateSigningKeyWIF, privateEncryptionKeyWIF);
     printf("%s\n", formatedV3);
     free(formatedV3);
     free(address3);
 
     // generate version4 address
     char *address4 = encodeV4Address(ripe, 20);
-    char *formatedV4
-        = formatKey(address4, privateSigningKeyWIF, privateEncryptionKeyWIF);
+    char *formatedV4 = formatKey(address4, privateSigningKeyWIF, privateEncryptionKeyWIF);
     printf("%s\n", formatedV4);
     free(formatedV4);
 
@@ -331,7 +346,7 @@ int deriviedPrivateKey(unsigned char *out, const char *passphrase,
     EVP_DigestUpdate(ctx, passphrase, strlen(passphrase));
     unsigned char *varintout = NULL;
     size_t len = 0;
-    encodeVarint(nonce, &varintout, &len);
+    varintout = encodeVarint((uint64_t)nonce, &len);
     EVP_DigestUpdate(ctx, varintout, len);
     free(varintout);
     EVP_DigestFinal_ex(ctx, out, NULL);
