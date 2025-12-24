@@ -16,6 +16,8 @@ void hashSHA512(EVP_MD_CTX *mdctx, const EVP_MD *sha512,
 void hashRIPEMD160(EVP_MD_CTX *mdctx, const EVP_MD *ripemd160,
                    unsigned char *cache64);
 unsigned char *encodeVarint(uint64_t u, size_t *outlen);
+uint64_t decodeVarint(unsigned char *data, size_t *consumed_bytes);
+unsigned char *encodeVarStr(const char *str, size_t *outlen);
 // use base58encode from changebase.h
 /**encode private key pair to bitmessage keys.dat format*/
 char *formatKey(char *address, char *privateSigningKeyWIF, char *privateEncryptionKeyWIF);

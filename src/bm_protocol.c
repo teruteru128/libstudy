@@ -1,13 +1,14 @@
 // プロトコルメッセージの構造化とパースの厳密化
 #include <bm_protocol.h>
 #include <stdlib.h>
-#include <string.h>>
+#include <string.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <arpa/inet.h>
 #include <openssl/sha.h>
 #include <errno.h>
 #include <sys/random.h>
+#include <time.h>
 
 struct message *parse_message(const unsigned char *data, size_t data_len)
 {
@@ -250,4 +251,60 @@ static unsigned char *createVersionPayload(struct sockaddr_storage *peer_addr, s
         *outlen = payload_len;
     }
     return payload;
+}
+
+// 26バイト版と38バイト版のnetwork addressを表示するユーティリティ関数
+void printNetworkAddress(unsigned char *addr, size_t addrlen)
+{
+    if (addrlen != 26 && addrlen != 38)
+    {
+        printf("Invalid network address length: %zu\n", addrlen);
+        return;
+    }
+    size_t offset = 0;
+    uint64_t time;
+    uint32_t stream;
+    if (addrlen == 38)
+    {
+        // 38バイト版は最初の8バイトがtime
+        time = be64toh(*((uint64_t *)(addr + offset)));
+        offset += 8;
+        // 次の4バイトがstream
+        stream = ntohl(*((uint32_t *)(addr + offset)));
+        offset += 4;
+    }
+    else
+    {
+        // 26バイト版はtimeとstream情報なし、timeとstreamを0に設定
+        time = 0;
+        stream = 0;
+    }
+    uint64_t services = be64toh(*((uint64_t *)(addr + offset)));
+    offset += 8;
+    unsigned char ip[16];
+    memcpy(ip, addr + offset, 16);
+    offset += 16;
+    uint16_t port = ntohs(*((uint16_t *)(addr + offset)));
+    offset += 2;
+
+    printf("Time: %" PRIu64 ", Stream: %" PRIu32 ", Services: %" PRIu64 ", ", time, stream, services);
+    // IPアドレスの表示
+    if (ip[0] == 0 && ip[1] == 0 && ip[2] == 0 && ip[3] == 0 &&
+        ip[4] == 0 && ip[5] == 0 && ip[6] == 0 && ip[7] == 0 &&
+        ip[8] == 0 && ip[9] == 0 && ip[10] == 0xff && ip[11] == 0xff)
+    {
+        // IPv4-mapped IPv6 address
+        printf("IPv4 Address: %u.%u.%u.%u, Port: %u\n", ip[12], ip[13], ip[14], ip[15], port);
+    }
+    else
+    {
+        // IPv6 address
+        char ipv6_str[40];
+        snprintf(ipv6_str, sizeof(ipv6_str),
+                 "%02x%02x:%02x%02x:%02x%02x:%02x%02x:"
+                 "%02x%02x:%02x%02x:%02x%02x:%02x%02x",
+                 ip[0], ip[1], ip[2], ip[3], ip[4], ip[5], ip[6], ip[7],
+                 ip[8], ip[9], ip[10], ip[11], ip[12], ip[13], ip[14], ip[15]);
+        printf("IPv6 Address: %s, Port: %u\n", ipv6_str, port);
+    }
 }

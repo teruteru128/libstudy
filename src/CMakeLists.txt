@@ -4,6 +4,10 @@ args_parse.c
 base64.c
 bitmessage.c
 bitset.c
+bm_crypto.c
+bm_network.c
+bm_protocol.c
+bm_storage.c
 bm.c
 bmapi.c
 chainCookies.c

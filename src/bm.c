@@ -112,6 +112,104 @@ unsigned char *encodeVarint(uint64_t len, size_t *outlen)
     return result;
 }
 
+uint64_t decodeVarint(unsigned char *data, size_t *consumed_bytes)
+{
+    uint64_t value = 0;
+    size_t offset = 0;
+    if (data[0] < 0xfd)
+    {
+        value = data[0];
+        offset = 1;
+    }
+    else if (data[0] == 0xfd)
+    {
+        value = data[1] | (data[2] << 8);
+        offset = 3;
+    }
+    else if (data[0] == 0xfe)
+    {
+        value = data[1] | (data[2] << 8) | (data[3] << 16) | (data[4] << 24);
+        offset = 5;
+    }
+    else if (data[0] == 0xff)
+    {
+        value = ((uint64_t)data[1]) | ((uint64_t)data[2] << 8) | ((uint64_t)data[3] << 16) | ((uint64_t)data[4] << 24) |
+                ((uint64_t)data[5] << 32) | ((uint64_t)data[6] << 40) | ((uint64_t)data[7] << 48) | ((uint64_t)data[8] << 56);
+        offset = 9;
+    }
+    if (consumed_bytes != NULL)
+    {
+        *consumed_bytes = offset;
+    }
+    return value;
+}
+
+unsigned char *encodeVarStr(const char *str, size_t *outlen)
+{
+    size_t len = strlen(str);
+    unsigned char *result = NULL;
+    if (len < 0xfd)
+    {
+        result = malloc(1 + len);
+        result[0] = (unsigned char)len;
+        memcpy(result + 1, str, len);
+        if (outlen != NULL)
+        {
+            *outlen = 1 + len;
+        }
+    }
+    else if (len <= 0xffff)
+    {
+        result = malloc(3 + len);
+        result[0] = 0xfd;
+        result[1] = (unsigned char)(len & 0xff);
+        result[2] = (unsigned char)((len >> 8) & 0xff);
+        memcpy(result + 3, str, len);
+        if (outlen != NULL)
+        {
+            *outlen = 3 + len;
+        }
+    }
+    else if (len <= 0xffffffff)
+    {
+        result = malloc(5 + len);
+        result[0] = 0xfe;
+        result[1] = (unsigned char)(len & 0xff);
+        result[2] = (unsigned char)((len >> 8) & 0xff);
+        result[3] = (unsigned char)((len >> 16) & 0xff);
+        result[4] = (unsigned char)((len >> 24) & 0xff);
+        memcpy(result + 5, str, len);
+        if (outlen != NULL)
+        {
+            *outlen = 5 + len;
+        }
+    }
+    else if (len <= 0xffffffffffffffffULL)
+    {
+        result = malloc(9 + len);
+        result[0] = 0xff;
+        result[1] = (unsigned char)(len & 0xff);
+        result[2] = (unsigned char)((len >> 8) & 0xff);
+        result[3] = (unsigned char)((len >> 16) & 0xff);
+        result[4] = (unsigned char)((len >> 24) & 0xff);
+        result[5] = (unsigned char)((len >> 32) & 0xff);
+        result[6] = (unsigned char)((len >> 40) & 0xff);
+        result[7] = (unsigned char)((len >> 48) & 0xff);
+        result[8] = (unsigned char)((len >> 56) & 0xff);
+        memcpy(result + 9, str, len);
+        if (outlen != NULL)
+        {
+            *outlen = 9 + len;
+        }
+    }
+    else
+    {
+        // 長すぎる場合はエラー
+        return NULL;
+    }
+    return result;
+}
+
 char *encodeAddress0(uint64_t version, uint64_t stream, unsigned char *ripe,
                      size_t ripelen, size_t max)
 {
