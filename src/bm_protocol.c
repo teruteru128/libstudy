@@ -15,34 +15,44 @@ struct message *parse_message(const unsigned char *data, size_t data_len)
     if (data_len < 24)
     {
         // データが不十分
+        fprintf(stderr, "Data length %zu is less than header size 24\n", data_len);
         return NULL;
     }
 
+    int length = ntohl(*(uint32_t *)(data + 16));
+    if (data_len < 24 + length)
+    {
+        // データが不十分
+        return NULL;
+    }
     struct message *msg = malloc(sizeof(struct message));
     if (msg == NULL)
     {
-        return NULL;
+        perror("malloc");
+        exit(EXIT_FAILURE);
     }
 
     memcpy(msg->magic, data, 4);
     memcpy(msg->command, data + 4, 12);
-    msg->length = ntohl(*(uint32_t *)(data + 16));
+    msg->length = length;
     msg->checksum = ntohl(*(uint32_t *)(data + 20));
 
-    if (data_len < 24 + msg->length)
+    if (msg->length > 0)
     {
-        // データが不十分
-        free(msg);
-        return NULL;
+        msg->payload = malloc(msg->length);
+        if (msg->payload == NULL)
+        {
+            perror("malloc");
+            free(msg);
+            exit(EXIT_FAILURE);
+        }
+        memcpy(msg->payload, data + 24, msg->length);
     }
-
-    msg->payload = malloc(msg->length);
-    if (msg->payload == NULL)
+    else
     {
-        free(msg);
-        return NULL;
+        // varackなどペイロードが空のメッセージ
+        msg->payload = NULL;
     }
-    memcpy(msg->payload, data + 24, msg->length);
 
     // チェックサムの検証
     // チェックサムはpayloadのSHA512ハッシュの最初の4バイト
@@ -50,16 +60,18 @@ struct message *parse_message(const unsigned char *data, size_t data_len)
     SHA512(data + 24, msg->length, hash1);
     uint32_t computed_checksum = *(uint32_t *)hash1;
 
-    if (computed_checksum != msg->checksum)
+    if (htonl(computed_checksum) != msg->checksum)
     {
         // チェックサム不一致
         free(msg->payload);
         free(msg);
+        fprintf(stderr, "Checksum mismatch! Expected: %08x, Computed: %08x\n", msg->checksum, computed_checksum);
         return NULL;
     }
 
     return msg;
 }
+
 void free_message(struct message *msg)
 {
     if (msg != NULL)
@@ -73,8 +85,8 @@ void free_message(struct message *msg)
 }
 
 void encodeTimeAndStreamInNetworkAddress(unsigned char *addr,
-                                                uint64_t time,
-                                                uint32_t stream)
+                                         uint64_t time,
+                                         uint32_t stream)
 {
     uint64_t net_time = htobe64(time);
     uint32_t net_stream = htobe32(stream);
