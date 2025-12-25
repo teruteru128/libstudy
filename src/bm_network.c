@@ -15,3 +15,5 @@
 #include <bm_protocol.h>               // struct messageの定義のため
 #include <endian.h>                    // htobe64, htobe32などのため
 
+int epfd = -1;
+
