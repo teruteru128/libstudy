@@ -42,6 +42,12 @@ typedef struct addr
     int stream_number;
 } bm_node_t;
 
+typedef struct addr_list
+{
+    uint64_t count;
+    bm_node_t *nodes;
+} bm_node_list_t;
+
 int bm_db_add_node(bm_node_t *addr_msg)
 {
     sqlite3_stmt *res = NULL;
