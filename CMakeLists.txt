@@ -39,6 +39,11 @@ find_package(Git)
 
 find_package(Iconv)
 
+find_package(SQLite3 REQUIRED)
+if(SQLite3_FOUND)
+    #include_directories(${SQLite3_INCLUDE_DIRS})
+endif(SQLite3_FOUND)
+
 include(GNUInstallDirs)
 
 include_directories(${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/src)
