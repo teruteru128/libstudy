@@ -46,136 +46,92 @@ int calcRipe(EVP_MD_CTX *mdctx, const EVP_MD *sha512, const EVP_MD *ripemd160,
     return 0;
 }
 
+size_t get_varint_size(uint64_t u)
+{
+    if (u < 0xfd)
+    {
+        return 1;
+    }
+    else if (u <= 0xffff)
+    {
+        return 3;
+    }
+    else if (u <= 0xffffffff)
+    {
+        return 5;
+    }
+
+    // u <= 0xffffffffffffffffULL
+    return 9;
+}
+
 /*
- *
+ * TODO: メモリ領域確保と書き込みを分割すると一括でメモリ領域を確保できる
  * https://github.com/Bitmessage/PyBitmessage/blob/d09782e53d3f42132532b6e39011cd27e7f41d25/src/addresses.py#L63
  * https://docs.python.org/ja/3/library/struct.html
  */
-unsigned char *encodeVarint(uint64_t len, size_t *outlen)
+uint8_t *encodeVarint(uint8_t *out, uint64_t len)
 {
-    unsigned char *result = NULL;
+    // TODO endian関数使ってエンコーディング
+    if (out == NULL)
+    {
+        return NULL;
+    }
     if (len < 0xfd)
     {
-        result = malloc(1);
-        result[0] = (unsigned char)len;
-        if (outlen != NULL)
-        {
-            *outlen = 1;
-        }
+        out[0] = (unsigned char)len;
     }
     else if (len <= 0xffff)
     {
-        result = malloc(3);
-        result[0] = 0xfd;
-        result[1] = (unsigned char)(len & 0xff);
-        result[2] = (unsigned char)((len >> 8) & 0xff);
-        if (outlen != NULL)
-        {
-            *outlen = 3 + len;
-        }
+        out[0] = 0xfd;
+        out[1] = (unsigned char)(len & 0xff);
+        out[2] = (unsigned char)((len >> 8) & 0xff);
     }
     else if (len <= 0xffffffff)
     {
-        result = malloc(5);
-        result[0] = 0xfe;
-        result[1] = (unsigned char)(len & 0xff);
-        result[2] = (unsigned char)((len >> 8) & 0xff);
-        result[3] = (unsigned char)((len >> 16) & 0xff);
-        result[4] = (unsigned char)((len >> 24) & 0xff);
-        if (outlen != NULL)
-        {
-            *outlen = 5 + len;
-        }
+        out[0] = 0xfe;
+        out[1] = (unsigned char)(len & 0xff);
+        out[2] = (unsigned char)((len >> 8) & 0xff);
+        out[3] = (unsigned char)((len >> 16) & 0xff);
+        out[4] = (unsigned char)((len >> 24) & 0xff);
     }
     else if (len <= 0xffffffffffffffffULL)
     {
-        result = malloc(9);
-        result[0] = 0xff;
-        result[1] = (unsigned char)(len & 0xff);
-        result[2] = (unsigned char)((len >> 8) & 0xff);
-        result[3] = (unsigned char)((len >> 16) & 0xff);
-        result[4] = (unsigned char)((len >> 24) & 0xff);
-        result[5] = (unsigned char)((len >> 32) & 0xff);
-        result[6] = (unsigned char)((len >> 40) & 0xff);
-        result[7] = (unsigned char)((len >> 48) & 0xff);
-        result[8] = (unsigned char)((len >> 56) & 0xff);
-        if (outlen != NULL)
-        {
-            *outlen = 9 + len;
-        }
+        out[0] = 0xff;
+        out[1] = (unsigned char)(len & 0xff);
+        out[2] = (unsigned char)((len >> 8) & 0xff);
+        out[3] = (unsigned char)((len >> 16) & 0xff);
+        out[4] = (unsigned char)((len >> 24) & 0xff);
+        out[5] = (unsigned char)((len >> 32) & 0xff);
+        out[6] = (unsigned char)((len >> 40) & 0xff);
+        out[7] = (unsigned char)((len >> 48) & 0xff);
+        out[8] = (unsigned char)((len >> 56) & 0xff);
     }
     else
     {
         // 長すぎる場合はエラー
         return NULL;
     }
-    return result;
+    return out;
 }
 
-unsigned char *encodeVarStr(const char *str, size_t *outlen)
+size_t get_varstr_size(const char *str)
 {
-    size_t len = strlen(str);
-    unsigned char *result = NULL;
-    if (len < 0xfd)
+    size_t length = strlen(str);
+    return get_varint_size(length) + length;
+}
+
+uint8_t *encodeVarStr(uint8_t *out, const char *str)
+{
+    if(out == NULL)
     {
-        result = malloc(1 + len);
-        result[0] = (unsigned char)len;
-        memcpy(result + 1, str, len);
-        if (outlen != NULL)
-        {
-            *outlen = 1 + len;
-        }
-    }
-    else if (len <= 0xffff)
-    {
-        result = malloc(3 + len);
-        result[0] = 0xfd;
-        result[1] = (unsigned char)(len & 0xff);
-        result[2] = (unsigned char)((len >> 8) & 0xff);
-        memcpy(result + 3, str, len);
-        if (outlen != NULL)
-        {
-            *outlen = 3 + len;
-        }
-    }
-    else if (len <= 0xffffffff)
-    {
-        result = malloc(5 + len);
-        result[0] = 0xfe;
-        result[1] = (unsigned char)(len & 0xff);
-        result[2] = (unsigned char)((len >> 8) & 0xff);
-        result[3] = (unsigned char)((len >> 16) & 0xff);
-        result[4] = (unsigned char)((len >> 24) & 0xff);
-        memcpy(result + 5, str, len);
-        if (outlen != NULL)
-        {
-            *outlen = 5 + len;
-        }
-    }
-    else if (len <= 0xffffffffffffffffULL)
-    {
-        result = malloc(9 + len);
-        result[0] = 0xff;
-        result[1] = (unsigned char)(len & 0xff);
-        result[2] = (unsigned char)((len >> 8) & 0xff);
-        result[3] = (unsigned char)((len >> 16) & 0xff);
-        result[4] = (unsigned char)((len >> 24) & 0xff);
-        result[5] = (unsigned char)((len >> 32) & 0xff);
-        result[6] = (unsigned char)((len >> 40) & 0xff);
-        result[7] = (unsigned char)((len >> 48) & 0xff);
-        result[8] = (unsigned char)((len >> 56) & 0xff);
-        memcpy(result + 9, str, len);
-        if (outlen != NULL)
-        {
-            *outlen = 9 + len;
-        }
-    }
-    else
-    {
-        // 長すぎる場合はエラー
         return NULL;
     }
-    return result;
+    size_t len = strlen(str);
+    encodeVarint(out, len);
+    size_t offset = get_varint_size(len);
+    memcpy(out + offset, str, len);
+    return out;
 }
 
 char *encodeAddress0(uint64_t version, uint64_t stream, unsigned char *ripe,
@@ -225,19 +181,13 @@ char *encodeAddress0(uint64_t version, uint64_t stream, unsigned char *ripe,
         workripe = &ripe[i];
         workripelen -= i;
     }
-    unsigned char *variantVersionout = NULL;
-    size_t variantVersionoutlen = 0;
-    unsigned char *variantStreamout = NULL;
-    size_t variantStreamoutlen = 0;
-    variantVersionout = encodeVarint(version, &variantVersionoutlen);
-    variantStreamout = encodeVarint(stream, &variantStreamoutlen);
+    size_t variantVersionoutlen = get_varint_size(version);
+    size_t variantStreamoutlen = get_varint_size(stream);
     size_t storedBinaryDataLen = variantVersionoutlen + variantStreamoutlen + workripelen + 4;
     unsigned char *storedBinaryData = malloc(storedBinaryDataLen);
-    memcpy(storedBinaryData, variantVersionout, variantVersionoutlen);
-    memcpy(storedBinaryData + variantVersionoutlen, variantStreamout,
-           variantStreamoutlen);
-    memcpy(storedBinaryData + variantVersionoutlen + variantStreamoutlen,
-           workripe, workripelen);
+    encodeVarint(storedBinaryData, version);
+    encodeVarint(storedBinaryData + variantVersionoutlen, stream);
+    memcpy(storedBinaryData + variantVersionoutlen + variantStreamoutlen, workripe, workripelen);
 
     {
         // make checksum
@@ -256,8 +206,6 @@ char *encodeAddress0(uint64_t version, uint64_t stream, unsigned char *ripe,
         memcpy(storedBinaryData + variantVersionoutlen + variantStreamoutlen + workripelen,
                cache64, 4);
     }
-    free(variantVersionout);
-    free(variantStreamout);
 
     char *a = base58encode(storedBinaryData, storedBinaryDataLen);
     free(storedBinaryData);
@@ -411,9 +359,9 @@ int deriviedPrivateKey(unsigned char *out, const char *passphrase,
     EVP_DigestInit_ex(ctx, m, NULL);
 #endif
     EVP_DigestUpdate(ctx, passphrase, strlen(passphrase));
-    unsigned char *varintout = NULL;
-    size_t len = 0;
-    varintout = encodeVarint((uint64_t)nonce, &len);
+    size_t len = get_varint_size((uint64_t)nonce);
+    unsigned char *varintout = malloc(len);
+    encodeVarint(varintout, (uint64_t)nonce);
     EVP_DigestUpdate(ctx, varintout, len);
     free(varintout);
     EVP_DigestFinal_ex(ctx, out, NULL);

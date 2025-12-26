@@ -407,26 +407,32 @@ void parseVersionMessage(unsigned char *payload, size_t payload_len, struct vers
     }
 }
 
-static unsigned char *endodeVariableLengthListOfIntegers(uint64_t *list, size_t listlen, size_t *outlen)
+static size_t get_varint_list_size(uint64_t *list, size_t listlen)
 {
-    size_t total_len = 0;
-    unsigned char *result = encodeVarint((uint64_t)listlen, &total_len);
-    fprintf(stderr, "list len encoded to %zu bytes\n", total_len);
-    for (size_t i = 0; i < listlen; i++)
+    size_t list_header_size = get_varint_size(listlen);
+    size_t sum_of_elements_size = 0;
+    for(size_t i = 0; i < listlen; i++)
     {
-        size_t item_len = 0;
-        unsigned char *item_encoded = encodeVarint(list[i], &item_len);
-        fprintf(stderr, "item %zu encoded to %zu bytes\n", i, item_len);
-        result = realloc(result, total_len + item_len);
-        memcpy(result + total_len, item_encoded, item_len);
-        total_len += item_len;
-        free(item_encoded);
+        sum_of_elements_size += get_varint_size(list[i]);
     }
-    if (outlen != NULL)
+    return list_header_size + sum_of_elements_size;
+}
+
+static uint8_t *endodeVariableLengthListOfIntegers(uint8_t *out, uint64_t *list, size_t listlen)
+{
+    if(out == NULL)
     {
-        *outlen = total_len;
+        return NULL;
     }
-    return result;
+    encodeVarint(out, listlen);
+    size_t offset = get_varint_size(listlen);
+    for(size_t i = 0; i < listlen; i++)
+    {
+        uint64_t e = list[i];
+        encodeVarint(out + offset, e);
+        offset += get_varint_size(e);
+    }
+    return out;
 }
 
 unsigned char *createVersionMessage(const char *user_agent_str, int version, struct sockaddr_storage *peer_addr, struct sockaddr_storage *local_addr, int sock, size_t *out_length)
