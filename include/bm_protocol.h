@@ -5,6 +5,11 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <sys/socket.h>
+#include <bm_network.h>
+
+extern const unsigned char magicbytes[4];
+extern const unsigned char empty_payload_checksum[4];
+
 struct message
 {
     char magic[4];
@@ -13,6 +18,36 @@ struct message
     uint32_t length;
     uint32_t checksum;
     unsigned char *payload;
+};
+
+struct version_message
+{
+    uint32_t version;
+    uint64_t services;
+    uint64_t timestamp;
+    unsigned char addr_recv[26];
+    unsigned char addr_from[26];
+    uint64_t nonce;
+    char *user_agent;
+    size_t stream_numbers_len;
+    uint64_t *stream_numbers;
+};
+
+struct addr_message
+{
+    uint64_t count;
+    struct address_info *addresses;
+};
+
+struct inventory_item
+{
+    unsigned char object_hash[32];
+};
+
+struct inventory_message
+{
+    uint64_t count;
+    struct inventory_item *items;
 };
 
 extern struct message *parse_message(const unsigned char *data, size_t data_len);
@@ -24,4 +59,7 @@ extern void encodeTimeAndStreamInNetworkAddress(unsigned char *addr,
                                                 uint32_t stream);
 
 extern void printNetworkAddress(unsigned char *addr, size_t addrlen);
+extern void parseVersionMessage(unsigned char *payload, size_t payload_len, struct version_message *out_msg);
+extern void process_command(struct fd_data *data, struct message *msg);
+extern unsigned char *createVersionMessage(const char *user_agent_str, int version, struct sockaddr_storage *peer_addr, struct sockaddr_storage *local_addr, int sock, size_t *out_length);
 #endif // BM_PROTOCOL_H

@@ -1,4 +1,5 @@
 // プロトコルメッセージの構造化とパースの厳密化
+#include <bm.h>
 #include <bm_protocol.h>
 #include <stdlib.h>
 #include <string.h>
@@ -9,6 +10,13 @@
 #include <errno.h>
 #include <sys/random.h>
 #include <time.h>
+#include <unistd.h>
+
+// BitMessageプロトコルのマジックバイト列
+const unsigned char magicbytes[4] = {0xe9, 0xbe, 0xb4, 0xd9};
+
+// チェックサム: SHA512("")の最初の4バイト
+const unsigned char empty_payload_checksum[4] = {0xcf, 0x83, 0xe1, 0x35};
 
 struct message *parse_message(const unsigned char *data, size_t data_len)
 {
@@ -318,5 +326,405 @@ void printNetworkAddress(unsigned char *addr, size_t addrlen)
                  ip[0], ip[1], ip[2], ip[3], ip[4], ip[5], ip[6], ip[7],
                  ip[8], ip[9], ip[10], ip[11], ip[12], ip[13], ip[14], ip[15]);
         printf("IPv6 Address: %s, Port: %u\n", ipv6_str, port);
+    }
+}
+
+uint64_t decodeVarint(unsigned char *data, size_t *consumed_bytes)
+{
+    uint64_t value = 0;
+    size_t offset = 0;
+    if (data[0] < 0xfd)
+    {
+        value = data[0];
+        offset = 1;
+    }
+    else if (data[0] == 0xfd)
+    {
+        value = data[1] | (data[2] << 8);
+        offset = 3;
+    }
+    else if (data[0] == 0xfe)
+    {
+        value = data[1] | (data[2] << 8) | (data[3] << 16) | (data[4] << 24);
+        offset = 5;
+    }
+    else if (data[0] == 0xff)
+    {
+        value = ((uint64_t)data[1]) | ((uint64_t)data[2] << 8) | ((uint64_t)data[3] << 16) | ((uint64_t)data[4] << 24) |
+                ((uint64_t)data[5] << 32) | ((uint64_t)data[6] << 40) | ((uint64_t)data[7] << 48) | ((uint64_t)data[8] << 56);
+        offset = 9;
+    }
+    if (consumed_bytes != NULL)
+    {
+        *consumed_bytes = offset;
+    }
+    return value;
+}
+
+void parseVersionMessage(unsigned char *payload, size_t payload_len, struct version_message *out_msg)
+{
+    size_t offset = 0;
+    out_msg->version = ntohl(*((uint32_t *)(payload + offset)));
+    offset += 4;
+    out_msg->services = be64toh(*((uint64_t *)(payload + offset)));
+    offset += 8;
+    out_msg->timestamp = be64toh(*((uint64_t *)(payload + offset)));
+    offset += 8;
+    memcpy(out_msg->addr_recv, payload + offset, 26);
+    offset += 26;
+    memcpy(out_msg->addr_from, payload + offset, 26);
+    offset += 26;
+    out_msg->nonce = be64toh(*((uint64_t *)(payload + offset)));
+    offset += 8;
+    // user_agentのデコード
+    size_t outlen = 0;
+    uint64_t ua_len = decodeVarint(payload + offset, &outlen);
+    offset += outlen;
+    out_msg->user_agent = malloc(ua_len + 1);
+    if (out_msg->user_agent == NULL)
+    {
+        perror("Memory allocation failed for user_agent");
+        exit(EXIT_FAILURE);
+    }
+    memcpy(out_msg->user_agent, payload + offset, ua_len);
+    out_msg->user_agent[ua_len] = '\0';
+    offset += ua_len;
+    // stream_numbersのデコード
+    uint64_t stream_count = decodeVarint(payload + offset, &outlen);
+    offset += outlen;
+    out_msg->stream_numbers_len = stream_count;
+    out_msg->stream_numbers = malloc(sizeof(uint64_t) * stream_count);
+    if (out_msg->stream_numbers == NULL)
+    {
+        perror("Memory allocation failed for stream_numbers");
+        free(out_msg->user_agent);
+        exit(EXIT_FAILURE);
+    }
+    for (size_t i = 0; i < stream_count; i++)
+    {
+        out_msg->stream_numbers[i] = decodeVarint(payload + offset, &outlen);
+        offset += outlen;
+    }
+}
+
+static unsigned char *endodeVariableLengthListOfIntegers(uint64_t *list, size_t listlen, size_t *outlen)
+{
+    size_t total_len = 0;
+    unsigned char *result = encodeVarint((uint64_t)listlen, &total_len);
+    fprintf(stderr, "list len encoded to %zu bytes\n", total_len);
+    for (size_t i = 0; i < listlen; i++)
+    {
+        size_t item_len = 0;
+        unsigned char *item_encoded = encodeVarint(list[i], &item_len);
+        fprintf(stderr, "item %zu encoded to %zu bytes\n", i, item_len);
+        result = realloc(result, total_len + item_len);
+        memcpy(result + total_len, item_encoded, item_len);
+        total_len += item_len;
+        free(item_encoded);
+    }
+    if (outlen != NULL)
+    {
+        *outlen = total_len;
+    }
+    return result;
+}
+
+unsigned char *createVersionMessage(const char *user_agent_str, int version, struct sockaddr_storage *peer_addr, struct sockaddr_storage *local_addr, int sock, size_t *out_length)
+{
+    // user_agent
+    size_t ua_len = 0;
+    unsigned char *user_agent = encodeVarStr(user_agent_str, &ua_len);
+    size_t payload_length = 82 + ua_len; // 固定長部分 + 可変長ユーザーエージェント
+    unsigned char *payload = malloc(payload_length);
+    size_t offset = 0;
+    uint32_t net_version = htobe32((uint32_t)version);
+    memcpy(payload + offset, &net_version, 4);
+    offset += 4;
+    uint64_t services = 0;
+    uint64_t net_services = htobe64(services);
+    memcpy(payload + offset, &net_services, 8);
+    offset += 8;
+    uint64_t timestamp = (uint64_t)time(NULL);
+    uint64_t net_timestamp = htobe64(timestamp);
+    memcpy(payload + offset, &net_timestamp, 8);
+    offset += 8;
+    // addr_recv
+    encodeNetworkAddress(payload + offset, peer_addr);
+    offset += 26;
+    // addr_from
+    encodeNetworkAddress(payload + offset, local_addr);
+    offset += 26;
+    uint64_t nonce = 0;
+    getrandom(&nonce, sizeof(nonce), GRND_NONBLOCK);
+    uint64_t net_nonce = htobe64(nonce);
+    memcpy(payload + offset, &net_nonce, 8);
+    offset += 8;
+    // user_agent
+    memcpy(payload + offset, user_agent, ua_len);
+    offset += ua_len;
+    // stream_numbers
+    size_t stream_list_len = 1;
+    size_t stream_list_encoded_len = 2;
+    unsigned char stream_list_encoded[] = {1, 1};
+    memcpy(payload + offset, stream_list_encoded, stream_list_encoded_len);
+    offset += stream_list_encoded_len;
+    free(user_agent);
+    // 全体の長さをセット
+    if (out_length != NULL)
+    {
+        *out_length = payload_length;
+    }
+    return payload;
+}
+
+void freeVersionMessage(struct version_message *msg)
+{
+    if (msg->user_agent != NULL)
+    {
+        free(msg->user_agent);
+        msg->user_agent = NULL;
+    }
+    if (msg->stream_numbers != NULL)
+    {
+        free(msg->stream_numbers);
+        msg->stream_numbers = NULL;
+    }
+}
+
+struct address_info
+{
+    uint64_t time;
+    uint32_t stream;
+    uint64_t services;
+    uint8_t ip[16];
+    uint16_t port;
+};
+
+void parseAddrMessage(unsigned char *payload, size_t payload_len, struct addr_message *out_msg)
+{
+    size_t offset = 0;
+    size_t outlen = 0;
+    out_msg->count = decodeVarint(payload + offset, &outlen);
+    offset += outlen;
+    out_msg->addresses = malloc(sizeof(struct address_info) * out_msg->count);
+    if (out_msg->addresses == NULL)
+    {
+        perror("Memory allocation failed for addresses");
+        exit(EXIT_FAILURE);
+    }
+    for (size_t i = 0; i < out_msg->count; i++)
+    {
+        out_msg->addresses[i].time = be64toh(*((uint64_t *)(payload + offset)));
+        offset += 8;
+        out_msg->addresses[i].stream = ntohl(*((uint32_t *)(payload + offset)));
+        offset += 4;
+        out_msg->addresses[i].services = be64toh(*((uint64_t *)(payload + offset)));
+        offset += 8;
+        memcpy(out_msg->addresses[i].ip, payload + offset, 16);
+        offset += 16;
+        out_msg->addresses[i].port = ntohs(*((uint16_t *)(payload + offset)));
+        offset += 2;
+    }
+}
+
+void freeAddrMessage(struct addr_message *msg)
+{
+    if (msg->addresses != NULL)
+    {
+        free(msg->addresses);
+        msg->addresses = NULL;
+    }
+}
+int is_valid_bm_addr(const uint8_t *p)
+{
+    // 1. IPv4射影アドレスの場合 (::ffff:x.x.x.x)
+    // 最初の10バイトが0、次の2バイトが0xff
+    int all_zero_prefix = p[0] == 0 && p[1] == 0 && p[2] == 0 && p[3] == 0 &&
+                          p[4] == 0 && p[5] == 0 && p[6] == 0 && p[7] == 0 &&
+                          p[8] == 0 && p[9] == 0;
+    if (all_zero_prefix)
+    {
+        // 次の2バイトが ff ff なら正常なIPv4
+        if (p[10] == 0xff && p[11] == 0xff)
+            return 1;
+        // それ以外の 0000...dfff... などは破損
+        return 0;
+    }
+
+    // 2. 本物のIPv6アドレスの場合
+    // 先頭が 00... は通常ありえない。グローバル(2000::/3)かULA(fd00::/8)が一般的
+    if (p[0] == 0x00)
+    {
+        return 0;
+    }
+    if ((p[0] & 0xe0) != 0x20)
+    {
+        return 0;
+    }
+
+    // それ以外はある程度信頼して表示
+    return 1;
+}
+
+void printAddrMessage(struct addr_message *addr_msg)
+{
+    fprintf(stderr, "Number of addresses: %" PRIu64 "\n", addr_msg->count);
+    for (uint64_t i = 0; i < addr_msg->count; i++)
+    {
+        if (is_valid_bm_addr(addr_msg->addresses[i].ip))
+        {
+            struct tm tm_info;
+            char time_buffer[128];
+            localtime_r((time_t *)&addr_msg->addresses[i].time, &tm_info);
+            strftime(time_buffer, sizeof(time_buffer), "%Y-%m-%d %H:%M:%S", &tm_info);
+            fprintf(stderr, "  Address %" PRIu64 ": time=%" PRIu64 "(%s), stream=%" PRIu32 ", services=%016" PRIx64 ", port=%u,", i,
+                    addr_msg->addresses[i].time, time_buffer, addr_msg->addresses[i].stream, addr_msg->addresses[i].services, addr_msg->addresses[i].port);
+            // IPアドレスの表示
+            unsigned char *ip = addr_msg->addresses[i].ip;
+            if (ip[0] == 0 && ip[1] == 0 && ip[2] == 0 && ip[3] == 0 &&
+                ip[4] == 0 && ip[5] == 0 && ip[6] == 0 && ip[7] == 0 &&
+                ip[8] == 0 && ip[9] == 0 && ip[10] == 0xff && ip[11] == 0xff)
+            {
+                // IPv4-mapped IPv6 address
+                fprintf(stderr, " IPv4 Address: %u.%u.%u.%u\n", ip[12], ip[13], ip[14], ip[15]);
+            }
+            else
+            {
+                // IPv6 address
+                char ipv6_str[40];
+                snprintf(ipv6_str, sizeof(ipv6_str),
+                         "%02x%02x:%02x%02x:%02x%02x:%02x%02x:"
+                         "%02x%02x:%02x%02x:%02x%02x:%02x%02x",
+                         ip[0], ip[1], ip[2], ip[3], ip[4], ip[5], ip[6], ip[7],
+                         ip[8], ip[9], ip[10], ip[11], ip[12], ip[13], ip[14], ip[15]);
+                fprintf(stderr, " IPv6 Address: %s\n", ipv6_str);
+            }
+        }
+        else
+        {
+            fprintf(stderr, "  Address %" PRIu64 ": ignored\n", i);
+        }
+    }
+}
+
+void parseInventoryMessage(unsigned char *payload, size_t payload_len, struct inventory_message *out_msg)
+{
+    size_t offset = 0;
+    size_t outlen = 0;
+    out_msg->count = decodeVarint(payload + offset, &outlen);
+    offset += outlen;
+    uint64_t actual_count = (payload_len - offset) / 32;
+    fprintf(stderr, "Declared inv count: %" PRIu64 ", Actual inv count in payload: %" PRIu64 "\n", out_msg->count, actual_count);
+    if (out_msg->count != actual_count)
+    {
+        fprintf(stderr, "Warning: inv count mismatch! Declared: %" PRIu64 ", Actual: %" PRIu64 "\n", out_msg->count, actual_count);
+    }
+    out_msg->count = actual_count;
+    out_msg->items = malloc(sizeof(struct inventory_item) * actual_count);
+    if (out_msg->items == NULL)
+    {
+        perror("Memory allocation failed for inventory items");
+        exit(EXIT_FAILURE);
+    }
+    // 実際のペイロードに含まれるアイテム数を計算
+    for (size_t i = 0; i < actual_count; i++)
+    {
+        memcpy(out_msg->items[i].object_hash, payload + offset, 32);
+        offset += 32;
+    }
+}
+
+void freeInventoryMessage(struct inventory_message *msg)
+{
+    if (msg->items != NULL)
+    {
+        free(msg->items);
+        msg->items = NULL;
+    }
+}
+
+void process_command(struct fd_data *data, struct message *msg)
+{
+    // コマンドに対する処理を Strategy パターンを模倣して実装
+    if (strncmp(msg->command, "verack", 12) == 0)
+    {
+        fprintf(stderr, "Received verack message\n");
+        // NOP
+    }
+    else if (strncmp(msg->command, "version", 12) == 0)
+    {
+        fprintf(stderr, "Received version message\n");
+        struct version_message ver_msg;
+        parseVersionMessage(msg->payload, msg->length, &ver_msg);
+        fprintf(stderr, "Version: %u, Services: %" PRIu64 ", Timestamp: %" PRIu64 "\n", ver_msg.version, ver_msg.services, ver_msg.timestamp);
+        printNetworkAddress(ver_msg.addr_recv, 26); // addr_recv
+        printNetworkAddress(ver_msg.addr_from, 26); // addr_from
+        fprintf(stderr, "Nonce: %016" PRIx64 "\n", ver_msg.nonce);
+        fprintf(stderr, "User Agent: %s\n", ver_msg.user_agent);
+        fprintf(stderr, "Stream Count: %" PRIu64 "\n", ver_msg.stream_numbers_len);
+        fprintf(stderr, "Streams: ");
+        for (uint64_t i = 0; i < ver_msg.stream_numbers_len; i++)
+        {
+            fprintf(stderr, "%" PRIu64 " ", ver_msg.stream_numbers[i]);
+        }
+        fprintf(stderr, "\n");
+        freeVersionMessage(&ver_msg);
+        if (replyVarack(data) != EXIT_SUCCESS)
+        {
+            //?
+        }
+    }
+    else if (strncmp(msg->command, "addr", 12) == 0)
+    {
+        fprintf(stderr, "Received addr message\n");
+        struct addr_message addr_msg;
+        parseAddrMessage(msg->payload, msg->length, &addr_msg);
+        printAddrMessage(&addr_msg);
+        // 本当は適宜ストレージに保存するんやろな
+        // struct addr_message を bm_node_t に詰め替えて送信
+        // メモリ解放
+        freeAddrMessage(&addr_msg);
+    }
+    else if (strncmp(msg->command, "inv", 12) == 0)
+    {
+        fprintf(stderr, "Received inv message\n");
+        struct inventory_message inv_msg;
+        parseInventoryMessage(msg->payload, msg->length, &inv_msg);
+        fprintf(stderr, "Number of inventory items: %" PRIu64 "\n", inv_msg.count);
+        /* for (uint64_t i = 0; i < inv_msg.count; i++)
+        {
+            fprintf(stderr, "  Item %" PRIu64 ": hash=", i);
+            for (int j = 0; j < 32; j++)
+            {
+                fprintf(stderr, "%02x", inv_msg.items[i].object_hash[j]);
+            }
+            fprintf(stderr, "\n");
+        } */
+        freeInventoryMessage(&inv_msg);
+        // getdata送信スレッドにinvベクタを転送する
+    }
+    else if (strncmp(msg->command, "ping", 12) == 0)
+    {
+        fprintf(stderr, "Received ping message\n");
+        if (replyPong(data) != EXIT_SUCCESS)
+        {
+            // ?
+        }
+    }
+    else if (strncmp(msg->command, "getdata", 12) == 0)
+    {
+        fprintf(stderr, "Received getdata message\n");
+        // DO ANYTHING
+    }
+    else if (strncmp(msg->command, "object", 12) == 0)
+    {
+        fprintf(stderr, "Received object message\n");
+        // object payload保存スレッドに転送する
+    }
+    else
+    {
+        char command[13] = {0};
+        strncpy(command, msg->command, 12);
+        fprintf(stderr, "Unknown command: %s\n", command);
     }
 }

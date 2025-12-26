@@ -112,38 +112,6 @@ unsigned char *encodeVarint(uint64_t len, size_t *outlen)
     return result;
 }
 
-uint64_t decodeVarint(unsigned char *data, size_t *consumed_bytes)
-{
-    uint64_t value = 0;
-    size_t offset = 0;
-    if (data[0] < 0xfd)
-    {
-        value = data[0];
-        offset = 1;
-    }
-    else if (data[0] == 0xfd)
-    {
-        value = data[1] | (data[2] << 8);
-        offset = 3;
-    }
-    else if (data[0] == 0xfe)
-    {
-        value = data[1] | (data[2] << 8) | (data[3] << 16) | (data[4] << 24);
-        offset = 5;
-    }
-    else if (data[0] == 0xff)
-    {
-        value = ((uint64_t)data[1]) | ((uint64_t)data[2] << 8) | ((uint64_t)data[3] << 16) | ((uint64_t)data[4] << 24) |
-                ((uint64_t)data[5] << 32) | ((uint64_t)data[6] << 40) | ((uint64_t)data[7] << 48) | ((uint64_t)data[8] << 56);
-        offset = 9;
-    }
-    if (consumed_bytes != NULL)
-    {
-        *consumed_bytes = offset;
-    }
-    return value;
-}
-
 unsigned char *encodeVarStr(const char *str, size_t *outlen)
 {
     size_t len = strlen(str);
