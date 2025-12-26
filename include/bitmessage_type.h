@@ -1,6 +1,9 @@
 
 #ifndef BITMESSAGE_TYPE_H
 #define BITMESSAGE_TYPE_H
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE 1
+#endif
 
 #include <netdb.h>
 #include <openssl/evp.h>

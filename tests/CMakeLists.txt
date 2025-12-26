@@ -26,7 +26,7 @@ target_link_libraries(changebasetest cunit study)
 add_test(NAME changebasetest COMMAND $<TARGET_FILE:changebasetest>)
 
 add_executable(ripeencode ripeencode.c)
-target_link_libraries(ripeencode cunit study)
+target_link_libraries(ripeencode PRIVATE cunit study OpenSSL::Crypto)
 add_test(NAME ripeencode COMMAND $<TARGET_FILE:ripeencode>)
 
 add_executable(base58test base58test.c)

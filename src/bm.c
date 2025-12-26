@@ -60,7 +60,7 @@ unsigned char *encodeVarint(uint64_t len, size_t *outlen)
         result[0] = (unsigned char)len;
         if (outlen != NULL)
         {
-            *outlen = len;
+            *outlen = 1;
         }
     }
     else if (len <= 0xffff)
@@ -232,7 +232,7 @@ char *encodeAddress0(uint64_t version, uint64_t stream, unsigned char *ripe,
     variantVersionout = encodeVarint(version, &variantVersionoutlen);
     variantStreamout = encodeVarint(stream, &variantStreamoutlen);
     size_t storedBinaryDataLen = variantVersionoutlen + variantStreamoutlen + workripelen + 4;
-    unsigned char *storedBinaryData = malloc(variantVersionoutlen + variantStreamoutlen + workripelen + 4);
+    unsigned char *storedBinaryData = malloc(storedBinaryDataLen);
     memcpy(storedBinaryData, variantVersionout, variantVersionoutlen);
     memcpy(storedBinaryData + variantVersionoutlen, variantStreamout,
            variantStreamoutlen);
@@ -241,7 +241,7 @@ char *encodeAddress0(uint64_t version, uint64_t stream, unsigned char *ripe,
 
     {
         // make checksum
-        const EVP_MD *sha512 = EVP_sha512();
+        EVP_MD *sha512 = EVP_MD_fetch(NULL, "SHA512", NULL);
         EVP_MD_CTX *ctx = EVP_MD_CTX_new();
         EVP_DigestInit(ctx, sha512);
         EVP_DigestUpdate(ctx, storedBinaryData, storedBinaryDataLen - 4);
@@ -252,6 +252,7 @@ char *encodeAddress0(uint64_t version, uint64_t stream, unsigned char *ripe,
         EVP_DigestUpdate(ctx, cache64, 64);
         EVP_DigestFinal(ctx, cache64, &s);
         EVP_MD_CTX_free(ctx);
+        EVP_MD_free(sha512);
         memcpy(storedBinaryData + variantVersionoutlen + variantStreamoutlen + workripelen,
                cache64, 4);
     }
