@@ -62,5 +62,8 @@ extern void printNetworkAddress(unsigned char *addr, size_t addrlen);
 extern void parseVersionMessage(unsigned char *payload, size_t payload_len, struct version_message *out_msg);
 extern void process_command(struct fd_data *data, struct message *msg);
 extern size_t get_version_message_size(const char *user_agent_str);
-extern unsigned char *createVersionMessage(uint8_t *out, const char *user_agent_str, int version, struct sockaddr_storage *peer_addr, struct sockaddr_storage *local_addr, int sock);
+extern size_t get_version_payload_size(const char *user_agent_str);
+extern unsigned char *create_version_payload(uint8_t *out, const char *user_agent_str, int version,
+                                           struct sockaddr_storage *peer_addr, struct sockaddr_storage *local_addr);
+extern uint8_t *new_version_message(const char *user_agent_str, int version, struct sockaddr_storage *peer_addr, struct sockaddr_storage *local_addr);
 #endif // BM_PROTOCOL_H

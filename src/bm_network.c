@@ -95,3 +95,20 @@ int replyPong(struct fd_data *data)
     }
     return EXIT_SUCCESS;
 }
+
+int postVersion(int sock, const char *user_agent_str, int version, struct sockaddr_storage *peer_addr, struct sockaddr_storage *local_addr)
+{
+    size_t versionmessagelen = get_version_message_size(user_agent_str);
+    uint8_t *version_message = new_version_message(user_agent_str, version, peer_addr, local_addr);
+    // 送信
+    ssize_t a = write(sock, version_message, versionmessagelen);
+    if (a != versionmessagelen)
+    {
+        perror("write error");
+        close(sock);
+        close(epfd);
+        return EXIT_FAILURE;
+    }
+    free(version_message);
+    return 0;
+}

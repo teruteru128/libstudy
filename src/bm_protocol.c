@@ -437,11 +437,17 @@ static uint8_t *endodeVariableLengthListOfIntegers(uint8_t *out, uint64_t *list,
 
 size_t get_version_message_size(const char *user_agent_str)
 {
+    size_t payload_len = get_version_payload_size(user_agent_str);
+    return 24 + payload_len;
+}
+
+size_t get_version_payload_size(const char *user_agent_str)
+{
     size_t ua_len = get_varstr_size(user_agent_str);
     return 82 + ua_len;
 }
 
-unsigned char *createVersionMessage(uint8_t *out, const char *user_agent_str, int version, struct sockaddr_storage *peer_addr, struct sockaddr_storage *local_addr, int sock)
+unsigned char *create_version_payload(uint8_t *out, const char *user_agent_str, int version, struct sockaddr_storage *peer_addr, struct sockaddr_storage *local_addr)
 {
     if (out == NULL)
     {
@@ -482,6 +488,23 @@ unsigned char *createVersionMessage(uint8_t *out, const char *user_agent_str, in
     memcpy(out + offset, stream_list_encoded, stream_list_encoded_len);
     offset += stream_list_encoded_len;
     return out;
+}
+
+uint8_t *new_version_message(const char *user_agent_str, int version, struct sockaddr_storage *peer_addr, struct sockaddr_storage *local_addr)
+{
+    size_t versionmsglen = get_version_payload_size(user_agent_str);
+    uint8_t *version_message = malloc(24 + versionmsglen);
+    create_version_payload(version_message + 24, user_agent_str, version, peer_addr, local_addr);
+    // ヘッダの作成
+    memcpy(version_message, magicbytes, 4);
+    strncpy(version_message + 4, "version", 12);
+    uint32_t net_payload_length = htobe32((uint32_t)versionmsglen);
+    memcpy(version_message + 16, &net_payload_length, 4);
+    // checksumの計算
+    unsigned char checksum_full[64];
+    SHA512(version_message + 24, versionmsglen, checksum_full);
+    memcpy(version_message + 20, checksum_full, 4);
+    return version_message;
 }
 
 void freeVersionMessage(struct version_message *msg)
