@@ -712,7 +712,9 @@ void process_command(struct fd_data *data, struct message *msg)
         fprintf(stderr, "Received ping message\n");
         if (replyPong(data) != EXIT_SUCCESS)
         {
-            // ?
+            perror("write pong error");
+            close(data->fd);
+            free_fd_data(data);
         }
     }
     else if (strncmp(msg->command, "getdata", 12) == 0)

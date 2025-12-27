@@ -91,9 +91,6 @@ int replyPong(struct fd_data *data)
     ssize_t w = write(data->fd, pong_header, 24);
     if (w != 24)
     {
-        perror("write pong error");
-        close(data->fd);
-        free_fd_data(data);
         return EXIT_FAILURE;
     }
     return EXIT_SUCCESS;
