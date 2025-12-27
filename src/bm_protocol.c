@@ -644,11 +644,11 @@ void parseInventoryMessage(unsigned char *payload, size_t payload_len, struct in
     out_msg->count = decodeVarint(payload + offset, &outlen);
     offset += outlen;
     uint64_t actual_count = (payload_len - offset) / 32;
-    fprintf(stderr, "Declared inv count: %" PRIu64 ", Actual inv count in payload: %" PRIu64 "\n", out_msg->count, actual_count);
+    /* fprintf(stderr, "Declared inv count: %" PRIu64 ", Actual inv count in payload: %" PRIu64 "\n", out_msg->count, actual_count);
     if (out_msg->count != actual_count)
     {
         fprintf(stderr, "Warning: inv count mismatch! Declared: %" PRIu64 ", Actual: %" PRIu64 "\n", out_msg->count, actual_count);
-    }
+    } */
     out_msg->count = actual_count;
     out_msg->items = malloc(sizeof(struct inventory_item) * actual_count);
     if (out_msg->items == NULL)
@@ -720,7 +720,7 @@ void process_command(struct fd_data *data, struct message *msg)
         fprintf(stderr, "Received inv message\n");
         struct inventory_message inv_msg;
         parseInventoryMessage(msg->payload, msg->length, &inv_msg);
-        fprintf(stderr, "Number of inventory items: %" PRIu64 "\n", inv_msg.count);
+        //fprintf(stderr, "Number of inventory items: %" PRIu64 "\n", inv_msg.count);
         /* for (uint64_t i = 0; i < inv_msg.count; i++)
         {
             fprintf(stderr, "  Item %" PRIu64 ": hash=", i);
@@ -735,7 +735,11 @@ void process_command(struct fd_data *data, struct message *msg)
     }
     else if (strncmp(msg->command, "ping", 12) == 0)
     {
-        fprintf(stderr, "Received ping message\n");
+        time_t now = time(NULL);
+        struct tm tm;
+        localtime_r(&now, &tm);
+        fprintf(stderr, "Received ping message(%4d/%02d/%02d %02d:%02d:%02d)\n",
+                tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
         if (replyPong(data) != EXIT_SUCCESS)
         {
             perror("write pong error");
