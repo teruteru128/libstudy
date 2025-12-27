@@ -411,7 +411,7 @@ static size_t get_varint_list_size(uint64_t *list, size_t listlen)
 {
     size_t list_header_size = get_varint_size(listlen);
     size_t sum_of_elements_size = 0;
-    for(size_t i = 0; i < listlen; i++)
+    for (size_t i = 0; i < listlen; i++)
     {
         sum_of_elements_size += get_varint_size(list[i]);
     }
@@ -420,13 +420,13 @@ static size_t get_varint_list_size(uint64_t *list, size_t listlen)
 
 static uint8_t *endodeVariableLengthListOfIntegers(uint8_t *out, uint64_t *list, size_t listlen)
 {
-    if(out == NULL)
+    if (out == NULL)
     {
         return NULL;
     }
     encodeVarint(out, listlen);
     size_t offset = get_varint_size(listlen);
-    for(size_t i = 0; i < listlen; i++)
+    for (size_t i = 0; i < listlen; i++)
     {
         uint64_t e = list[i];
         encodeVarint(out + offset, e);
@@ -435,50 +435,53 @@ static uint8_t *endodeVariableLengthListOfIntegers(uint8_t *out, uint64_t *list,
     return out;
 }
 
-unsigned char *createVersionMessage(const char *user_agent_str, int version, struct sockaddr_storage *peer_addr, struct sockaddr_storage *local_addr, int sock, size_t *out_length)
+size_t get_version_message_size(const char *user_agent_str)
 {
+    size_t ua_len = get_varstr_size(user_agent_str);
+    return 82 + ua_len;
+}
+
+unsigned char *createVersionMessage(uint8_t *out, const char *user_agent_str, int version, struct sockaddr_storage *peer_addr, struct sockaddr_storage *local_addr, int sock)
+{
+    if (out == NULL)
+    {
+        return NULL;
+    }
     // user_agent
     size_t ua_len = get_varstr_size(user_agent_str);
-    size_t payload_length = 82 + ua_len; // 固定長部分 + 可変長ユーザーエージェント
-    unsigned char *payload = malloc(payload_length);
     size_t offset = 0;
     uint32_t net_version = htobe32((uint32_t)version);
-    memcpy(payload + offset, &net_version, 4);
+    memcpy(out + offset, &net_version, 4);
     offset += 4;
     uint64_t services = 0;
     uint64_t net_services = htobe64(services);
-    memcpy(payload + offset, &net_services, 8);
+    memcpy(out + offset, &net_services, 8);
     offset += 8;
     uint64_t timestamp = (uint64_t)time(NULL);
     uint64_t net_timestamp = htobe64(timestamp);
-    memcpy(payload + offset, &net_timestamp, 8);
+    memcpy(out + offset, &net_timestamp, 8);
     offset += 8;
     // addr_recv
-    encodeNetworkAddress(payload + offset, peer_addr);
+    encodeNetworkAddress(out + offset, peer_addr);
     offset += 26;
     // addr_from
-    encodeNetworkAddress(payload + offset, local_addr);
+    encodeNetworkAddress(out + offset, local_addr);
     offset += 26;
     uint64_t nonce = 0;
     getrandom(&nonce, sizeof(nonce), GRND_NONBLOCK);
     uint64_t net_nonce = htobe64(nonce);
-    memcpy(payload + offset, &net_nonce, 8);
+    memcpy(out + offset, &net_nonce, 8);
     offset += 8;
     // user_agent
-    encodeVarStr(payload + offset, user_agent_str);
+    encodeVarStr(out + offset, user_agent_str);
     offset += ua_len;
     // stream_numbers
     size_t stream_list_len = 1;
     size_t stream_list_encoded_len = 2;
     unsigned char stream_list_encoded[] = {1, 1};
-    memcpy(payload + offset, stream_list_encoded, stream_list_encoded_len);
+    memcpy(out + offset, stream_list_encoded, stream_list_encoded_len);
     offset += stream_list_encoded_len;
-    // 全体の長さをセット
-    if (out_length != NULL)
-    {
-        *out_length = payload_length;
-    }
-    return payload;
+    return out;
 }
 
 void freeVersionMessage(struct version_message *msg)
