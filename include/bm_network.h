@@ -30,4 +30,7 @@ extern void free_fd_data(struct fd_data *data);
 extern int replyVarack(struct fd_data *data);
 extern int replyPong(struct fd_data *data);
 int postVersion(int sock, const char *user_agent_str, int version, struct sockaddr_storage *peer_addr, struct sockaddr_storage *local_addr);
+void *epoll_wait_thread(void * arg);
+void *upload_thread(void *arg);
+void *download_thread(void *arg);
 #endif // BM_NETWORK_H

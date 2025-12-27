@@ -112,3 +112,21 @@ int postVersion(int sock, const char *user_agent_str, int version, struct sockad
     free(version_message);
     return 0;
 }
+
+// epoll wait thread
+void *epoll_wait_thread(void * arg)
+{
+    return NULL;
+}
+
+// network thread
+// upload thread
+void *upload_thread(void *arg)
+{
+    return NULL;
+}
+// download thread
+void *download_thread(void *arg)
+{
+    return NULL;
+}

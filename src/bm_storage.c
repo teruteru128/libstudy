@@ -9,3 +9,5 @@
 #include <bm_protocol.h> // struct messageの定義のため
 #include <endian.h>      // htobe64, htobe32などのため
 // ここにストレージ関連の関数を実装します。
+
+// sql thread

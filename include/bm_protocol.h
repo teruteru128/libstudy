@@ -66,4 +66,5 @@ extern size_t get_version_payload_size(const char *user_agent_str);
 extern unsigned char *create_version_payload(uint8_t *out, const char *user_agent_str, int version,
                                            struct sockaddr_storage *peer_addr, struct sockaddr_storage *local_addr);
 extern uint8_t *new_version_message(const char *user_agent_str, int version, struct sockaddr_storage *peer_addr, struct sockaddr_storage *local_addr);
+void *command_process_thread(void *arg);
 #endif // BM_PROTOCOL_H

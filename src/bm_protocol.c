@@ -764,3 +764,9 @@ void process_command(struct fd_data *data, struct message *msg)
         fprintf(stderr, "Unknown command: %s\n", command);
     }
 }
+
+// command process thread
+void *command_process_thread(void *arg)
+{
+    return NULL;
+}
