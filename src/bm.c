@@ -195,12 +195,11 @@ char *encodeAddress0(uint64_t version, uint64_t stream, unsigned char *ripe,
         EVP_MD_CTX *ctx = EVP_MD_CTX_new();
         EVP_DigestInit(ctx, sha512);
         EVP_DigestUpdate(ctx, storedBinaryData, storedBinaryDataLen - 4);
-        unsigned int s = 0;
         unsigned char cache64[64];
-        EVP_DigestFinal(ctx, cache64, &s);
+        EVP_DigestFinal(ctx, cache64, NULL);
         EVP_DigestInit(ctx, sha512);
         EVP_DigestUpdate(ctx, cache64, 64);
-        EVP_DigestFinal(ctx, cache64, &s);
+        EVP_DigestFinal(ctx, cache64, NULL);
         EVP_MD_CTX_free(ctx);
         EVP_MD_free(sha512);
         memcpy(storedBinaryData + variantVersionoutlen + variantStreamoutlen + workripelen,

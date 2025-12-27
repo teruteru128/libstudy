@@ -18,6 +18,7 @@ void hashRIPEMD160(EVP_MD_CTX *mdctx, const EVP_MD *ripemd160,
 extern size_t get_varint_size(uint64_t u);
 extern uint8_t *encodeVarint(uint8_t *out, uint64_t len);
 uint64_t decodeVarint(unsigned char *data, size_t *consumed_bytes);
+extern size_t get_varstr_size(const char *str);
 uint8_t *encodeVarStr(uint8_t *out, const char *str);
 // use base58encode from changebase.h
 /**encode private key pair to bitmessage keys.dat format*/

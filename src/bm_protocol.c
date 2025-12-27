@@ -438,8 +438,7 @@ static uint8_t *endodeVariableLengthListOfIntegers(uint8_t *out, uint64_t *list,
 unsigned char *createVersionMessage(const char *user_agent_str, int version, struct sockaddr_storage *peer_addr, struct sockaddr_storage *local_addr, int sock, size_t *out_length)
 {
     // user_agent
-    size_t ua_len = 0;
-    unsigned char *user_agent = encodeVarStr(user_agent_str, &ua_len);
+    size_t ua_len = get_varstr_size(user_agent_str);
     size_t payload_length = 82 + ua_len; // 固定長部分 + 可変長ユーザーエージェント
     unsigned char *payload = malloc(payload_length);
     size_t offset = 0;
@@ -466,7 +465,7 @@ unsigned char *createVersionMessage(const char *user_agent_str, int version, str
     memcpy(payload + offset, &net_nonce, 8);
     offset += 8;
     // user_agent
-    memcpy(payload + offset, user_agent, ua_len);
+    encodeVarStr(payload + offset, user_agent_str);
     offset += ua_len;
     // stream_numbers
     size_t stream_list_len = 1;
@@ -474,7 +473,6 @@ unsigned char *createVersionMessage(const char *user_agent_str, int version, str
     unsigned char stream_list_encoded[] = {1, 1};
     memcpy(payload + offset, stream_list_encoded, stream_list_encoded_len);
     offset += stream_list_encoded_len;
-    free(user_agent);
     // 全体の長さをセット
     if (out_length != NULL)
     {
