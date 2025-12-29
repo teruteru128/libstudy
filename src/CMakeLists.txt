@@ -4,13 +4,13 @@ args_parse.c
 base64.c
 bitmessage.c
 bitset.c
+bm_api.c
 bm_crypto.c
 bm_network.c
 bm_protocol.c
 bm_sonota.c
 bm_storage.c
 bm_queue.c
-bmapi.c
 chainCookies.c
 changebase.c
 charset-convert.c

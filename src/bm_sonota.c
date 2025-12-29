@@ -4,7 +4,7 @@
 #endif
 #include "bitmessage.h"
 #include "bm_sonota.h"
-#include "bmapi.h"
+#include "bm_api.h"
 #include "nlz.h"
 #include <changebase.h>
 #include <err.h>
