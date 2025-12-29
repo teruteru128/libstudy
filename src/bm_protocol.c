@@ -1,5 +1,5 @@
 // プロトコルメッセージの構造化とパースの厳密化
-#include <bm.h>
+#include <bm_sonota.h>
 #include <bm_protocol.h>
 #include <stdlib.h>
 #include <string.h>

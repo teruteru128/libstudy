@@ -3,7 +3,7 @@
 #include "config.h"
 #endif
 #include "bitmessage.h"
-#include "bm.h"
+#include "bm_sonota.h"
 #include "bmapi.h"
 #include "nlz.h"
 #include <changebase.h>

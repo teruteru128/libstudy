@@ -2,7 +2,7 @@
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
-#include <bm.h>
+#include <bm_sonota.h>
 #include <byteswap.h>
 #include <err.h>
 #include <openssl/evp.h>

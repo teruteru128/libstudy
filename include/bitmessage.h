@@ -2,7 +2,7 @@
 #ifndef BITMESSAGE_H
 #define BITMESSAGE_H
 
-//TODO: bitmessage.h と bm.h の役割分け
+//TODO: bitmessage.h と bm_sonota.h の役割分け
 //ネットワーク
 //鍵とハッシュとアドレスとエンコード
 

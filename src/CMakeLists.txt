@@ -7,9 +7,9 @@ bitset.c
 bm_crypto.c
 bm_network.c
 bm_protocol.c
+bm_sonota.c
 bm_storage.c
 bm_queue.c
-bm.c
 bmapi.c
 chainCookies.c
 changebase.c

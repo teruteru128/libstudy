@@ -3,7 +3,7 @@
 #include "config.h"
 #endif
 #include "base64.h"
-#include "bm.h"
+#include "bm_sonota.h"
 #include "bmapi.h"
 #include "xmlrpc.h"
 #include <stdio.h>

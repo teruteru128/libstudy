@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <changebase.h>
-#include <bm.h>
+#include <bm_sonota.h>
 
 #define DATA "00000D9663F57318B4E52288BFDC8B3C23E84DE1"
 #define TARGET "BM-NAxwJoagtHikgoyv2wsDpdFdwb867sKn"

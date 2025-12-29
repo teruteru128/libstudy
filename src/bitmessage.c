@@ -6,4 +6,4 @@
 
 #include "args.h"
 #include "bitmessage.h"
-#include "bm.h"
+#include "bm_sonota.h"
