@@ -4,8 +4,13 @@
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE 1
 #endif
+#ifndef _DEFAULT_SOURCE
+#define _DEFAULT_SOURCE 1
+#endif
 
 #include <netdb.h>
+#include <sys/socket.h>
+#include <sys/types.h>
 #include <openssl/evp.h>
 #include <openssl/ripemd.h>
 #include <openssl/sha.h>
