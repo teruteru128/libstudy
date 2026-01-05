@@ -23,6 +23,12 @@ struct fd_data
     int fd;
     size_t size;
     size_t length;
+    // ローカル
+    struct sockaddr_storage local_addr;
+    socklen_t local_len;
+    // ピア
+    struct sockaddr_storage peer_addr;
+    socklen_t peer_len;
     uint8_t *connectedBuffer;
 };
 extern struct fd_data *new_fd_data(enum fd_type type, int fd);

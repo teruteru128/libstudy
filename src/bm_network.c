@@ -31,6 +31,22 @@ struct fd_data *new_fd_data(enum fd_type type, int fd)
     data->fd = fd;
     data->size = INIT_CONNECT_BUFFER_SIZE;
     data->length = 0;
+    data->local_len = sizeof(data->local_addr);
+    // ローカルアドレスの取得
+    if (getsockname(fd, (struct sockaddr *)&data->local_addr, &data->local_len) == -1)
+    {
+        perror("getsockname error");
+        free(data);
+        return NULL;
+    }
+    data->peer_len = sizeof(data->peer_addr);
+    // ピアアドレス（相手先）の取得
+    if (getpeername(fd, (struct sockaddr *)&data->peer_addr, &data->peer_len) == -1)
+    {
+        perror("getpeername error (may be normal for unconnected sockets)");
+        free(data);
+        return NULL;
+    }
     data->connectedBuffer = malloc(INIT_CONNECT_BUFFER_SIZE);
     if (data->connectedBuffer == NULL)
     {
@@ -53,7 +69,10 @@ void free_fd_data(struct fd_data *data)
     free(data);
 }
 
-// verackコマンドを送信する
+/**
+ * verackコマンドを送信する
+ * @return if(success) return EXIT_SUCCESS; else EXIT_FAILURE;
+ */
 int replyVarack(struct fd_data *data)
 {
     unsigned char verack_header[24];

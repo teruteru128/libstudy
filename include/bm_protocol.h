@@ -25,7 +25,9 @@ struct version_message
     uint32_t version;
     uint64_t services;
     uint64_t timestamp;
+    // 送信先
     unsigned char addr_recv[26];
+    // 送信元
     unsigned char addr_from[26];
     uint64_t nonce;
     char *user_agent;

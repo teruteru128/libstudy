@@ -105,30 +105,22 @@ void encodeTimeAndStreamInNetworkAddress(unsigned char *addr,
 void encodeNetworkAddress(unsigned char *addr, struct sockaddr_storage *local_addr)
 {
     // servicesの8バイトはゼロ埋め
-    memset(addr, 0, 8);
+    memset(addr, 0, 26);
     if (local_addr->ss_family == AF_INET)
     {
+        struct sockaddr_in *sin = (struct sockaddr_in *)local_addr;
         // IPv4アドレスの場合、IPv4マッピングIPv6アドレスに変換してセット
-        addr[8] = 0;
-        addr[9] = 0;
-        addr[10] = 0;
-        addr[11] = 0;
-        addr[12] = 0;
-        addr[13] = 0;
         addr[14] = 0xff;
         addr[15] = 0xff;
-        struct sockaddr_in *sin = (struct sockaddr_in *)local_addr;
-        memcpy(addr + 16, &sin->sin_addr, 4); // IPv4アドレスをコピー
-        uint16_t port = htons(sin->sin_port);
-        memcpy(addr + 24, &port, 2); // ポート番号をコピー
+        memcpy(addr + 16, &sin->sin_addr, sizeof(sin->sin_addr)); // IPv4アドレスをコピー
+        memcpy(addr + 24, &sin->sin_port, sizeof(sin->sin_port)); // ポート番号をコピー
     }
     else if (local_addr->ss_family == AF_INET6)
     {
-        // IPv6アドレスの場合
         struct sockaddr_in6 *sin6 = (struct sockaddr_in6 *)local_addr;
-        memcpy(addr + 8, &sin6->sin6_addr, 16); // IPv6アドレスをコピー
-        uint16_t port = htons(sin6->sin6_port);
-        memcpy(addr + 24, &port, 2); // ポート番号をコピー
+        // IPv6アドレスの場合
+        memcpy(addr + 8, &sin6->sin6_addr, sizeof(sin6->sin6_addr));  // IPv6アドレスをコピー
+        memcpy(addr + 24, &sin6->sin6_port, sizeof(sin6->sin6_port)); // ポート番号をコピー
     }
 }
 
@@ -687,8 +679,10 @@ void process_command(struct fd_data *data, struct message *msg)
         struct version_message ver_msg;
         parseVersionMessage(msg->payload, msg->length, &ver_msg);
         fprintf(stderr, "Version: %u, Services: %" PRIu64 ", Timestamp: %" PRIu64 "\n", ver_msg.version, ver_msg.services, ver_msg.timestamp);
-        printNetworkAddress(ver_msg.addr_recv, 26); // addr_recv
-        printNetworkAddress(ver_msg.addr_from, 26); // addr_from
+        // recv == local
+        printNetworkAddress(ver_msg.addr_recv, sizeof(ver_msg.addr_recv)); // addr_recv
+        // from == peer
+        printNetworkAddress(ver_msg.addr_from, sizeof(ver_msg.addr_from)); // addr_from
         fprintf(stderr, "Nonce: %016" PRIx64 "\n", ver_msg.nonce);
         fprintf(stderr, "User Agent: %s\n", ver_msg.user_agent);
         fprintf(stderr, "Stream Count: %" PRIu64 "\n", ver_msg.stream_numbers_len);
@@ -720,7 +714,7 @@ void process_command(struct fd_data *data, struct message *msg)
         fprintf(stderr, "Received inv message\n");
         struct inventory_message inv_msg;
         parseInventoryMessage(msg->payload, msg->length, &inv_msg);
-        //fprintf(stderr, "Number of inventory items: %" PRIu64 "\n", inv_msg.count);
+        // fprintf(stderr, "Number of inventory items: %" PRIu64 "\n", inv_msg.count);
         /* for (uint64_t i = 0; i < inv_msg.count; i++)
         {
             fprintf(stderr, "  Item %" PRIu64 ": hash=", i);
