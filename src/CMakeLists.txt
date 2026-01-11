@@ -49,3 +49,6 @@ xorshift.c
 target_link_libraries(study ${OPENSSL_CRYPTO_LIBRARIES} GnuTLS::GnuTLS xmlrpc xmlrpc_client SQLite::SQLite3)
 target_include_directories(study PRIVATE ${OPENSSL_INCLUDE_DIR} $<$<BOOL:${GNUTLS_FOUND}>:${GNUTLS_INCLUDE_DIR}>)
 target_compile_definitions(study PRIVATE $<$<BOOL:${GNUTLS_FOUND}>:${GNUTLS_DEFINITIONS}>)
+#configure_file("${CMAKE_CURRENT_SOURCE_DIR}/config.h.in" "${CMAKE_CURRENT_BINARY_DIR}/config.h")
+#include_directories("${CMAKE_CURRENT_BINARY_DIR}")
+#add_definitions(HAVE_CONFIG_H)

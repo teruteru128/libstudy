@@ -1,4 +1,6 @@
 
+#define _DEFAULT_SOURCE 1
+#define _GNU_SOURCE 1
 #include <java_random.h>
 #include <openssl/evp.h>
 #include <openssl/sha.h>
@@ -18,9 +20,8 @@ static EVP_PKEY *generatekey()
     EVP_PKEY *ephem = NULL;
 #if OPENSSL_VERSION_NUMBER >= 0x30000000L
     EVP_PKEY_CTX *keygenctx = EVP_PKEY_CTX_new_from_name(NULL, "EC", NULL);
-    const OSSL_PARAM params[]
-        = { OSSL_PARAM_utf8_string(OSSL_PKEY_PARAM_GROUP_NAME, SN_secp256k1, 0),
-            OSSL_PARAM_END };
+    const OSSL_PARAM params[] = {OSSL_PARAM_utf8_string(OSSL_PKEY_PARAM_GROUP_NAME, SN_secp256k1, 0),
+                                 OSSL_PARAM_END};
     EVP_PKEY_CTX_set_params(keygenctx, params);
     EVP_PKEY_keygen_init(keygenctx);
     EVP_PKEY_keygen(keygenctx, &ephem);
@@ -72,6 +73,7 @@ int genAckPayload(int streamNumber, int stealthLevel, unsigned char **payload,
     unsigned char priv[32] = "";
     unsigned char *pubkey = NULL;
     int64_t seed = 0;
+    struct drand48_data data;
     size_t dummyMessageLength = 0;
     unsigned char *dummyMessage = 0;
     ssize_t numberOfRandomBytes = 0;
@@ -92,7 +94,8 @@ int genAckPayload(int streamNumber, int stealthLevel, unsigned char **payload,
         }
         // convert to 0x0000XXXXXXXXXXXXL from 0xXXXXXXXXXXXX0000L
         seed = initialScramble(le64toh(seed));
-        dummyMessageLength = nextIntWithBounds(&seed, 567) + 234;
+        seed48_r((uint16_t *)&seed, &data);
+        dummyMessageLength = nextIntWithBounds(&data, 567) + 234;
         dummyMessage = malloc(dummyMessageLength);
         numberOfRandomBytes = getrandom(dummyMessage, dummyMessageLength, 0);
         if (numberOfRandomBytes < 0)
