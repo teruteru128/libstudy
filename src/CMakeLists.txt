@@ -14,6 +14,7 @@ bm_queue.c
 chainCookies.c
 changebase.c
 charset-convert.c
+clocktest.c
 crlffd.c
 epsp-parser.c
 genackpayload.c
