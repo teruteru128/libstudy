@@ -6,6 +6,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <arpa/inet.h>
+#include <endian.h>
 #include <openssl/sha.h>
 #include <errno.h>
 #include <sys/random.h>
@@ -332,18 +333,26 @@ uint64_t decodeVarint(unsigned char *data, size_t *consumed_bytes)
     }
     else if (data[0] == 0xfd)
     {
-        value = data[1] | (data[2] << 8);
+        /* バグ修正: Bitmessageのvarintはビッグエンディアン(PyBitmessageの
+         * addresses.py decodeVarintが`unpack('>H'/'>I'/'>Q', ...)`を使っている)。
+         * 以前はリトルエンディアンとして読んでいた */
+        uint16_t be;
+        memcpy(&be, data + 1, sizeof(be));
+        value = be16toh(be);
         offset = 3;
     }
     else if (data[0] == 0xfe)
     {
-        value = data[1] | (data[2] << 8) | (data[3] << 16) | (data[4] << 24);
+        uint32_t be;
+        memcpy(&be, data + 1, sizeof(be));
+        value = be32toh(be);
         offset = 5;
     }
     else if (data[0] == 0xff)
     {
-        value = ((uint64_t)data[1]) | ((uint64_t)data[2] << 8) | ((uint64_t)data[3] << 16) | ((uint64_t)data[4] << 24) |
-                ((uint64_t)data[5] << 32) | ((uint64_t)data[6] << 40) | ((uint64_t)data[7] << 48) | ((uint64_t)data[8] << 56);
+        uint64_t be;
+        memcpy(&be, data + 1, sizeof(be));
+        value = be64toh(be);
         offset = 9;
     }
     if (consumed_bytes != NULL)

@@ -7,6 +7,7 @@
 #include "bm_api.h"
 #include "nlz.h"
 #include <changebase.h>
+#include <endian.h>
 #include <err.h>
 #include <openssl/ec.h>
 #include <openssl/evp.h>
@@ -72,7 +73,11 @@ size_t get_varint_size(uint64_t u)
  */
 uint8_t *encodeVarint(uint8_t *out, uint64_t len)
 {
-    // TODO endian関数使ってエンコーディング
+    /* バグ修正: 0xfd/0xfe/0xff以降の多バイト部分はBitcoinのCompactSize(リトルエンディアン)
+     * とは違い、Bitmessageプロトコルではビッグエンディアン(PyBitmessageのaddresses.py
+     * encodeVarintが`pack('>H'/'>I'/'>Q', ...)`を使っている)。以前は1バイトずつ手動で
+     * リトルエンディアン順に書き込んでいたが、htobeXXを使えばエンディアン変換込みで
+     * そのままmemcpyできる(当時のTODOコメントが指していたのはこの話) */
     if (out == NULL)
     {
         return NULL;
@@ -84,28 +89,20 @@ uint8_t *encodeVarint(uint8_t *out, uint64_t len)
     else if (len <= 0xffff)
     {
         out[0] = 0xfd;
-        out[1] = (unsigned char)(len & 0xff);
-        out[2] = (unsigned char)((len >> 8) & 0xff);
+        uint16_t be = htobe16((uint16_t)len);
+        memcpy(out + 1, &be, sizeof(be));
     }
     else if (len <= 0xffffffff)
     {
         out[0] = 0xfe;
-        out[1] = (unsigned char)(len & 0xff);
-        out[2] = (unsigned char)((len >> 8) & 0xff);
-        out[3] = (unsigned char)((len >> 16) & 0xff);
-        out[4] = (unsigned char)((len >> 24) & 0xff);
+        uint32_t be = htobe32((uint32_t)len);
+        memcpy(out + 1, &be, sizeof(be));
     }
     else if (len <= 0xffffffffffffffffULL)
     {
         out[0] = 0xff;
-        out[1] = (unsigned char)(len & 0xff);
-        out[2] = (unsigned char)((len >> 8) & 0xff);
-        out[3] = (unsigned char)((len >> 16) & 0xff);
-        out[4] = (unsigned char)((len >> 24) & 0xff);
-        out[5] = (unsigned char)((len >> 32) & 0xff);
-        out[6] = (unsigned char)((len >> 40) & 0xff);
-        out[7] = (unsigned char)((len >> 48) & 0xff);
-        out[8] = (unsigned char)((len >> 56) & 0xff);
+        uint64_t be = htobe64(len);
+        memcpy(out + 1, &be, sizeof(be));
     }
     else
     {
