@@ -723,7 +723,7 @@ void process_command(struct fd_data *data, struct message *msg)
         fprintf(stderr, "Received inv message\n");
         struct inventory_message inv_msg;
         parseInventoryMessage(msg->payload, msg->length, &inv_msg);
-        // fprintf(stderr, "Number of inventory items: %" PRIu64 "\n", inv_msg.count);
+        fprintf(stderr, "Number of inventory items: %" PRIu64 "\n", inv_msg.count);
         /* for (uint64_t i = 0; i < inv_msg.count; i++)
         {
             fprintf(stderr, "  Item %" PRIu64 ": hash=", i);

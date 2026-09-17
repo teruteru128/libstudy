@@ -8,7 +8,7 @@
 typedef int32_t(nextfunc)(int bits, void *args);
 
 int64_t nextLong(struct drand48_data *);
-int32_t nextInt(int64_t *);
+int32_t nextInt(struct drand48_data *);
 int32_t nextIntWithBounds(struct drand48_data *, int32_t);
 int32_t nextintwithbounds2_r(int32_t bound, nextfunc *next, void *args);
 double nextDouble(struct drand48_data *);
